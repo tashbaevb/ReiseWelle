@@ -5,38 +5,46 @@ import java.util.UUID;
 public class TripStopPrice {
 
     private UUID id;
-    private UUID tripId;
-    private UUID stopId;
-    private double priceFromStart;
+    private Trip trip;
+    private Stop stop;
+    private Double priceFromStart;
 
-    public TripStopPrice(UUID tripId, UUID stopId, double priceFromStart) {
+    public TripStopPrice(Trip trip, Stop stop, Double priceFromStart) {
         this.id = UUID.randomUUID();
-        this.tripId = tripId;
-        this.stopId = stopId;
+        this.trip = trip;
+        this.stop = stop;
         this.priceFromStart = priceFromStart;
     }
+
     public UUID getId() {
         return id;
     }
-    public UUID getTripId() {
-        return tripId;
-    }
-    public UUID getStopId() {
-        return stopId;
-    }
-    public double getPriceFromStart() {
-        return priceFromStart;
-    }
+
     public void setId(UUID id) {
         this.id = id;
     }
-    public void setTripId(UUID tripId) {
-        this.tripId = tripId;
+
+    public Trip getTrip() {
+        return trip;
     }
-    public void setStopId(UUID stopId) {
-        this.stopId = stopId;
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
     }
-    public void setPriceFromStart(double priceFromStart) {
+
+    public Stop getStop() {
+        return stop;
+    }
+
+    public void setStop(Stop stop) {
+        this.stop = stop;
+    }
+
+    public Double getPriceFromStart() {
+        return priceFromStart;
+    }
+
+    public void setPriceFromStart(Double priceFromStart) {
         this.priceFromStart = priceFromStart;
     }
 }

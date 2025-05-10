@@ -6,30 +6,35 @@ public class City {
 
     private UUID id;
     private String name;
-    private UUID countryId;
+    private Country country;
 
-    public City(String name, UUID countryId) {
+    public City(String name, Country country) {
         this.id = UUID.randomUUID();
         this.name = name;
-        this.countryId = countryId;
+        this.country = country;
     }
 
     public UUID getId() {
         return id;
     }
-    public String getName() {
-        return name;
-    }
-    public UUID getCountryId() {
-        return countryId;
-    }
+
     public void setId(UUID id) {
         this.id = id;
     }
+
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
-    public void setCountryId(UUID countryId) {
-        this.countryId = countryId;
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
     }
 }

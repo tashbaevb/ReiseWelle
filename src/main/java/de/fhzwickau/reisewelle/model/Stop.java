@@ -6,16 +6,16 @@ import java.time.LocalDateTime;
 public class Stop {
 
     private UUID id;
-    private UUID tripId;
-    private UUID cityId;
+    private Trip trip;
+    private City city;
     private LocalDateTime arrivalTime;
     private LocalDateTime departureTime;
-    private int stopOrder;
+    private Integer stopOrder;
 
-    public Stop(UUID tripId, UUID cityId, LocalDateTime arrivalTime, LocalDateTime departureTime, int stopOrder) {
+    public Stop(Trip trip, City city, LocalDateTime arrivalTime, LocalDateTime departureTime, Integer stopOrder) {
         this.id = UUID.randomUUID();
-        this.tripId = tripId;
-        this.cityId = cityId;
+        this.trip = trip;
+        this.city = city;
         this.arrivalTime = arrivalTime;
         this.departureTime = departureTime;
         this.stopOrder = stopOrder;
@@ -24,37 +24,48 @@ public class Stop {
     public UUID getId() {
         return id;
     }
-    public UUID getTripId() {
-        return tripId;
-    }
-    public UUID getCityId() {
-        return cityId;
-    }
-    public LocalDateTime getArrivalTime() {
-        return arrivalTime;
-    }
-    public LocalDateTime getDepartureTime() {
-        return departureTime;
-    }
-    public int getStopOrder() {
-        return stopOrder;
-    }
+
     public void setId(UUID id) {
         this.id = id;
     }
-    public void setTripId(UUID tripId) {
-        this.tripId = tripId;
+
+    public Trip getTrip() {
+        return trip;
     }
-    public void setCityId(UUID cityId) {
-        this.cityId = cityId;
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
     }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public LocalDateTime getArrivalTime() {
+        return arrivalTime;
+    }
+
     public void setArrivalTime(LocalDateTime arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
+
+    public LocalDateTime getDepartureTime() {
+        return departureTime;
+    }
+
     public void setDepartureTime(LocalDateTime departureTime) {
         this.departureTime = departureTime;
     }
-    public void setStopOrder(int stopOrder) {
+
+    public Integer getStopOrder() {
+        return stopOrder;
+    }
+
+    public void setStopOrder(Integer stopOrder) {
         this.stopOrder = stopOrder;
     }
 }

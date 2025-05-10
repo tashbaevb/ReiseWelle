@@ -15,7 +15,7 @@ public class LoginController {
 
     @FXML
     private void onTripsButtonClick(ActionEvent event) {
-        openNewWindow(event, "trips_page.fxml", "Trips Page");
+        openNewWindow(event, "/de/fhzwickau/reisewelle/user/trips_page.fxml", "Trips Page");
     }
 
     @FXML

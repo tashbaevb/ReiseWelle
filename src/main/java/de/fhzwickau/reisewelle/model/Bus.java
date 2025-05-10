@@ -5,42 +5,49 @@ import java.util.UUID;
 public class Bus {
 
     private UUID id;
-    private String name;
-    private int totalSeats;
-    private UUID statusId;
+    private String busNumber;
+    private Integer totalSeats;
+    private Status status;
 
-    public Bus(String name, int totalSeats, UUID statusId) {
+    public Bus(String busNumber, int totalSeats, Status status) {
         this.id = UUID.randomUUID();
-        this.name = name;
+        this.busNumber = busNumber;
         this.totalSeats = totalSeats;
-        this.statusId = statusId;
+        this.status = status;
+    }
+
+    public Bus() {
     }
 
     public UUID getId() {
         return id;
     }
+
     public String getName() {
-        return name;
+        return busNumber;
     }
+
     public int getTotalSeats() {
         return totalSeats;
     }
 
-    public UUID getStatusId() {
-        return statusId;
+    public Status getStatus() {
+        return status;
     }
+
     public void setId(UUID id) {
         this.id = id;
     }
+
     public void setName(String name) {
-        this.name = name;
+        this.busNumber = name;
     }
+
     public void setTotalSeats(int totalSeats) {
         this.totalSeats = totalSeats;
     }
-    public void setStatusId(UUID statusId) {
-        this.statusId = statusId;
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
-
-
 }

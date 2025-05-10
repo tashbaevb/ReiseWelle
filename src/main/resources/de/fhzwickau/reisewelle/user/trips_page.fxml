@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="de.fhzwickau.reisewelle.controller.TripController">
+    <VBox>
+        <HBox spacing="5">
+            <TextField fx:id="fromCityField" promptText="Откуда"/>
+            <TextField fx:id="toCityField" promptText="Куда"/>
+            <DatePicker fx:id="datePicker"/>
+        </HBox>
+        <HBox spacing="5">
+            <Label text="Взрослые:"/>
+            <Spinner fx:id="adultSpinner"/>
+            <Label text="Дети:"/>
+            <Spinner fx:id="childSpinner"/>
+            <Label text="Велосипеды:"/>
+            <Spinner fx:id="bikeSpinner"/>
+            <Button text="Поиск" onAction="#onSearchClicked"/>
+        </HBox>
+
+
+        <TableView fx:id="tripTable" onMouseClicked="#onTripSelected">
+            <columns>
+                <TableColumn fx:id="fromColumn" text="Откуда"/>
+                <TableColumn fx:id="toColumn" text="Куда"/>
+                <TableColumn fx:id="departureColumn" text="Отправление"/>
+                <TableColumn fx:id="arrivalColumn" text="Прибытие"/>
+                <TableColumn fx:id="priceColumn" text="Цена"/>
+                <TableColumn fx:id="seatsColumn" text="Свободные места"/>
+            </columns>
+        </TableView>
+    </VBox>
+</AnchorPane>
+
+

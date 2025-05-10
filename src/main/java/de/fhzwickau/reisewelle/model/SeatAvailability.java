@@ -5,46 +5,55 @@ import java.util.UUID;
 public class SeatAvailability {
 
     private UUID id;
-    private UUID tripId;
-    private UUID startStopId;
-    private UUID endStopId;
-    private int availableSeats;
+    private Trip trip;
+    private Stop startStop;
+    private Stop endStop;
+    private Integer availableSeats;
 
-    public SeatAvailability(UUID tripId, UUID startStopId, UUID endStopId, int availableSeats) {
+    public SeatAvailability(Trip trip, Stop startStop, Stop endStop, int availableSeats) {
         this.id = UUID.randomUUID();
-        this.tripId = tripId;
-        this.startStopId = startStopId;
-        this.endStopId = endStopId;
+        this.trip = trip;
+        this.startStop = startStop;
+        this.endStop = endStop;
         this.availableSeats = availableSeats;
     }
 
     public UUID getId() {
         return id;
     }
-    public UUID getTripId() {
-        return tripId;
-    }
-    public UUID getStartStopId() {
-        return startStopId;
-    }
-    public UUID getEndStopId() {
-        return endStopId;
-    }
-    public int getAvailableSeats() {
-        return availableSeats;
-    }
+
     public void setId(UUID id) {
         this.id = id;
     }
-    public void setTripId(UUID tripId) {
-        this.tripId = tripId;
+
+    public Trip getTrip() {
+        return trip;
     }
-    public void setStartStopId(UUID startStopId) {
-        this.startStopId = startStopId;
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
     }
-    public void setEndStopId(UUID endStopId) {
-        this.endStopId = endStopId;
+
+    public Stop getStartStop() {
+        return startStop;
     }
+
+    public void setStartStop(Stop startStop) {
+        this.startStop = startStop;
+    }
+
+    public Stop getEndStop() {
+        return endStop;
+    }
+
+    public void setEndStop(Stop endStop) {
+        this.endStop = endStop;
+    }
+
+    public int getAvailableSeats() {
+        return availableSeats;
+    }
+
     public void setAvailableSeats(int availableSeats) {
         this.availableSeats = availableSeats;
     }

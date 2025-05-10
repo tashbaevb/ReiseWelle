@@ -2,24 +2,21 @@ package de.fhzwickau.reisewelle.model;
 
 import java.util.UUID;
 
-public class TripStatus {
+public class Status {
 
     private UUID id;
     private String name;
 
-    public TripStatus(String name) {
+    public Status(String name) {
         this.id = UUID.randomUUID();
         this.name = name;
-    }
-
-    public TripStatus() {
     }
 
     public UUID getId() {
         return id;
     }
 
-    public String getName() {
+    public String getname() {
         return name;
     }
 
@@ -27,7 +24,8 @@ public class TripStatus {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setname(String name) {
         this.name = name;
     }
+
 }
