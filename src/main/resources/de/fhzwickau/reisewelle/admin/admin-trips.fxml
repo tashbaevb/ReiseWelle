@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.AdminTripsController"
+      spacing="10" prefHeight="400.0" prefWidth="600.0" style="-fx-padding: 10;">
+    <children>
+        <Label text="Trips" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        <TableView fx:id="tripsTable" prefHeight="300.0">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="150.0" />
+                <TableColumn fx:id="busIdColumn" text="Bus ID" prefWidth="150.0" />
+                <TableColumn fx:id="driverIdColumn" text="Driver ID" prefWidth="150.0" />
+                <TableColumn fx:id="departureDateColumn" text="Departure Date" prefWidth="100.0" />
+                <TableColumn fx:id="statusColumn" text="Status" prefWidth="100.0" />
+            </columns>
+        </TableView>
+        <HBox spacing="10">
+            <children>
+                <Button fx:id="addButton" text="Add" onAction="#addTrip" />
+                <Button fx:id="editButton" text="Edit" onAction="#editTrip" disable="true" />
+                <Button fx:id="deleteButton" text="Delete" onAction="#deleteTrip" disable="true" />
+            </children>
+        </HBox>
+    </children>
+</VBox>

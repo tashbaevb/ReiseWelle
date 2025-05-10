@@ -20,7 +20,7 @@ public class LoginController {
 
     @FXML
     protected void onAdminButtonClick(ActionEvent event) {
-        openNewWindow(event, "admin-home-page.fxml", "Admin Home Page");
+        openNewWindow(event, "/de/fhzwickau/reisewelle/admin/admin-home-page.fxml", "Admin Home Page");
     }
 
     private void openNewWindow(ActionEvent event, String fxmlFileName, String title) {

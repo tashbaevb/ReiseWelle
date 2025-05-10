@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.AdminBusesController"
+      spacing="10" prefHeight="400.0" prefWidth="600.0" style="-fx-padding: 10;">
+    <children>
+        <Label text="Buses" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        <TableView fx:id="busesTable" prefHeight="300.0">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Name" prefWidth="200.0" />
+                <TableColumn fx:id="totalSeatsColumn" text="Total Seats" prefWidth="100.0" />
+                <TableColumn fx:id="statusColumn" text="Status" prefWidth="100.0" />
+            </columns>
+        </TableView>
+        <HBox spacing="10">
+            <children>
+                <Button fx:id="addButton" text="Add" onAction="#addBus" />
+                <Button fx:id="editButton" text="Edit" onAction="#editBus" disable="true" />
+                <Button fx:id="deleteButton" text="Delete" onAction="#deleteBus" disable="true" />
+            </children>
+        </HBox>
+    </children>
+</VBox>
