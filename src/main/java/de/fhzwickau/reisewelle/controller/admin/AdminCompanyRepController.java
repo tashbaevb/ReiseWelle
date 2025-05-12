@@ -35,24 +35,29 @@ public class AdminCompanyRepController {
     @FXML
     private void initialize() {
         emailColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
-        roleColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUserRole().getRoleName()));
+        roleColumn.setCellValueFactory(cellData -> {
+            User user = cellData.getValue();
+            String roleName = user.getUserRole() != null ? user.getUserRole().getRoleName() : "Unknown";
+            System.out.println("User: " + user.getEmail() + ", Role: " + roleName);
+            return new SimpleStringProperty(roleName);
+        });
         createdAtColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt() != null ? cellData.getValue().getCreatedAt().toString() : ""));
 
-        // Найти роль CompanyRep
+        // Найти роль Employee (или CompanyRep, в зависимости от названия)
         UserRole companyRepRole = userRoleRepository.findAll().stream()
-                .filter(role -> role.getRoleName().equals("CompanyRep"))
+                .filter(role -> role.getRoleName().equals("Employee"))
                 .findFirst()
                 .orElse(null);
         if (companyRepRole == null) {
-            System.out.println("Role 'CompanyRep' not found in the database");
+            System.out.println("Role 'Employee' not found in the database");
             return;
         }
         companyRepRoleId = companyRepRole.getId();
-        System.out.println("CompanyRep role ID: " + companyRepRoleId);
+        System.out.println("Employee role ID: " + companyRepRoleId);
 
-        // Загрузить только пользователей с ролью CompanyRep
+        // Загрузить только пользователей с ролью Employee
         companyReps.addAll(userRepository.findAll().stream()
-                .filter(user -> user.getUserRole().getId().equals(companyRepRoleId))
+                .filter(user -> user.getUserRole() != null && user.getUserRole().getId().equals(companyRepRoleId))
                 .toList());
         companyRepTable.setItems(companyReps);
 
@@ -101,12 +106,12 @@ public class AdminCompanyRepController {
             AddEditUserController controller = loader.getController();
             controller.setUser(user);
             controller.setStage(stage);
-            controller.setRoleFilter(companyRepRoleId); // Ограничим выбор роли только CompanyRep
+            controller.setRoleFilter(companyRepRoleId); // Ограничим выбор роли только Employee
 
             stage.setOnHidden(event -> {
                 System.out.println("Updating company reps table...");
                 companyReps.setAll(userRepository.findAll().stream()
-                        .filter(u -> u.getUserRole().getId().equals(companyRepRoleId))
+                        .filter(u -> u.getUserRole() != null && u.getUserRole().getId().equals(companyRepRoleId))
                         .toList());
             });
             stage.show();
