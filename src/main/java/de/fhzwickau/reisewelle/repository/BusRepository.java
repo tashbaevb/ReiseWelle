@@ -73,7 +73,8 @@ public class BusRepository {
         try (Connection conn = JDBCConfig.getInstance();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (bus.getId() == null) {
-                bus.setId(UUID.randomUUID());
+                bus.setId(UUID.randomUUID()); // Генерируем новый UUID для новой записи
+                System.out.println("Generating new ID: " + bus.getId());
                 stmt.setString(1, bus.getId().toString());
                 stmt.setString(2, bus.getBusNumber());
                 stmt.setInt(3, bus.getTotalSeats());

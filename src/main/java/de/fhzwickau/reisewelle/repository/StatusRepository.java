@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class StatusRepository {
+
     public List<Status> findAll() {
         List<Status> statuses = new ArrayList<>();
         String sql = "SELECT id, name FROM Status";
@@ -24,7 +25,9 @@ public class StatusRepository {
                 status.setId(UUID.fromString(rs.getString("id")));
                 statuses.add(status);
             }
+            System.out.println("Loaded statuses: " + statuses.size());
         } catch (SQLException e) {
+            System.err.println("Error in StatusRepository.findAll: " + e.getMessage());
             e.printStackTrace();
         }
         return statuses;
@@ -43,6 +46,7 @@ public class StatusRepository {
                 }
             }
         } catch (SQLException e) {
+            System.err.println("Error in StatusRepository.findById: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -57,25 +61,19 @@ public class StatusRepository {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (status.getId() == null) {
                 status.setId(UUID.randomUUID());
+                System.out.println("Generating new ID for status: " + status.getId());
                 stmt.setString(1, status.getId().toString());
                 stmt.setString(2, status.getName());
+                System.out.println("Executing INSERT: id=" + status.getId() + ", name=" + status.getName());
             } else {
                 stmt.setString(1, status.getName());
                 stmt.setString(2, status.getId().toString());
+                System.out.println("Executing UPDATE: id=" + status.getId() + ", name=" + status.getName());
             }
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("Rows affected: " + rowsAffected);
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void delete(UUID id) {
-        String sql = "DELETE FROM Status WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, id.toString());
-            stmt.executeUpdate();
-        } catch (SQLException e) {
+            System.err.println("Error in StatusRepository.save: " + e.getMessage());
             e.printStackTrace();
         }
     }

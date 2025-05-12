@@ -4,13 +4,14 @@
 <?import javafx.scene.control.*?>
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="de.fhzwickau.reisewelle.controller.admin.AdminCompanyRepsController"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.AdminCompanyRepController"
       spacing="10" prefHeight="400.0" prefWidth="600.0" style="-fx-padding: 10;">
     <children>
         <Label text="Company Representatives" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-        <TableView fx:id="companyRepsTable" prefHeight="300.0">
+        <TableView fx:id="companyRepTable" prefHeight="300.0">
             <columns>
                 <TableColumn fx:id="emailColumn" text="Email" prefWidth="200.0" />
+                <TableColumn fx:id="roleColumn" text="Role" prefWidth="150.0" />
                 <TableColumn fx:id="createdAtColumn" text="Created At" prefWidth="150.0" />
             </columns>
         </TableView>

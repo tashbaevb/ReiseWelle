@@ -12,7 +12,6 @@ public class Trip {
     private TripStatus status;
 
     public Trip(Bus bus, Driver driver, LocalDate departureDate, TripStatus status) {
-        this.id = UUID.randomUUID();
         this.bus = bus;
         this.driver = driver;
         this.departureDate = departureDate;

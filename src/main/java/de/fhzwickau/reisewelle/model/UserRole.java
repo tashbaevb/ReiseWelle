@@ -8,7 +8,6 @@ public class UserRole {
     private String roleName;
 
     public UserRole(String roleName) {
-        this.id = UUID.randomUUID();
         this.roleName = roleName;
     }
 
@@ -27,4 +26,9 @@ public class UserRole {
     public void setRoleName(String roleName) {
         this.roleName = roleName;
     }
+    @Override
+    public String toString() {
+        return roleName != null ? roleName : "Unnamed Status";
+    }
+
 }

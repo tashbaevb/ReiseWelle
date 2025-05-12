@@ -19,7 +19,7 @@ public class AdminHomeController {
 
     @FXML
     private void showCompanyReps() {
-        loadContent("admin-company-reps.fxml");
+        loadContent("admin-company-rep.fxml");
     }
 
     @FXML

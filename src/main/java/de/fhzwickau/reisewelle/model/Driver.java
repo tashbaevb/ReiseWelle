@@ -11,7 +11,6 @@ public class Driver {
     private Status status;
 
     public Driver(String firstName, String lastName, String licenseNumber, Status status) {
-        this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.licenseNumber = licenseNumber;
@@ -59,5 +58,12 @@ public class Driver {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return (firstName != null && lastName != null)
+                ? firstName + " " + lastName
+                : "Unnamed Status";
     }
 }

@@ -32,7 +32,7 @@ public class AdminBusesController {
     private void initialize() {
         busNumberColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getBusNumber()));
         totalSeatsColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getTotalSeats()).asObject());
-        statusColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus().getName()));
+        statusColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus() != null ? cellData.getValue().getStatus().getName() : ""));
 
         buses.addAll(busRepository.findAll());
         busesTable.setItems(buses);

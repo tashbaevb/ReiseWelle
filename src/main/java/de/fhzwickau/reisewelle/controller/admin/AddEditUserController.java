@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class AddEditUserController {
 
@@ -34,6 +35,21 @@ public class AddEditUserController {
         }
     }
 
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    public void setRoleFilter(UUID allowedRoleId) {
+        // Фильтруем роли, оставляем только ту, что соответствует allowedRoleId
+        List<UserRole> roles = userRoleRepository.findAll().stream()
+                .filter(role -> role.getId().equals(allowedRoleId))
+                .toList();
+        roleComboBox.getItems().setAll(roles);
+        if (!roles.isEmpty()) {
+            roleComboBox.setValue(roles.get(0)); // Устанавливаем роль по умолчанию
+        }
+    }
+
     @FXML
     private void initialize() {
         List<UserRole> roles = userRoleRepository.findAll();
@@ -42,26 +58,33 @@ public class AddEditUserController {
             System.out.println("Loaded role: id=" + role.getId() + ", name=" + role.getRoleName());
         }
         roleComboBox.getItems().setAll(roles);
+    }
 
-        saveButton.setOnAction(event -> {
-            if (validateInput()) {
-                if (user == null) {
-                    user = new User();
+    @FXML
+    private void save() {
+        if (validateInput()) {
+            if (user == null) {
+                String email = emailField.getText();
+                String password = passwordField.getText();
+                UserRole selectedRole = roleComboBox.getValue();
+                if (selectedRole == null) {
+                    System.out.println("Error: No role selected");
+                    return;
                 }
+                user = new User(email, password, selectedRole, LocalDateTime.now());
+                System.out.println("Saving new user: email=" + user.getEmail() + ", role=" + user.getUserRole().getRoleName());
+            } else {
                 user.setEmail(emailField.getText());
                 user.setPassword(passwordField.getText());
                 UserRole selectedRole = roleComboBox.getValue();
                 if (selectedRole != null) {
                     user.setUserRole(selectedRole);
-                    System.out.println("Saving user: email=" + user.getEmail() + ", role=" + selectedRole.getRoleName());
-                } else {
-                    System.out.println("Error: No role selected");
-                    return;
                 }
-                userRepository.save(user);
-                stage.close();
+                System.out.println("Updating user: email=" + user.getEmail() + ", role=" + user.getUserRole().getRoleName());
             }
-        });
+            userRepository.save(user);
+            stage.close();
+        }
     }
 
     private boolean validateInput() {
@@ -74,7 +97,8 @@ public class AddEditUserController {
         return true;
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
+    @FXML
+    private void cancel() {
+        stage.close();
     }
 }

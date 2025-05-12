@@ -8,7 +8,6 @@ public class Status {
     private String name;
 
     public Status(String name) {
-        this.id = UUID.randomUUID();
         this.name = name;
     }
 
@@ -28,4 +27,8 @@ public class Status {
         this.name = name;
     }
 
+    @Override
+    public String toString() {
+        return name != null ? name : "Unnamed Status";
+    }
 }

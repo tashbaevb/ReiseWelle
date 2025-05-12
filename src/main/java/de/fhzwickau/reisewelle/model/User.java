@@ -19,7 +19,7 @@ public class User {
     }
 
     public User(String email, String password, UserRole userRole, LocalDateTime created_at) {
-        this.id = UUID.randomUUID();
+
         this.email = email;
         this.password = password;
         this.userRole = userRole;

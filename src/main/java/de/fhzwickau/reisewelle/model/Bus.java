@@ -10,7 +10,6 @@ public class Bus {
     private Status status;
 
     public Bus(String busNumber, int totalSeats, Status status) {
-        this.id = UUID.randomUUID();
         this.busNumber = busNumber;
         this.totalSeats = totalSeats;
         this.status = status;
@@ -49,5 +48,10 @@ public class Bus {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return busNumber != null ? busNumber : "Unnamed Status";
     }
 }

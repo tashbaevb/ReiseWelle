@@ -112,27 +112,27 @@ public class UserRepository {
     public void save(User user) {
         String sql = user.getId() == null ?
                 "INSERT INTO [dbo].[User] (id, email, password, user_role_id, created_at) VALUES (?, ?, ?, ?, ?)" :
-                "UPDATE [dbo].[User] SET email = ?, password = ?, user_role_id = ? WHERE id = ?";
+                "UPDATE [dbo].[User] SET email = ?, password = ?, user_role_id = ?, created_at = ? WHERE id = ?";
 
         try (Connection conn = JDBCConfig.getInstance();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (user.getId() == null) {
                 user.setId(UUID.randomUUID());
+                System.out.println("Generating new ID for user: " + user.getId());
                 stmt.setString(1, user.getId().toString());
                 stmt.setString(2, user.getEmail());
                 stmt.setString(3, user.getPassword());
                 stmt.setString(4, user.getUserRole().getId().toString());
                 stmt.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
-                System.out.println("Inserting new user: id=" + user.getId() + ", email=" + user.getEmail() + ", roleId=" + user.getUserRole().getId());
+                System.out.println("Executing INSERT: id=" + user.getId() + ", email=" + user.getEmail() + ", roleId=" + user.getUserRole().getId());
             } else {
                 stmt.setString(1, user.getEmail());
                 stmt.setString(2, user.getPassword());
                 stmt.setString(3, user.getUserRole().getId().toString());
-                stmt.setString(4, user.getId().toString());
-                System.out.println("Updating user: id=" + user.getId() + ", email=" + user.getEmail() + ", roleId=" + user.getUserRole().getId());
+                stmt.setTimestamp(4, user.getCreatedAt() != null ? Timestamp.valueOf(user.getCreatedAt()) : null);
+                stmt.setString(5, user.getId().toString());
+                System.out.println("Executing UPDATE: id=" + user.getId() + ", email=" + user.getEmail() + ", roleId=" + user.getUserRole().getId());
             }
-            System.out.println("Executing SQL: " + sql);
-            System.out.println("Parameters: email=" + user.getEmail() + ", password=" + user.getPassword() + ", user_role_id=" + user.getUserRole().getId());
             int rowsAffected = stmt.executeUpdate();
             System.out.println("Rows affected: " + rowsAffected);
         } catch (SQLException e) {
