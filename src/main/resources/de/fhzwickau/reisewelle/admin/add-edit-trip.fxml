@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.AddEditTripController"
+      spacing="10" prefWidth="300.0" prefHeight="250.0" style="-fx-padding: 10;">
+    <children>
+        <Label text="Add/Edit Trip" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        <Label text="Bus" />
+        <ComboBox fx:id="busComboBox" prefWidth="150.0" />
+        <Label text="Driver" />
+        <ComboBox fx:id="driverComboBox" prefWidth="150.0" />
+        <Label text="Departure Date" />
+        <DatePicker fx:id="departureDatePicker" />
+        <Label text="Status" />
+        <ComboBox fx:id="statusComboBox" prefWidth="150.0" />
+        <HBox spacing="10" alignment="CENTER">
+            <children>
+                <Button text="Save" onAction="#save" />
+                <Button text="Cancel" onAction="#cancel" />
+            </children>
+        </HBox>
+    </children>
+</VBox>

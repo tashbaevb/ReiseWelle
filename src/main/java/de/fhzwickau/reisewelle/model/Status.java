@@ -16,7 +16,7 @@ public class Status {
         return id;
     }
 
-    public String getname() {
+    public String getName() {
         return name;
     }
 
@@ -24,7 +24,7 @@ public class Status {
         this.id = id;
     }
 
-    public void setname(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 

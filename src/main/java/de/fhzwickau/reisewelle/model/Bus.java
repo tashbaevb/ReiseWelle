@@ -23,7 +23,7 @@ public class Bus {
         return id;
     }
 
-    public String getName() {
+    public String getBusNumber() {
         return busNumber;
     }
 
@@ -39,7 +39,7 @@ public class Bus {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setBusNumber(String name) {
         this.busNumber = name;
     }
 

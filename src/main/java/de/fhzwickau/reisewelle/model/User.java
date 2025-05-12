@@ -11,6 +11,13 @@ public class User {
     private UserRole userRole;
     private LocalDateTime created_at;
 
+    public User() {
+        this.email = "";
+        this.password = "";
+        this.userRole = null;
+        this.created_at = null;
+    }
+
     public User(String email, String password, UserRole userRole, LocalDateTime created_at) {
         this.id = UUID.randomUUID();
         this.email = email;
@@ -51,11 +58,11 @@ public class User {
         this.userRole = userRole;
     }
 
-    public LocalDateTime getCreated_at() {
+    public LocalDateTime getCreatedAt() {
         return created_at;
     }
 
-    public void setCreated_at(LocalDateTime created_at) {
+    public void setCreatedAt(LocalDateTime created_at) {
         this.created_at = created_at;
     }
 }

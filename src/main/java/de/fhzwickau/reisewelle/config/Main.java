@@ -7,11 +7,11 @@ import java.sql.Statement;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         Connection connection = JDBCConfig.getInstance();
         if (connection != null) {
             String selectQuery = """
-                    SELECT * FROM Users;
+                    SELECT * FROM Eblan;
                     """;
 
             try (Statement stmt = connection.createStatement();

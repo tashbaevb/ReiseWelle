@@ -1,44 +1,39 @@
 package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.User;
+import de.fhzwickau.reisewelle.repository.UserRepository;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class AdminCompanyRepsController {
 
-    @FXML
-    private TableView<User> companyRepsTable;
-    @FXML
-    private TableColumn<User, String> usernameColumn;
-    @FXML
-    private TableColumn<User, String> emailColumn;
-    @FXML
-    private TableColumn<User, String> createdAtColumn;
-    @FXML
-    private Button addButton;
-    @FXML
-    private Button editButton;
-    @FXML
-    private Button deleteButton;
+    @FXML private TableView<User> companyRepsTable;
+    @FXML private TableColumn<User, String> emailColumn;
+    @FXML private TableColumn<User, String> createdAtColumn;
+    @FXML private Button addButton;
+    @FXML private Button editButton;
+    @FXML private Button deleteButton;
 
     private ObservableList<User> companyReps = FXCollections.observableArrayList();
+    private UserRepository userRepository = new UserRepository();
 
     @FXML
     private void initialize() {
-        // Настройка столбцов таблицы
-        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        emailColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
+        createdAtColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt() != null ? cellData.getValue().getCreatedAt().toString() : ""));
 
-        // Привязка данных к таблице
+        companyReps.addAll(userRepository.findCompanyReps());
         companyRepsTable.setItems(companyReps);
 
-        // Активация кнопок Edit/Delete при выборе строки
         companyRepsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             editButton.setDisable(newSelection == null);
             deleteButton.setDisable(newSelection == null);
@@ -47,16 +42,47 @@ public class AdminCompanyRepsController {
 
     @FXML
     private void addCompanyRep() {
-        // TODO: Открыть форму для добавления представителя компании
+        showAddEditDialog(null);
     }
 
     @FXML
     private void editCompanyRep() {
-        // TODO: Открыть форму для редактирования выбранного представителя
+        User selected = companyRepsTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            showAddEditDialog(selected);
+        }
     }
 
     @FXML
     private void deleteCompanyRep() {
-        // TODO: Удалить выбранного представителя
+        User selected = companyRepsTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirm Deletion");
+            alert.setHeaderText("Are you sure you want to delete this company representative?");
+            alert.setContentText("Email: " + selected.getEmail());
+            if (alert.showAndWait().get() == ButtonType.OK) {
+                userRepository.delete(selected.getId());
+                companyReps.remove(selected);
+            }
+        }
+    }
+
+    private void showAddEditDialog(User user) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/admin/add-edit-user.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(loader.load()));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle(user == null ? "Add Company Representative" : "Edit Company Representative");
+
+            AddEditUserController controller = loader.getController();
+            controller.setUser(user);
+
+            stage.setOnHidden(event -> companyReps.setAll(userRepository.findCompanyReps()));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

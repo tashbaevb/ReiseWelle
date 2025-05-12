@@ -10,10 +10,9 @@
         <Label text="Trips" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
         <TableView fx:id="tripsTable" prefHeight="300.0">
             <columns>
-                <TableColumn fx:id="idColumn" text="ID" prefWidth="150.0" />
-                <TableColumn fx:id="busIdColumn" text="Bus ID" prefWidth="150.0" />
-                <TableColumn fx:id="driverIdColumn" text="Driver ID" prefWidth="150.0" />
-                <TableColumn fx:id="departureDateColumn" text="Departure Date" prefWidth="100.0" />
+                <TableColumn fx:id="busColumn" text="Bus" prefWidth="150.0" />
+                <TableColumn fx:id="driverColumn" text="Driver" prefWidth="150.0" />
+                <TableColumn fx:id="departureDateColumn" text="Departure Date" prefWidth="150.0" />
                 <TableColumn fx:id="statusColumn" text="Status" prefWidth="100.0" />
             </columns>
         </TableView>

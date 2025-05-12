@@ -10,7 +10,7 @@
         <Label text="Buses" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
         <TableView fx:id="busesTable" prefHeight="300.0">
             <columns>
-                <TableColumn fx:id="nameColumn" text="Name" prefWidth="200.0" />
+                <TableColumn fx:id="busNumberColumn" text="Bus Number" prefWidth="150.0" />
                 <TableColumn fx:id="totalSeatsColumn" text="Total Seats" prefWidth="100.0" />
                 <TableColumn fx:id="statusColumn" text="Status" prefWidth="100.0" />
             </columns>
