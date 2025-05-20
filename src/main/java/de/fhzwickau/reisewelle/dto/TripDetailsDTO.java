@@ -1,4 +1,4 @@
-package de.fhzwickau.reisewelle.model;
+package de.fhzwickau.reisewelle.dto;
 
 import java.util.List;
 

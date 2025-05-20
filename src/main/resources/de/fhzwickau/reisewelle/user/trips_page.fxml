@@ -3,12 +3,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="de.fhzwickau.reisewelle.controller.TripController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="de.fhzwickau.reisewelle.controller.user.TripController">
     <VBox>
         <HBox spacing="5">
             <TextField fx:id="fromCityField" promptText="Откуда"/>
             <TextField fx:id="toCityField" promptText="Куда"/>
-            <DatePicker fx:id="datePicker"/>
+            <AnchorPane fx:id="datetimePickerContainer" prefHeight="40" prefWidth="250"/>
+
         </HBox>
         <HBox spacing="5">
             <Label text="Взрослые:"/>
@@ -33,5 +34,3 @@
         </TableView>
     </VBox>
 </AnchorPane>
-
-

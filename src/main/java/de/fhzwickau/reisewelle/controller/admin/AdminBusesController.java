@@ -1,7 +1,7 @@
 package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.Bus;
-import de.fhzwickau.reisewelle.repository.BusRepository;
+import de.fhzwickau.reisewelle.dao.BusRepository;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;

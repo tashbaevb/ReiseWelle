@@ -1,32 +1,43 @@
-package de.fhzwickau.reisewelle.controller;
+package de.fhzwickau.reisewelle.controller.user;
 
-import de.fhzwickau.reisewelle.model.TripSegmentDTO;
-import de.fhzwickau.reisewelle.repository.TripRepository;
+import de.fhzwickau.reisewelle.dto.TripSegmentDTO;
+import de.fhzwickau.reisewelle.dao.TripRepository;
+import de.fhzwickau.reisewelle.utils.CustomDateTimePicker;
+import de.fhzwickau.reisewelle.utils.DateTimePicker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class TripController implements Initializable {
 
+    private CustomDateTimePicker dateTimePicker;
+
     @FXML private TextField fromCityField;
     @FXML private TextField toCityField;
-    @FXML private DatePicker datePicker;
     @FXML private Spinner<Integer> adultSpinner;
     @FXML private Spinner<Integer> childSpinner;
     @FXML private Spinner<Integer> bikeSpinner;
+    @FXML private AnchorPane datetimePickerContainer;
 
     @FXML private TableView<TripSegmentDTO> tripTable;
     @FXML private TableColumn<TripSegmentDTO, String> fromColumn;
@@ -38,6 +49,9 @@ public class TripController implements Initializable {
 
     private final TripRepository tripRepo = new TripRepository();
 
+    public TripController() throws SQLException {
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         fromColumn.setCellValueFactory(new PropertyValueFactory<>("fromCity"));
@@ -47,24 +61,54 @@ public class TripController implements Initializable {
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         seatsColumn.setCellValueFactory(new PropertyValueFactory<>("availableSeats"));
 
-        adultSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 1));
-        childSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0));
-        bikeSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10, 0));
+        adultSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 40, 1));
+        childSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 40, 0));
+        bikeSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0));
+
+        CustomDateTimePicker dateTimePicker = new CustomDateTimePicker();
+        dateTimePicker.setPrefWidth(250);
+        datetimePickerContainer.getChildren().add(dateTimePicker);
+        AnchorPane.setTopAnchor(dateTimePicker, 0.0);
+        AnchorPane.setRightAnchor(dateTimePicker, 0.0);
+        AnchorPane.setBottomAnchor(dateTimePicker, 0.0);
+        AnchorPane.setLeftAnchor(dateTimePicker, 0.0);
+
+        this.dateTimePicker = dateTimePicker;
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
+        departureColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.format(formatter));
+            }
+        });
+
+        arrivalColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.format(formatter));
+            }
+        });
+
     }
 
     @FXML
     public void onSearchClicked() {
         String from = fromCityField.getText();
         String to = toCityField.getText();
-        LocalDate date = datePicker.getValue();
+        LocalDateTime dateTime = dateTimePicker.getDateTimeValue();
 
         int adults = adultSpinner.getValue();
         int children = childSpinner.getValue();
         int bikes = bikeSpinner.getValue();
 
-        List<TripSegmentDTO> trips = tripRepo.searchTrips(from, to, date, adults, children, bikes);
+        List<TripSegmentDTO> trips = tripRepo.searchTrips(from, to, dateTime, adults, children, bikes);
         tripTable.getItems().setAll(trips);
     }
+
 
     @FXML
     public void onTripSelected(MouseEvent event) throws IOException {

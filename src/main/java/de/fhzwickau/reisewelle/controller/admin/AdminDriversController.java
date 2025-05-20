@@ -1,7 +1,7 @@
 package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.Driver;
-import de.fhzwickau.reisewelle.repository.DriverRepository;
+import de.fhzwickau.reisewelle.dao.DriverRepository;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

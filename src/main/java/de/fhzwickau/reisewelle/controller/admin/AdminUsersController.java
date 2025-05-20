@@ -1,7 +1,7 @@
 package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.User;
-import de.fhzwickau.reisewelle.repository.UserRepository;
+import de.fhzwickau.reisewelle.dao.UserRepository;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

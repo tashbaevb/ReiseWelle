@@ -2,8 +2,8 @@ package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.Driver;
 import de.fhzwickau.reisewelle.model.Status;
-import de.fhzwickau.reisewelle.repository.DriverRepository;
-import de.fhzwickau.reisewelle.repository.StatusRepository;
+import de.fhzwickau.reisewelle.dao.DriverRepository;
+import de.fhzwickau.reisewelle.dao.StatusRepository;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;

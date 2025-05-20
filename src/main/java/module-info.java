@@ -16,4 +16,7 @@ module de.fhzwickau.reisewelle {
     exports de.fhzwickau.reisewelle.controller.admin;
     opens de.fhzwickau.reisewelle.controller.admin to javafx.fxml;
     exports de.fhzwickau.reisewelle.model;
+    exports de.fhzwickau.reisewelle.controller.user;
+    opens de.fhzwickau.reisewelle.controller.user to javafx.fxml;
+    exports de.fhzwickau.reisewelle.dto;
 }

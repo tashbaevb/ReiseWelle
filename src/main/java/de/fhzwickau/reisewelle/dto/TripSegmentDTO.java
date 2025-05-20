@@ -1,4 +1,4 @@
-package de.fhzwickau.reisewelle.model;
+package de.fhzwickau.reisewelle.dto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -10,10 +10,11 @@ public class TripSegmentDTO {
     private String toCity;
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
-    private double price;
-    private int availableSeats;
+    private Double price;
+    private Integer availableSeats;
+    private Integer availableBikes;
 
-    public TripSegmentDTO(UUID tripId, String fromCity, String toCity, LocalDateTime departureTime, LocalDateTime arrivalTime, double price, int availableSeats) {
+    public TripSegmentDTO(UUID tripId, String fromCity, String toCity, LocalDateTime departureTime, LocalDateTime arrivalTime, double price, int availableSeats, int availableBikes) {
         this.tripId = tripId;
         this.fromCity = fromCity;
         this.toCity = toCity;
@@ -21,6 +22,7 @@ public class TripSegmentDTO {
         this.arrivalTime = arrivalTime;
         this.price = price;
         this.availableSeats = availableSeats;
+        this.availableBikes = availableBikes;
     }
 
     public UUID getTripId() {
@@ -77,5 +79,13 @@ public class TripSegmentDTO {
 
     public void setAvailableSeats(int availableSeats) {
         this.availableSeats = availableSeats;
+    }
+
+    public int getAvailableBikes() {
+        return availableBikes;
+    }
+
+    public void setAvailableBikes(int availableBikes) {
+        this.availableBikes = availableBikes;
     }
 }

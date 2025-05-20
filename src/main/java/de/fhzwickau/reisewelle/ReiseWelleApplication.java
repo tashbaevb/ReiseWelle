@@ -17,6 +17,11 @@ public class ReiseWelleApplication extends Application {
         stage.show();
     }
 
+    @Override
+    public void stop() {
+
+    }
+
     public static void main(String[] args) {
         launch();
     }

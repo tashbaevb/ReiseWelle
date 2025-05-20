@@ -6,11 +6,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="de.fhzwickau.reisewelle.controller.DetailTripController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="de.fhzwickau.reisewelle.controller.user.DetailTripController">
     <VBox spacing="10">
         <Label fx:id="driverLabel" text="Водитель"/>
         <Label fx:id="busLabel" text="Автобус"/>
-        <Label fx:id="availableSeatsLabel" text="Свободно мест"/>
         <Label text="Остановки:"/>
         <ListView fx:id="stopsList"/>
     </VBox>

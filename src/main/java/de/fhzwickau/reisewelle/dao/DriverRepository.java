@@ -1,4 +1,4 @@
-package de.fhzwickau.reisewelle.repository;
+package de.fhzwickau.reisewelle.dao;
 
 import de.fhzwickau.reisewelle.config.JDBCConfig;
 import de.fhzwickau.reisewelle.model.Driver;
