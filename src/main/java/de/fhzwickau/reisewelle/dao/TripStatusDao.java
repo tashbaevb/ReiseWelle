@@ -11,13 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class TripStatusRepository {
-    public List<TripStatus> findAll() {
+public class TripStatusDao {
+
+    public List<TripStatus> findAll() throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         List<TripStatus> tripStatuses = new ArrayList<>();
         String sql = "SELECT id, name FROM TripStatus";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 TripStatus tripStatus = new TripStatus(rs.getString("name"));
@@ -30,10 +31,10 @@ public class TripStatusRepository {
         return tripStatuses;
     }
 
-    public TripStatus findById(UUID id) {
+    public TripStatus findById(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = "SELECT id, name FROM TripStatus WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -48,13 +49,13 @@ public class TripStatusRepository {
         return null;
     }
 
-    public void save(TripStatus tripStatus) {
+    public void save(TripStatus tripStatus) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = tripStatus.getId() == null ?
                 "INSERT INTO TripStatus (id, name) VALUES (?, ?)" :
                 "UPDATE TripStatus SET name = ? WHERE id = ?";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (tripStatus.getId() == null) {
                 tripStatus.setId(UUID.randomUUID());
                 stmt.setString(1, tripStatus.getId().toString());
@@ -69,10 +70,10 @@ public class TripStatusRepository {
         }
     }
 
-    public void delete(UUID id) {
+    public void delete(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = "DELETE FROM TripStatus WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
         } catch (SQLException e) {

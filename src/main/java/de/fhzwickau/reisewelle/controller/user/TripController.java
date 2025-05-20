@@ -1,9 +1,8 @@
 package de.fhzwickau.reisewelle.controller.user;
 
 import de.fhzwickau.reisewelle.dto.TripSegmentDTO;
-import de.fhzwickau.reisewelle.dao.TripRepository;
+import de.fhzwickau.reisewelle.dao.TripDao;
 import de.fhzwickau.reisewelle.utils.CustomDateTimePicker;
-import de.fhzwickau.reisewelle.utils.DateTimePicker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -47,10 +46,7 @@ public class TripController implements Initializable {
     @FXML private TableColumn<TripSegmentDTO, Double> priceColumn;
     @FXML private TableColumn<TripSegmentDTO, Integer> seatsColumn;
 
-    private final TripRepository tripRepo = new TripRepository();
-
-    public TripController() throws SQLException {
-    }
+    private final TripDao tripRepo = new TripDao();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -96,7 +92,7 @@ public class TripController implements Initializable {
     }
 
     @FXML
-    public void onSearchClicked() {
+    public void onSearchClicked() throws SQLException {
         String from = fromCityField.getText();
         String to = toCityField.getText();
         LocalDateTime dateTime = dateTimePicker.getDateTimeValue();
@@ -111,7 +107,7 @@ public class TripController implements Initializable {
 
 
     @FXML
-    public void onTripSelected(MouseEvent event) throws IOException {
+    public void onTripSelected(MouseEvent event) throws IOException, SQLException {
         TripSegmentDTO selected = tripTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/user/detail_trip.fxml"));

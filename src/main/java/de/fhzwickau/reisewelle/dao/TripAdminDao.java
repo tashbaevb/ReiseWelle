@@ -15,25 +15,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class TripAdminRepository {
-    private final BusRepository busRepository = new BusRepository();
-    private final DriverRepository driverRepository = new DriverRepository();
-    private final TripStatusRepository tripStatusRepository = new TripStatusRepository();
+public class TripAdminDao {
 
-    public List<Trip> findAll() {
+    private final BusDao busDao = new BusDao();
+    private final DriverDao driverDao = new DriverDao();
+    private final TripStatusDao tripStatusDao = new TripStatusDao();
+
+    public List<Trip> findAll() throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         List<Trip> trips = new ArrayList<>();
         String sql = "SELECT id, bus_id, driver_id, departure_date, status_id FROM Trip";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 UUID busId = UUID.fromString(rs.getString("bus_id"));
                 UUID driverId = UUID.fromString(rs.getString("driver_id"));
                 UUID statusId = UUID.fromString(rs.getString("status_id"));
-                Bus bus = busRepository.findById(busId);
-                Driver driver = driverRepository.findById(driverId);
-                TripStatus status = tripStatusRepository.findById(statusId);
+                Bus bus = busDao.findById(busId);
+                Driver driver = driverDao.findById(driverId);
+                TripStatus status = tripStatusDao.findById(statusId);
                 Trip trip = new Trip(
                         bus,
                         driver,
@@ -49,19 +50,21 @@ public class TripAdminRepository {
         return trips;
     }
 
-    public Trip findById(UUID id) {
+    public Trip findById(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = "SELECT id, bus_id, driver_id, departure_date, status_id FROM Trip WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     UUID busId = UUID.fromString(rs.getString("bus_id"));
                     UUID driverId = UUID.fromString(rs.getString("driver_id"));
                     UUID statusId = UUID.fromString(rs.getString("status_id"));
-                    Bus bus = busRepository.findById(busId);
-                    Driver driver = driverRepository.findById(driverId);
-                    TripStatus status = tripStatusRepository.findById(statusId);
+                    Bus bus = busDao.findById(busId);
+                    Driver driver = driverDao.findById(driverId);
+                    TripStatus status = tripStatusDao.findById(statusId);
                     Trip trip = new Trip(
                             bus,
                             driver,
@@ -78,13 +81,13 @@ public class TripAdminRepository {
         return null;
     }
 
-    public void save(Trip trip) {
+    public void save(Trip trip) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = trip.getId() == null ?
                 "INSERT INTO Trip (id, bus_id, driver_id, departure_date, status_id) VALUES (?, ?, ?, ?, ?)" :
                 "UPDATE Trip SET bus_id = ?, driver_id = ?, departure_date = ?, status_id = ? WHERE id = ?";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (trip.getId() == null) {
                 trip.setId(UUID.randomUUID());
                 stmt.setString(1, trip.getId().toString());
@@ -105,10 +108,10 @@ public class TripAdminRepository {
         }
     }
 
-    public void delete(UUID id) {
+    public void delete(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = "DELETE FROM Trip WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
         } catch (SQLException e) {

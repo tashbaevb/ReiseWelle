@@ -2,14 +2,15 @@ package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.User;
 import de.fhzwickau.reisewelle.model.UserRole;
-import de.fhzwickau.reisewelle.dao.UserRepository;
-import de.fhzwickau.reisewelle.dao.UserRoleRepository;
+import de.fhzwickau.reisewelle.dao.UserDao;
+import de.fhzwickau.reisewelle.dao.UserRoleDao;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -22,8 +23,8 @@ public class AddEditUserController {
     @FXML private Button saveButton;
 
     private User user;
-    private UserRepository userRepository = new UserRepository();
-    private UserRoleRepository userRoleRepository = new UserRoleRepository();
+    private final UserDao userDao = new UserDao();
+    private final UserRoleDao userRoleDao = new UserRoleDao();
     private Stage stage;
 
     public void setUser(User user) {
@@ -39,9 +40,9 @@ public class AddEditUserController {
         this.stage = stage;
     }
 
-    public void setRoleFilter(UUID allowedRoleId) {
+    public void setRoleFilter(UUID allowedRoleId) throws SQLException {
         // Фильтруем роли, оставляем только ту, что соответствует allowedRoleId
-        List<UserRole> roles = userRoleRepository.findAll().stream()
+        List<UserRole> roles = userRoleDao.findAll().stream()
                 .filter(role -> role.getId().equals(allowedRoleId))
                 .toList();
         roleComboBox.getItems().setAll(roles);
@@ -51,8 +52,8 @@ public class AddEditUserController {
     }
 
     @FXML
-    private void initialize() {
-        List<UserRole> roles = userRoleRepository.findAll();
+    private void initialize() throws SQLException {
+        List<UserRole> roles = userRoleDao.findAll();
         System.out.println("Loaded roles count: " + roles.size());
         for (UserRole role : roles) {
             System.out.println("Loaded role: id=" + role.getId() + ", name=" + role.getRoleName());
@@ -61,7 +62,7 @@ public class AddEditUserController {
     }
 
     @FXML
-    private void save() {
+    private void save() throws SQLException {
         if (validateInput()) {
             if (user == null) {
                 String email = emailField.getText();
@@ -82,7 +83,7 @@ public class AddEditUserController {
                 }
                 System.out.println("Updating user: email=" + user.getEmail() + ", role=" + user.getUserRole().getRoleName());
             }
-            userRepository.save(user);
+            userDao.save(user);
             stage.close();
         }
     }

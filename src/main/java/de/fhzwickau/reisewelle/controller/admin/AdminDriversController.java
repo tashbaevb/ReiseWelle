@@ -1,7 +1,7 @@
 package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.Driver;
-import de.fhzwickau.reisewelle.dao.DriverRepository;
+import de.fhzwickau.reisewelle.dao.DriverDao;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,6 +13,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class AdminDriversController {
 
@@ -26,16 +27,16 @@ public class AdminDriversController {
     @FXML private Button deleteButton;
 
     private ObservableList<Driver> drivers = FXCollections.observableArrayList();
-    private DriverRepository driverRepository = new DriverRepository();
+    private DriverDao driverDao = new DriverDao();
 
     @FXML
-    private void initialize() {
+    private void initialize() throws SQLException {
         firstNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFirstName()));
         lastNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLastName()));
         licenseNumberColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLicenseNumber()));
         statusColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus().getName()));
 
-        drivers.addAll(driverRepository.findAll());
+        drivers.addAll(driverDao.findAll());
         driversTable.setItems(drivers);
 
         driversTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -58,7 +59,7 @@ public class AdminDriversController {
     }
 
     @FXML
-    private void deleteDriver() {
+    private void deleteDriver() throws SQLException {
         Driver selected = driversTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -66,7 +67,7 @@ public class AdminDriversController {
             alert.setHeaderText("Are you sure you want to delete this driver?");
             alert.setContentText("Name: " + selected.getFirstName() + " " + selected.getLastName());
             if (alert.showAndWait().get() == ButtonType.OK) {
-                driverRepository.delete(selected.getId());
+                driverDao.delete(selected.getId());
                 drivers.remove(selected);
             }
         }
@@ -83,7 +84,13 @@ public class AdminDriversController {
             AddEditDriverController controller = loader.getController();
             controller.setDriver(driver);
 
-            stage.setOnHidden(event -> drivers.setAll(driverRepository.findAll()));
+            stage.setOnHidden(event -> {
+                try {
+                    drivers.setAll(driverDao.findAll());
+                } catch (SQLException sqle) {
+                    sqle.printStackTrace();
+                }
+            });
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,7 +1,7 @@
 package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.Bus;
-import de.fhzwickau.reisewelle.dao.BusRepository;
+import de.fhzwickau.reisewelle.dao.BusDao;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -14,6 +14,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.sql.SQLNonTransientConnectionException;
 
 public class AdminBusesController {
 
@@ -26,15 +28,15 @@ public class AdminBusesController {
     @FXML private Button deleteButton;
 
     private ObservableList<Bus> buses = FXCollections.observableArrayList();
-    private BusRepository busRepository = new BusRepository();
+    private BusDao busDao = new BusDao();
 
     @FXML
-    private void initialize() {
+    private void initialize() throws SQLException {
         busNumberColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getBusNumber()));
         totalSeatsColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getTotalSeats()).asObject());
         statusColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus() != null ? cellData.getValue().getStatus().getName() : ""));
 
-        buses.addAll(busRepository.findAll());
+        buses.addAll(busDao.findAll());
         busesTable.setItems(buses);
 
         busesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -57,7 +59,7 @@ public class AdminBusesController {
     }
 
     @FXML
-    private void deleteBus() {
+    private void deleteBus() throws SQLException {
         Bus selected = busesTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -65,7 +67,7 @@ public class AdminBusesController {
             alert.setHeaderText("Are you sure you want to delete this bus?");
             alert.setContentText("Bus Number: " + selected.getBusNumber());
             if (alert.showAndWait().get() == ButtonType.OK) {
-                busRepository.delete(selected.getId());
+                busDao.delete(selected.getId());
                 buses.remove(selected);
             }
         }
@@ -82,10 +84,26 @@ public class AdminBusesController {
             AddEditBusController controller = loader.getController();
             controller.setBus(bus);
 
-            stage.setOnHidden(event -> buses.setAll(busRepository.findAll()));
+            stage.setOnHidden(event -> {
+                try {
+                    buses.setAll(busDao.findAll());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showErrorDialog("Database error", "Could not load updated bus list.");
+                }
+            });
+
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void showErrorDialog(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

@@ -11,14 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class UserRoleRepository {
+public class UserRoleDao {
 
-    public List<UserRole> findAll() {
+    public List<UserRole> findAll() throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         List<UserRole> userRoles = new ArrayList<>();
         String sql = "SELECT id, role_name FROM [dbo].[UserRole]";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 String roleId = rs.getString("id");
@@ -35,12 +35,11 @@ public class UserRoleRepository {
         return userRoles;
     }
 
-    public UserRole findById(UUID id) {
+    public UserRole findById(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = "SELECT id, role_name FROM [dbo].[UserRole] WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
-            System.out.println("Searching for role with id: " + id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     String roleId = rs.getString("id");
@@ -59,13 +58,13 @@ public class UserRoleRepository {
         return null;
     }
 
-    public void save(UserRole userRole) {
+    public void save(UserRole userRole) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = userRole.getId() == null ?
                 "INSERT INTO [dbo].[UserRole] (id, role_name) VALUES (?, ?)" :
                 "UPDATE [dbo].[UserRole] SET role_name = ? WHERE id = ?";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (userRole.getId() == null) {
                 userRole.setId(UUID.randomUUID());
                 System.out.println("Generating new ID for userRole: " + userRole.getId());

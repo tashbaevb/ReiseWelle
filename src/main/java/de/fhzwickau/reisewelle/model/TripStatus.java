@@ -8,7 +8,6 @@ public class TripStatus {
     private String name;
 
     public TripStatus(String name) {
-        this.id = UUID.randomUUID();
         this.name = name;
     }
 

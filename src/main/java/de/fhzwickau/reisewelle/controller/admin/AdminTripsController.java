@@ -1,7 +1,7 @@
 package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.Trip;
-import de.fhzwickau.reisewelle.dao.TripAdminRepository;
+import de.fhzwickau.reisewelle.dao.TripAdminDao;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,6 +13,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class AdminTripsController {
 
@@ -26,10 +27,10 @@ public class AdminTripsController {
     @FXML private Button deleteButton;
 
     private ObservableList<Trip> trips = FXCollections.observableArrayList();
-    private TripAdminRepository tripRepository = new TripAdminRepository();
+    private TripAdminDao tripRepository = new TripAdminDao();
 
     @FXML
-    private void initialize() {
+    private void initialize() throws SQLException {
         busColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getBus() != null ? cellData.getValue().getBus().getBusNumber() : ""));
         driverColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDriver() != null ? cellData.getValue().getDriver().getFirstName() + " " + cellData.getValue().getDriver().getLastName() : ""));
         departureDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDepartureDate().toString()));
@@ -58,7 +59,7 @@ public class AdminTripsController {
     }
 
     @FXML
-    private void deleteTrip() {
+    private void deleteTrip() throws SQLException {
         Trip selected = tripsTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -83,7 +84,13 @@ public class AdminTripsController {
             AddEditTripController controller = loader.getController();
             controller.setTrip(trip);
 
-            stage.setOnHidden(event -> trips.setAll(tripRepository.findAll()));
+            stage.setOnHidden(event -> {
+                try {
+                    trips.setAll(tripRepository.findAll());
+                } catch (SQLException sqle) {
+                    sqle.printStackTrace();
+                }
+            });
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

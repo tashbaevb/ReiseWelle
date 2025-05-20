@@ -1,7 +1,7 @@
 package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.User;
-import de.fhzwickau.reisewelle.dao.UserRepository;
+import de.fhzwickau.reisewelle.dao.UserDao;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,6 +13,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 public class AdminUsersController {
@@ -26,10 +27,10 @@ public class AdminUsersController {
     @FXML private Button deleteButton;
 
     private ObservableList<User> users = FXCollections.observableArrayList();
-    private UserRepository userRepository = new UserRepository();
+    private final UserDao userDao = new UserDao();
 
     @FXML
-    private void initialize() {
+    private void initialize() throws SQLException {
         emailColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
         roleColumn.setCellValueFactory(cellData -> {
             User user = cellData.getValue();
@@ -38,8 +39,7 @@ public class AdminUsersController {
         });
         createdAtColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt() != null ? cellData.getValue().getCreatedAt().toString() : ""));
 
-        // Загрузка пользователей
-        List<User> loadedUsers = userRepository.findAll();
+        List<User> loadedUsers = userDao.findAll();
         System.out.println("Loaded users count: " + loadedUsers.size());
         for (User user : loadedUsers) {
             System.out.println("User loaded: email=" + user.getEmail() + ", role=" + (user.getUserRole() != null ? user.getUserRole().getRoleName() : "null"));
@@ -67,7 +67,7 @@ public class AdminUsersController {
     }
 
     @FXML
-    private void deleteUser() {
+    private void deleteUser() throws SQLException {
         User selected = usersTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -75,7 +75,7 @@ public class AdminUsersController {
             alert.setHeaderText("Are you sure you want to delete this user?");
             alert.setContentText("Email: " + selected.getEmail());
             if (alert.showAndWait().get() == ButtonType.OK) {
-                userRepository.delete(selected.getId());
+                userDao.delete(selected.getId());
                 users.remove(selected);
             }
         }
@@ -91,11 +91,15 @@ public class AdminUsersController {
 
             AddEditUserController controller = loader.getController();
             controller.setUser(user);
-            controller.setStage(stage); // Передаем Stage
+            controller.setStage(stage);
 
             stage.setOnHidden(event -> {
                 System.out.println("Updating users table...");
-                users.setAll(userRepository.findAll());
+                try {
+                    users.setAll(userDao.findAll());
+                } catch (SQLException sqle) {
+                    sqle.printStackTrace();
+                }
             });
             stage.show();
         } catch (IOException e) {

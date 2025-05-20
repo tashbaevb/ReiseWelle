@@ -10,21 +10,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class TripRepository {
+public class TripDao {
 
-    private Connection conn = null;
-
-    public TripRepository() throws SQLException {
-        conn = JDBCConfig.getInstance();
-    }
-
-    public List<TripSegmentDTO> searchTrips(String fromCity, String toCity, LocalDateTime dateTime, int adults, int children, int bicycles) {
+    public List<TripSegmentDTO> searchTrips(String fromCity, String toCity, LocalDateTime dateTime, int adults, int children, int bicycles) throws SQLException {
+        Connection connection = JDBCConfig.getInstance();
         List<TripSegmentDTO> segments = new ArrayList<>();
         String sql = """
         SELECT t.id as trip_id,
@@ -74,7 +68,7 @@ public class TripRepository {
 
         int totalPassengers = adults + children;
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, fromCity);
             stmt.setString(2, toCity);
             stmt.setDate(3, Date.valueOf(dateTime.toLocalDate()));
@@ -117,9 +111,11 @@ public class TripRepository {
     }
 
 
-    public TripDetailsDTO getTripDetails(UUID tripId) {
+    public TripDetailsDTO getTripDetails(UUID tripId) throws SQLException {
+        Connection connection = JDBCConfig.getInstance();
+
         String sql = """
-            SELECT 
+            SELECT
                 d.first_name,
                 d.last_name,
                 b.bus_number,
@@ -137,8 +133,7 @@ public class TripRepository {
             ORDER BY s.stop_order
         """;
 
-        try {
-            PreparedStatement stmt = conn.prepareStatement(sql);
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setObject(1, tripId);
             ResultSet rs = stmt.executeQuery();
 

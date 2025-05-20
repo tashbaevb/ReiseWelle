@@ -14,20 +14,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class UserRepository {
-    private final UserRoleRepository userRoleRepository = new UserRoleRepository();
+public class UserDao {
 
-    public List<User> findAll() {
+    private final UserRoleDao userRoleDao = new UserRoleDao();
+
+    public List<User> findAll() throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         List<User> users = new ArrayList<>();
         String sql = "SELECT id, email, password, user_role_id, created_at FROM [dbo].[User]";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 String roleIdStr = rs.getString("user_role_id");
                 UUID roleId = UUID.fromString(roleIdStr);
-                UserRole userRole = userRoleRepository.findById(roleId);
+                UserRole userRole = userRoleDao.findById(roleId);
                 if (userRole == null) {
                     System.out.println("Warning: UserRole not found for roleId: " + roleIdStr);
                     continue;
@@ -50,16 +51,17 @@ public class UserRepository {
         return users;
     }
 
-    public User findById(UUID id) {
+    public User findById(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = "SELECT id, email, password, user_role_id, created_at FROM [dbo].[User] WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     String roleIdStr = rs.getString("user_role_id");
                     UUID roleId = UUID.fromString(roleIdStr);
-                    UserRole userRole = userRoleRepository.findById(roleId);
+                    UserRole userRole = userRoleDao.findById(roleId);
                     if (userRole == null) {
                         System.out.println("Warning: UserRole not found for roleId: " + roleId);
                         return null;
@@ -81,19 +83,19 @@ public class UserRepository {
         return null;
     }
 
-    public List<User> findCompanyReps() {
+    public List<User> findCompanyReps() throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         List<User> companyReps = new ArrayList<>();
         String sql = "SELECT u.id, u.email, u.password, u.user_role_id, u.created_at " +
                 "FROM [User] u " +
                 "JOIN UserRole r ON u.user_role_id = r.id " +
                 "WHERE r.role_name = 'company_rep'";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 UUID roleId = UUID.fromString(rs.getString("user_role_id"));
-                UserRole userRole = userRoleRepository.findById(roleId);
+                UserRole userRole = userRoleDao.findById(roleId);
                 User user = new User(
                         rs.getString("email"),
                         rs.getString("password"),
@@ -109,13 +111,13 @@ public class UserRepository {
         return companyReps;
     }
 
-    public void save(User user) {
+    public void save(User user) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = user.getId() == null ?
                 "INSERT INTO [dbo].[User] (id, email, password, user_role_id, created_at) VALUES (?, ?, ?, ?, ?)" :
                 "UPDATE [dbo].[User] SET email = ?, password = ?, user_role_id = ?, created_at = ? WHERE id = ?";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (user.getId() == null) {
                 user.setId(UUID.randomUUID());
                 System.out.println("Generating new ID for user: " + user.getId());
@@ -142,10 +144,10 @@ public class UserRepository {
         }
     }
 
-    public void delete(UUID id) {
+    public void delete(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = "DELETE FROM [dbo].[User] WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             int rowsAffected = stmt.executeUpdate();
             System.out.println("Rows deleted: " + rowsAffected);

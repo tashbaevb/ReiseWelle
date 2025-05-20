@@ -2,12 +2,14 @@ package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.Driver;
 import de.fhzwickau.reisewelle.model.Status;
-import de.fhzwickau.reisewelle.dao.DriverRepository;
-import de.fhzwickau.reisewelle.dao.StatusRepository;
+import de.fhzwickau.reisewelle.dao.DriverDao;
+import de.fhzwickau.reisewelle.dao.StatusDao;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
+import java.sql.SQLException;
 
 public class AddEditDriverController {
 
@@ -17,8 +19,8 @@ public class AddEditDriverController {
     @FXML private ComboBox<Status> statusComboBox;
 
     private Driver driver;
-    private DriverRepository driverRepository = new DriverRepository();
-    private StatusRepository statusRepository = new StatusRepository();
+    private final DriverDao driverDao = new DriverDao();
+    private final StatusDao statusDao = new StatusDao();
 
     public void setDriver(Driver driver) {
         this.driver = driver;
@@ -31,12 +33,12 @@ public class AddEditDriverController {
     }
 
     @FXML
-    private void initialize() {
-        statusComboBox.getItems().addAll(statusRepository.findAll());
+    private void initialize() throws SQLException {
+        statusComboBox.getItems().addAll(statusDao.findAll());
     }
 
     @FXML
-    private void save() {
+    private void save() throws SQLException {
         if (driver == null) {
             driver = new Driver(
                     firstNameField.getText(),
@@ -50,7 +52,7 @@ public class AddEditDriverController {
             driver.setLicenseNumber(licenseNumberField.getText());
             driver.setStatus(statusComboBox.getValue());
         }
-        driverRepository.save(driver);
+        driverDao.save(driver);
         close();
     }
 

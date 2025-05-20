@@ -1,4 +1,5 @@
 package de.fhzwickau.reisewelle.dao;
+
 import de.fhzwickau.reisewelle.config.JDBCConfig;
 import de.fhzwickau.reisewelle.model.Bus;
 import de.fhzwickau.reisewelle.model.Status;
@@ -11,19 +12,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BusRepository {
-    private final StatusRepository statusRepository = new StatusRepository();
+public class BusDao {
 
-    public List<Bus> findAll() {
+    private final StatusDao statusDao = new StatusDao();
+
+    public List<Bus> findAll() throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         List<Bus> buses = new ArrayList<>();
+
         String sql = "SELECT id, bus_number, total_seats, status_id FROM Bus";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
                 UUID statusId = UUID.fromString(rs.getString("status_id"));
-                Status status = statusRepository.findById(statusId);
+                Status status = statusDao.findById(statusId);
                 Bus bus = new Bus(
                         rs.getString("bus_number"),
                         rs.getInt("total_seats"),
@@ -40,15 +44,17 @@ public class BusRepository {
         return buses;
     }
 
-    public Bus findById(UUID id) {
+    public Bus findById(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
+
         String sql = "SELECT id, bus_number, total_seats, status_id FROM Bus WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     UUID statusId = UUID.fromString(rs.getString("status_id"));
-                    Status status = statusRepository.findById(statusId);
+                    Status status = statusDao.findById(statusId);
                     Bus bus = new Bus(
                             rs.getString("bus_number"),
                             rs.getInt("total_seats"),
@@ -65,13 +71,14 @@ public class BusRepository {
         return null;
     }
 
-    public void save(Bus bus) {
+    public void save(Bus bus) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
+
         String sql = bus.getId() == null ?
                 "INSERT INTO Bus (id, bus_number, total_seats, status_id) VALUES (?, ?, ?, ?)" :
                 "UPDATE Bus SET bus_number = ?, total_seats = ?, status_id = ? WHERE id = ?";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (bus.getId() == null) {
                 bus.setId(UUID.randomUUID()); // Генерируем новый UUID для новой записи
                 System.out.println("Generating new ID: " + bus.getId());
@@ -95,10 +102,11 @@ public class BusRepository {
         }
     }
 
-    public void delete(UUID id) {
+    public void delete(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
+
         String sql = "DELETE FROM Bus WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
         } catch (SQLException e) {

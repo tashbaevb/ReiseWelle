@@ -2,12 +2,14 @@ package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.model.Bus;
 import de.fhzwickau.reisewelle.model.Status;
-import de.fhzwickau.reisewelle.dao.BusRepository;
-import de.fhzwickau.reisewelle.dao.StatusRepository;
+import de.fhzwickau.reisewelle.dao.BusDao;
+import de.fhzwickau.reisewelle.dao.StatusDao;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
+import java.sql.SQLException;
 
 public class AddEditBusController {
 
@@ -16,8 +18,8 @@ public class AddEditBusController {
     @FXML private ComboBox<Status> statusComboBox;
 
     private Bus bus;
-    private BusRepository busRepository = new BusRepository();
-    private StatusRepository statusRepository = new StatusRepository();
+    private final BusDao busDao = new BusDao();
+    private final StatusDao statusDao = new StatusDao();
 
     public void setBus(Bus bus) {
         this.bus = bus;
@@ -29,13 +31,13 @@ public class AddEditBusController {
     }
 
     @FXML
-    private void initialize() {
-        statusComboBox.getItems().addAll(statusRepository.findAll());
+    private void initialize() throws SQLException {
+        statusComboBox.getItems().addAll(statusDao.findAll());
         System.out.println("Loaded statuses: " + statusComboBox.getItems().size());
     }
 
     @FXML
-    private void save() {
+    private void save() throws SQLException {
         System.out.println("Save button clicked");
         if (bus == null) {
             try {
@@ -63,7 +65,7 @@ public class AddEditBusController {
             bus.setStatus(statusComboBox.getValue());
             System.out.println("Updating bus: number=" + bus.getBusNumber() + ", seats=" + bus.getTotalSeats() + ", status=" + bus.getStatus().getName());
         }
-        busRepository.save(bus);
+        busDao.save(bus);
         System.out.println("Save completed, closing window");
         close();
     }

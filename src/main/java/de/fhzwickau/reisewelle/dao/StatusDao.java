@@ -11,14 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class StatusRepository {
+public class StatusDao {
 
-    public List<Status> findAll() {
+    public List<Status> findAll() throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         List<Status> statuses = new ArrayList<>();
         String sql = "SELECT id, name FROM Status";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Status status = new Status(rs.getString("name"));
@@ -33,10 +33,10 @@ public class StatusRepository {
         return statuses;
     }
 
-    public Status findById(UUID id) {
+    public Status findById(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = "SELECT id, name FROM Status WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -52,13 +52,13 @@ public class StatusRepository {
         return null;
     }
 
-    public void save(Status status) {
+    public void save(Status status) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = status.getId() == null ?
                 "INSERT INTO Status (id, name) VALUES (?, ?)" :
                 "UPDATE Status SET name = ? WHERE id = ?";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (status.getId() == null) {
                 status.setId(UUID.randomUUID());
                 System.out.println("Generating new ID for status: " + status.getId());

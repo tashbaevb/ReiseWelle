@@ -12,19 +12,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class DriverRepository {
-    private final StatusRepository statusRepository = new StatusRepository();
+public class DriverDao {
 
-    public List<Driver> findAll() {
+    private final StatusDao statusDao = new StatusDao();
+
+    public List<Driver> findAll() throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         List<Driver> drivers = new ArrayList<>();
         String sql = "SELECT id, first_name, last_name, license_number, status_id FROM Driver";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 UUID statusId = UUID.fromString(rs.getString("status_id"));
-                Status status = statusRepository.findById(statusId);
+                Status status = statusDao.findById(statusId);
                 Driver driver = new Driver(
                         rs.getString("first_name"),
                         rs.getString("last_name"),
@@ -40,15 +41,17 @@ public class DriverRepository {
         return drivers;
     }
 
-    public Driver findById(UUID id) {
+    public Driver findById(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = "SELECT id, first_name, last_name, license_number, status_id FROM Driver WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     UUID statusId = UUID.fromString(rs.getString("status_id"));
-                    Status status = statusRepository.findById(statusId);
+                    Status status = statusDao.findById(statusId);
                     Driver driver = new Driver(
                             rs.getString("first_name"),
                             rs.getString("last_name"),
@@ -65,13 +68,13 @@ public class DriverRepository {
         return null;
     }
 
-    public void save(Driver driver) {
+    public void save(Driver driver) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = driver.getId() == null ?
                 "INSERT INTO Driver (id, first_name, last_name, license_number, status_id) VALUES (?, ?, ?, ?, ?)" :
                 "UPDATE Driver SET first_name = ?, last_name = ?, license_number = ?, status_id = ? WHERE id = ?";
 
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (driver.getId() == null) {
                 driver.setId(UUID.randomUUID());
                 stmt.setString(1, driver.getId().toString());
@@ -92,10 +95,10 @@ public class DriverRepository {
         }
     }
 
-    public void delete(UUID id) {
+    public void delete(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
         String sql = "DELETE FROM Driver WHERE id = ?";
-        try (Connection conn = JDBCConfig.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
         } catch (SQLException e) {

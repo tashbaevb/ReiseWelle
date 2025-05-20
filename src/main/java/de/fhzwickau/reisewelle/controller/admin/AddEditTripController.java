@@ -4,14 +4,16 @@ import de.fhzwickau.reisewelle.model.Bus;
 import de.fhzwickau.reisewelle.model.Driver;
 import de.fhzwickau.reisewelle.model.Trip;
 import de.fhzwickau.reisewelle.model.TripStatus;
-import de.fhzwickau.reisewelle.dao.BusRepository;
-import de.fhzwickau.reisewelle.dao.DriverRepository;
-import de.fhzwickau.reisewelle.dao.TripAdminRepository;
-import de.fhzwickau.reisewelle.dao.TripStatusRepository;
+import de.fhzwickau.reisewelle.dao.BusDao;
+import de.fhzwickau.reisewelle.dao.DriverDao;
+import de.fhzwickau.reisewelle.dao.TripAdminDao;
+import de.fhzwickau.reisewelle.dao.TripStatusDao;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.stage.Stage;
+
+import java.sql.SQLException;
 
 public class AddEditTripController {
 
@@ -21,10 +23,10 @@ public class AddEditTripController {
     @FXML private ComboBox<TripStatus> statusComboBox;
 
     private Trip trip;
-    private TripAdminRepository tripRepository = new TripAdminRepository();
-    private BusRepository busRepository = new BusRepository();
-    private DriverRepository driverRepository = new DriverRepository();
-    private TripStatusRepository tripStatusRepository = new TripStatusRepository();
+    private final TripAdminDao tripRepository = new TripAdminDao();
+    private final BusDao busDao = new BusDao();
+    private final DriverDao driverDao = new DriverDao();
+    private final TripStatusDao tripStatusDao = new TripStatusDao();
 
     public void setTrip(Trip trip) {
         this.trip = trip;
@@ -37,14 +39,14 @@ public class AddEditTripController {
     }
 
     @FXML
-    private void initialize() {
-        busComboBox.getItems().addAll(busRepository.findAll());
-        driverComboBox.getItems().addAll(driverRepository.findAll());
-        statusComboBox.getItems().addAll(tripStatusRepository.findAll());
+    private void initialize() throws SQLException {
+        busComboBox.getItems().addAll(busDao.findAll());
+        driverComboBox.getItems().addAll(driverDao.findAll());
+        statusComboBox.getItems().addAll(tripStatusDao.findAll());
     }
 
     @FXML
-    private void save() {
+    private void save() throws SQLException {
         if (trip == null) {
             trip = new Trip(
                     busComboBox.getValue(),
