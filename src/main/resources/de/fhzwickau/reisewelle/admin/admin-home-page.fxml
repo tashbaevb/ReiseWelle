@@ -15,7 +15,7 @@
         <VBox spacing="10" alignment="TOP_CENTER" style="-fx-padding: 10;">
             <children>
                 <Button text="Users" fx:id="usersButton" onAction="#showUsers" />
-                <Button text="Company Representatives" fx:id="companyRepsButton" onAction="#showCompanyReps" />
+                <Button text="Company Representatives" fx:id="employee" onAction="#showEmployee" />
                 <Button text="Buses" fx:id="busesButton" onAction="#showBuses" />
                 <Button text="Drivers" fx:id="driversButton" onAction="#showDrivers" />
                 <Button text="Trips" fx:id="tripsButton" onAction="#showTrips" />

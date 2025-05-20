@@ -12,97 +12,98 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class DriverDao {
+public class DriverDao implements BaseDao<Driver> {
 
     private final StatusDao statusDao = new StatusDao();
 
+    @Override
     public List<Driver> findAll() throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        List<Driver> drivers = new ArrayList<>();
         String sql = "SELECT id, first_name, last_name, license_number, status_id FROM Driver";
+        List<Driver> drivers = new ArrayList<>();
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                UUID statusId = UUID.fromString(rs.getString("status_id"));
-                Status status = statusDao.findById(statusId);
-                Driver driver = new Driver(
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("license_number"),
-                        status
-                );
-                driver.setId(UUID.fromString(rs.getString("id")));
-                drivers.add(driver);
+                drivers.add(mapRowToDriver(rs));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return drivers;
     }
 
+    @Override
     public Driver findById(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
         String sql = "SELECT id, first_name, last_name, license_number, status_id FROM Driver WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
-
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    UUID statusId = UUID.fromString(rs.getString("status_id"));
-                    Status status = statusDao.findById(statusId);
-                    Driver driver = new Driver(
-                            rs.getString("first_name"),
-                            rs.getString("last_name"),
-                            rs.getString("license_number"),
-                            status
-                    );
-                    driver.setId(UUID.fromString(rs.getString("id")));
-                    return driver;
+                    return mapRowToDriver(rs);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return null;
     }
 
+    @Override
     public void save(Driver driver) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = driver.getId() == null ?
-                "INSERT INTO Driver (id, first_name, last_name, license_number, status_id) VALUES (?, ?, ?, ?, ?)" :
-                "UPDATE Driver SET first_name = ?, last_name = ?, license_number = ?, status_id = ? WHERE id = ?";
+        boolean isNew = driver.getId() == null;
+
+        String sql = isNew
+                ? "INSERT INTO Driver (id, first_name, last_name, license_number, status_id) VALUES (?, ?, ?, ?, ?)"
+                : "UPDATE Driver SET first_name = ?, last_name = ?, license_number = ?, status_id = ? WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            if (driver.getId() == null) {
-                driver.setId(UUID.randomUUID());
-                stmt.setString(1, driver.getId().toString());
-                stmt.setString(2, driver.getFirstName());
-                stmt.setString(3, driver.getLastName());
-                stmt.setString(4, driver.getLicenseNumber());
-                stmt.setString(5, driver.getStatus().getId().toString());
+            if (isNew) {
+                prepareInsert(stmt, driver);
             } else {
-                stmt.setString(1, driver.getFirstName());
-                stmt.setString(2, driver.getLastName());
-                stmt.setString(3, driver.getLicenseNumber());
-                stmt.setString(4, driver.getStatus().getId().toString());
-                stmt.setString(5, driver.getId().toString());
+                prepareUpdate(stmt, driver);
             }
             stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
+    @Override
     public void delete(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
         String sql = "DELETE FROM Driver WHERE id = ?";
+
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+    }
+
+    private Driver mapRowToDriver(ResultSet rs) throws SQLException {
+        UUID id = UUID.fromString(rs.getString("id"));
+        String firstName = rs.getString("first_name");
+        String lastName = rs.getString("last_name");
+        String licenseNumber = rs.getString("license_number");
+        UUID statusId = UUID.fromString(rs.getString("status_id"));
+        Status status = statusDao.findById(statusId);
+
+        Driver driver = new Driver(firstName, lastName, licenseNumber, status);
+        driver.setId(id);
+        return driver;
+    }
+
+    private void prepareInsert(PreparedStatement stmt, Driver driver) throws SQLException {
+        driver.setId(UUID.randomUUID());
+        stmt.setString(1, driver.getId().toString());
+        stmt.setString(2, driver.getFirstName());
+        stmt.setString(3, driver.getLastName());
+        stmt.setString(4, driver.getLicenseNumber());
+        stmt.setString(5, driver.getStatus().getId().toString());
+    }
+
+    private void prepareUpdate(PreparedStatement stmt, Driver driver) throws SQLException {
+        stmt.setString(1, driver.getFirstName());
+        stmt.setString(2, driver.getLastName());
+        stmt.setString(3, driver.getLicenseNumber());
+        stmt.setString(4, driver.getStatus().getId().toString());
+        stmt.setString(5, driver.getId().toString());
     }
 }

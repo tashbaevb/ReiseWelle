@@ -11,73 +11,84 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class TripStatusDao {
+public class TripStatusDao implements BaseDao<TripStatus> {
 
+    @Override
     public List<TripStatus> findAll() throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        List<TripStatus> tripStatuses = new ArrayList<>();
         String sql = "SELECT id, name FROM TripStatus";
+        List<TripStatus> tripStatuses = new ArrayList<>();
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                TripStatus tripStatus = new TripStatus(rs.getString("name"));
-                tripStatus.setId(UUID.fromString(rs.getString("id")));
-                tripStatuses.add(tripStatus);
+                tripStatuses.add(mapTripStatus(rs));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+
         return tripStatuses;
     }
 
+    @Override
     public TripStatus findById(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
         String sql = "SELECT id, name FROM TripStatus WHERE id = ?";
+
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    TripStatus tripStatus = new TripStatus(rs.getString("name"));
-                    tripStatus.setId(UUID.fromString(rs.getString("id")));
-                    return tripStatus;
+                    return mapTripStatus(rs);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+
         return null;
     }
 
+    @Override
     public void save(TripStatus tripStatus) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = tripStatus.getId() == null ?
-                "INSERT INTO TripStatus (id, name) VALUES (?, ?)" :
-                "UPDATE TripStatus SET name = ? WHERE id = ?";
+        boolean isNew = tripStatus.getId() == null;
+        String sql = isNew
+                ? "INSERT INTO TripStatus (id, name) VALUES (?, ?)"
+                : "UPDATE TripStatus SET name = ? WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            if (tripStatus.getId() == null) {
+            if (isNew) {
                 tripStatus.setId(UUID.randomUUID());
-                stmt.setString(1, tripStatus.getId().toString());
-                stmt.setString(2, tripStatus.getName());
+                prepareInsert(stmt, tripStatus);
             } else {
-                stmt.setString(1, tripStatus.getName());
-                stmt.setString(2, tripStatus.getId().toString());
+                prepareUpdate(stmt, tripStatus);
             }
             stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
+    @Override
     public void delete(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
         String sql = "DELETE FROM TripStatus WHERE id = ?";
+
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+    }
+
+    private TripStatus mapTripStatus(ResultSet rs) throws SQLException {
+        TripStatus tripStatus = new TripStatus(rs.getString("name"));
+        tripStatus.setId(UUID.fromString(rs.getString("id")));
+        return tripStatus;
+    }
+
+    private void prepareInsert(PreparedStatement stmt, TripStatus tripStatus) throws SQLException {
+        stmt.setString(1, tripStatus.getId().toString());
+        stmt.setString(2, tripStatus.getName());
+    }
+
+    private void prepareUpdate(PreparedStatement stmt, TripStatus tripStatus) throws SQLException {
+        stmt.setString(1, tripStatus.getName());
+        stmt.setString(2, tripStatus.getId().toString());
     }
 }

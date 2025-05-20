@@ -7,6 +7,11 @@ public class Status {
     private UUID id;
     private String name;
 
+    public Status(UUID id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Status(String name) {
         this.name = name;
     }

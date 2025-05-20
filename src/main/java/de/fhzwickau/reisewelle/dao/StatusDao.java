@@ -11,70 +11,78 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class StatusDao {
+public class StatusDao implements BaseDao<Status> {
 
+    @Override
     public List<Status> findAll() throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        List<Status> statuses = new ArrayList<>();
         String sql = "SELECT id, name FROM Status";
+        List<Status> statuses = new ArrayList<>();
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                Status status = new Status(rs.getString("name"));
-                status.setId(UUID.fromString(rs.getString("id")));
-                statuses.add(status);
+                statuses.add(mapStatus(rs));
             }
-            System.out.println("Loaded statuses: " + statuses.size());
-        } catch (SQLException e) {
-            System.err.println("Error in StatusRepository.findAll: " + e.getMessage());
-            e.printStackTrace();
         }
+
         return statuses;
     }
 
+    @Override
     public Status findById(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
         String sql = "SELECT id, name FROM Status WHERE id = ?";
+
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    Status status = new Status(rs.getString("name"));
-                    status.setId(UUID.fromString(rs.getString("id")));
-                    return status;
+                    return mapStatus(rs);
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Error in StatusRepository.findById: " + e.getMessage());
-            e.printStackTrace();
         }
+
         return null;
     }
 
+    @Override
     public void save(Status status) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = status.getId() == null ?
-                "INSERT INTO Status (id, name) VALUES (?, ?)" :
-                "UPDATE Status SET name = ? WHERE id = ?";
+        boolean isNew = status.getId() == null;
+        String sql = isNew
+                ? "INSERT INTO Status (id, name) VALUES (?, ?)"
+                : "UPDATE Status SET name = ? WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            if (status.getId() == null) {
+            if (isNew) {
                 status.setId(UUID.randomUUID());
-                System.out.println("Generating new ID for status: " + status.getId());
-                stmt.setString(1, status.getId().toString());
-                stmt.setString(2, status.getName());
-                System.out.println("Executing INSERT: id=" + status.getId() + ", name=" + status.getName());
+                prepareInsert(stmt, status);
             } else {
-                stmt.setString(1, status.getName());
-                stmt.setString(2, status.getId().toString());
-                System.out.println("Executing UPDATE: id=" + status.getId() + ", name=" + status.getName());
+                prepareUpdate(stmt, status);
             }
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("Rows affected: " + rowsAffected);
-        } catch (SQLException e) {
-            System.err.println("Error in StatusRepository.save: " + e.getMessage());
-            e.printStackTrace();
+            stmt.executeUpdate();
         }
+    }
+
+    @Override
+    public void delete(UUID id) throws SQLException {
+        // Not Realized
+    }
+
+    private Status mapStatus(ResultSet rs) throws SQLException {
+        Status status = new Status(rs.getString("name"));
+        status.setId(UUID.fromString(rs.getString("id")));
+        return status;
+    }
+
+    private void prepareInsert(PreparedStatement stmt, Status status) throws SQLException {
+        stmt.setString(1, status.getId().toString());
+        stmt.setString(2, status.getName());
+    }
+
+    private void prepareUpdate(PreparedStatement stmt, Status status) throws SQLException {
+        stmt.setString(1, status.getName());
+        stmt.setString(2, status.getId().toString());
     }
 }

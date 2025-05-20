@@ -8,6 +8,7 @@ module de.fhzwickau.reisewelle {
     requires net.synedra.validatorfx;
     requires java.sql;
     requires java.dotenv;
+    requires org.slf4j;
 
     opens de.fhzwickau.reisewelle to javafx.fxml;
     exports de.fhzwickau.reisewelle;

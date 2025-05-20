@@ -11,6 +11,11 @@ public class UserRole {
         this.roleName = roleName;
     }
 
+    public UserRole(UUID id, String roleName) {
+        this.id = id;
+        this.roleName = roleName;
+    }
+
     public UUID getId() {
         return id;
     }

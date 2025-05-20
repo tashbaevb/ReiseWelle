@@ -13,44 +13,35 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class UserDao {
+public class UserDao implements BaseDao<User> {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
     private final UserRoleDao userRoleDao = new UserRoleDao();
 
+    @Override
     public List<User> findAll() throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        List<User> users = new ArrayList<>();
         String sql = "SELECT id, email, password, user_role_id, created_at FROM [dbo].[User]";
+        List<User> users = new ArrayList<>();
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                String roleIdStr = rs.getString("user_role_id");
-                UUID roleId = UUID.fromString(roleIdStr);
-                UserRole userRole = userRoleDao.findById(roleId);
-                if (userRole == null) {
-                    System.out.println("Warning: UserRole not found for roleId: " + roleIdStr);
-                    continue;
+                User user = mapUser(rs);
+                if (user != null) {
+                    users.add(user);
+                    logger.info("Loaded user: email={}, role={}", user.getEmail(), user.getUserRole().getRoleName());
                 }
-                User user = new User(
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        userRole,
-                        rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null
-                );
-                user.setId(UUID.fromString(rs.getString("id")));
-                users.add(user);
-                System.out.println("Loaded user: email=" + user.getEmail() + ", role=" + userRole.getRoleName());
             }
-            System.out.println("Total users loaded: " + users.size());
-        } catch (SQLException e) {
-            System.err.println("Error in UserRepository.findAll: " + e.getMessage());
-            e.printStackTrace();
         }
+
         return users;
     }
 
+    @Override
     public User findById(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
         String sql = "SELECT id, email, password, user_role_id, created_at FROM [dbo].[User] WHERE id = ?";
@@ -59,101 +50,98 @@ public class UserDao {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    String roleIdStr = rs.getString("user_role_id");
-                    UUID roleId = UUID.fromString(roleIdStr);
-                    UserRole userRole = userRoleDao.findById(roleId);
-                    if (userRole == null) {
-                        System.out.println("Warning: UserRole not found for roleId: " + roleId);
-                        return null;
-                    }
-                    User user = new User(
-                            rs.getString("email"),
-                            rs.getString("password"),
-                            userRole,
-                            rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null
-                    );
-                    user.setId(UUID.fromString(rs.getString("id")));
-                    return user;
+                    return mapUser(rs);
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Error in UserRepository.findById: " + e.getMessage());
-            e.printStackTrace();
         }
+
         return null;
     }
 
-    public List<User> findCompanyReps() throws SQLException {
+    @Override
+    public void save(User user) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
+        boolean isNew = user.getId() == null;
+        String sql =  isNew
+                ? "INSERT INTO [dbo].[User] (id, email, password, user_role_id, created_at) VALUES (?, ?, ?, ?, ?)"
+                : "UPDATE [dbo].[User] SET email = ?, password = ?, user_role_id = ?, created_at = ? WHERE id = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            if (isNew) {
+                prepareInsert(stmt, user);
+                logger.info("Executing INSERT: id=" + user.getId() + ", email=" + user.getEmail() + ", roleId=" + user.getUserRole().getId());
+            } else {
+                prepareUpdate(stmt, user);
+                logger.info("Executing UPDATE: id=" + user.getId() + ", email=" + user.getEmail() + ", roleId=" + user.getUserRole().getId());
+            }
+            stmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public void delete(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
+        String sql = "DELETE FROM [dbo].[User] WHERE id = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id.toString());
+            stmt.executeUpdate();
+        }
+    }
+
+    public List<User> findEmployees() throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
+        String sql = """
+                SELECT u.id, u.email, u.password, u.user_role_id, u.created_at
+                FROM [User] u
+                JOIN UserRole r ON u.user_role_id = r.id
+                WHERE r.role_name = 'employee'
+                """;
         List<User> companyReps = new ArrayList<>();
-        String sql = "SELECT u.id, u.email, u.password, u.user_role_id, u.created_at " +
-                "FROM [User] u " +
-                "JOIN UserRole r ON u.user_role_id = r.id " +
-                "WHERE r.role_name = 'company_rep'";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                UUID roleId = UUID.fromString(rs.getString("user_role_id"));
-                UserRole userRole = userRoleDao.findById(roleId);
-                User user = new User(
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        userRole,
-                        rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null
-                );
-                user.setId(UUID.fromString(rs.getString("id")));
-                companyReps.add(user);
+                companyReps.add(mapUser(rs));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+
         return companyReps;
     }
 
-    public void save(User user) throws SQLException {
-        Connection conn = JDBCConfig.getInstance();
-        String sql = user.getId() == null ?
-                "INSERT INTO [dbo].[User] (id, email, password, user_role_id, created_at) VALUES (?, ?, ?, ?, ?)" :
-                "UPDATE [dbo].[User] SET email = ?, password = ?, user_role_id = ?, created_at = ? WHERE id = ?";
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            if (user.getId() == null) {
-                user.setId(UUID.randomUUID());
-                System.out.println("Generating new ID for user: " + user.getId());
-                stmt.setString(1, user.getId().toString());
-                stmt.setString(2, user.getEmail());
-                stmt.setString(3, user.getPassword());
-                stmt.setString(4, user.getUserRole().getId().toString());
-                stmt.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
-                System.out.println("Executing INSERT: id=" + user.getId() + ", email=" + user.getEmail() + ", roleId=" + user.getUserRole().getId());
-            } else {
-                stmt.setString(1, user.getEmail());
-                stmt.setString(2, user.getPassword());
-                stmt.setString(3, user.getUserRole().getId().toString());
-                stmt.setTimestamp(4, user.getCreatedAt() != null ? Timestamp.valueOf(user.getCreatedAt()) : null);
-                stmt.setString(5, user.getId().toString());
-                System.out.println("Executing UPDATE: id=" + user.getId() + ", email=" + user.getEmail() + ", roleId=" + user.getUserRole().getId());
-            }
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("Rows affected: " + rowsAffected);
-        } catch (SQLException e) {
-            System.err.println("Error in UserRepository.save: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Failed to save user: " + e.getMessage(), e);
+    private User mapUser(ResultSet rs) throws SQLException {
+        UUID roleId = UUID.fromString(rs.getString("user_role_id"));
+        UserRole userRole = userRoleDao.findById(roleId);
+        if (userRole == null) {
+            logger.warn("UserRole not found for roleId: {}", roleId);
+            return null;
         }
+
+        User user = new User(
+                rs.getString("email"),
+                rs.getString("password"),
+                userRole,
+                rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null
+        );
+        user.setId(roleId);
+
+        return user;
     }
 
-    public void delete(UUID id) throws SQLException {
-        Connection conn = JDBCConfig.getInstance();
-        String sql = "DELETE FROM [dbo].[User] WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, id.toString());
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("Rows deleted: " + rowsAffected);
-        } catch (SQLException e) {
-            System.err.println("Error in UserRepository.delete: " + e.getMessage());
-            e.printStackTrace();
-        }
+    private void prepareInsert(PreparedStatement stmt, User user) throws SQLException {
+        user.setId(UUID.randomUUID());
+        stmt.setString(1, user.getId().toString());
+        stmt.setString(2, user.getEmail());
+        stmt.setString(3, user.getPassword());
+        stmt.setString(4, user.getUserRole().getId().toString());
+        stmt.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+    }
+
+    private void prepareUpdate(PreparedStatement stmt, User user) throws SQLException {
+        stmt.setString(1, user.getEmail());
+        stmt.setString(2, user.getPassword());
+        stmt.setString(3, user.getUserRole().getId().toString());
+        stmt.setTimestamp(4, user.getCreatedAt() != null ? Timestamp.valueOf(user.getCreatedAt()) : null);
+        stmt.setString(5, user.getId().toString());
     }
 }

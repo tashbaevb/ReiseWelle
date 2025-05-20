@@ -12,105 +12,96 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BusDao {
+public class BusDao implements BaseDao<Bus> {
 
-    private final StatusDao statusDao = new StatusDao();
+    private final BaseDao<Status> statusDao = new StatusDao();
 
     public List<Bus> findAll() throws SQLException {
         Connection conn = JDBCConfig.getInstance();
+        String sql = """
+                SELECT b.id, b.bus_number, b.total_seats, s.id AS status_id, s.name AS status_name 
+                FROM Bus b JOIN Status s ON b.status_id = s.id
+                """;
         List<Bus> buses = new ArrayList<>();
-
-        String sql = "SELECT id, bus_number, total_seats, status_id FROM Bus";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
-                UUID statusId = UUID.fromString(rs.getString("status_id"));
-                Status status = statusDao.findById(statusId);
-                Bus bus = new Bus(
-                        rs.getString("bus_number"),
-                        rs.getInt("total_seats"),
-                        status
-                );
-                bus.setId(UUID.fromString(rs.getString("id")));
-                buses.add(bus);
+                buses.add(mapBus(rs));
             }
-            System.out.println("Loaded buses: " + buses.size());
-        } catch (SQLException e) {
-            System.err.println("Error in findAll: " + e.getMessage());
-            e.printStackTrace();
         }
+
         return buses;
     }
 
     public Bus findById(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-
         String sql = "SELECT id, bus_number, total_seats, status_id FROM Bus WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    UUID statusId = UUID.fromString(rs.getString("status_id"));
-                    Status status = statusDao.findById(statusId);
-                    Bus bus = new Bus(
-                            rs.getString("bus_number"),
-                            rs.getInt("total_seats"),
-                            status
-                    );
-                    bus.setId(UUID.fromString(rs.getString("id")));
-                    return bus;
+                    return mapBus(rs);
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Error in findById: " + e.getMessage());
-            e.printStackTrace();
         }
+
         return null;
     }
 
     public void save(Bus bus) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-
-        String sql = bus.getId() == null ?
-                "INSERT INTO Bus (id, bus_number, total_seats, status_id) VALUES (?, ?, ?, ?)" :
-                "UPDATE Bus SET bus_number = ?, total_seats = ?, status_id = ? WHERE id = ?";
+        boolean isNew = bus.getId() == null;
+        String sql = isNew
+                ? "INSERT INTO Bus (id, bus_number, total_seats, status_id) VALUES (?, ?, ?, ?)"
+                : "UPDATE Bus SET bus_number = ?, total_seats = ?, status_id = ? WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            if (bus.getId() == null) {
-                bus.setId(UUID.randomUUID()); // Генерируем новый UUID для новой записи
-                System.out.println("Generating new ID: " + bus.getId());
-                stmt.setString(1, bus.getId().toString());
-                stmt.setString(2, bus.getBusNumber());
-                stmt.setInt(3, bus.getTotalSeats());
-                stmt.setString(4, bus.getStatus().getId().toString());
-                System.out.println("Executing INSERT: id=" + bus.getId() + ", number=" + bus.getBusNumber() + ", seats=" + bus.getTotalSeats() + ", statusId=" + bus.getStatus().getId());
+            if (isNew) {
+                bus.setId(UUID.randomUUID());
+                prepareInsert(stmt, bus);
             } else {
-                stmt.setString(1, bus.getBusNumber());
-                stmt.setInt(2, bus.getTotalSeats());
-                stmt.setString(3, bus.getStatus().getId().toString());
-                stmt.setString(4, bus.getId().toString());
-                System.out.println("Executing UPDATE: id=" + bus.getId() + ", number=" + bus.getBusNumber() + ", seats=" + bus.getTotalSeats() + ", statusId=" + bus.getStatus().getId());
+                prepareUpdate(stmt, bus);
             }
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("Rows affected: " + rowsAffected);
-        } catch (SQLException e) {
-            System.err.println("Error in save: " + e.getMessage());
-            e.printStackTrace();
+            stmt.executeUpdate();
         }
     }
 
     public void delete(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-
         String sql = "DELETE FROM Bus WHERE id = ?";
+
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+    }
+
+    private Bus mapBus(ResultSet rs) throws SQLException {
+        UUID statusId = UUID.fromString(rs.getString("status_id"));
+        Status status = statusDao.findById(statusId);
+
+        UUID id = UUID.fromString(rs.getString("id"));
+        String busNumber = rs.getString("bus_number");
+        int totalSeats = rs.getInt("total_seats");
+
+        Bus bus = new Bus(busNumber, totalSeats, status);
+        bus.setId(id);
+        return bus;
+    }
+
+    private void prepareInsert(PreparedStatement stmt, Bus bus) throws SQLException {
+        stmt.setObject(1, bus.getId().toString());
+        stmt.setString(2, bus.getBusNumber());
+        stmt.setInt(3, bus.getTotalSeats());
+        stmt.setObject(4, bus.getStatus().getId().toString());
+    }
+
+    private void prepareUpdate(PreparedStatement stmt, Bus bus) throws SQLException {
+        stmt.setString(1, bus.getBusNumber());
+        stmt.setInt(2, bus.getTotalSeats());
+        stmt.setObject(3, bus.getStatus().getId().toString());
+        stmt.setObject(4, bus.getId().toString());
     }
 }

@@ -1,34 +1,86 @@
 package de.fhzwickau.reisewelle.controller.admin;
 
+import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.model.User;
 import de.fhzwickau.reisewelle.model.UserRole;
 import de.fhzwickau.reisewelle.dao.UserDao;
 import de.fhzwickau.reisewelle.dao.UserRoleDao;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
-public class AddEditUserController {
+public class AddEditUserController extends BaseAddEditController<User> {
 
     @FXML private TextField emailField;
     @FXML private TextField passwordField;
     @FXML private ComboBox<UserRole> roleComboBox;
-    @FXML private Button saveButton;
 
+    private static final Logger logger = LoggerFactory.getLogger(User.class);
+    private final BaseDao<User> userDao = new UserDao();
+    private final BaseDao<UserRole> userRoleDao = new UserRoleDao();
     private User user;
-    private final UserDao userDao = new UserDao();
-    private final UserRoleDao userRoleDao = new UserRoleDao();
-    private Stage stage;
+    private UserRole userRole;
+
+    @FXML
+    private void initialize() throws SQLException {
+        List<UserRole> roles = userRoleDao.findAll();
+        for (UserRole role : roles) {
+            logger.info("Loaded role: id=" + role.getId() + ", name=" + role.getRoleName());
+        }
+        roleComboBox.getItems().setAll(roles);
+    }
+
+    @Override
+    protected void saveEntity() throws SQLException {
+        if (validateInput()) {
+            if (entity == null) {
+                String email = emailField.getText();
+                String password = passwordField.getText();
+                UserRole selectedRole = roleComboBox.getValue();
+                if (selectedRole == null) {
+                    logger.warn("Error: No role selected");
+                    return;
+                }
+                entity = new User(email, password, selectedRole, LocalDateTime.now());
+                logger.info("Saving new user: email=" + entity.getEmail() + ", role=" + entity.getUserRole().getRoleName());
+            } else {
+                entity.setEmail(emailField.getText());
+                entity.setPassword(passwordField.getText());
+                UserRole selectedRole = roleComboBox.getValue();
+                if (selectedRole != null) {
+                    entity.setUserRole(selectedRole);
+                }
+                logger.info("Updating user: email=" + entity.getEmail() + ", role=" + entity.getUserRole().getRoleName());
+            }
+            userDao.save(entity);
+        }
+    }
+
+    @Override
+    protected Node getAnyControl() {
+        return emailField;
+    }
+
+    private boolean validateInput() {
+        String email = emailField.getText();
+        String password = passwordField.getText();
+        if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty() || roleComboBox.getValue() == null) {
+            logger.warn("Validation failed: Empty fields or no role selected");
+            return false;
+        }
+        return true;
+    }
 
     public void setUser(User user) {
         this.user = user;
+
         if (user != null) {
             emailField.setText(user.getEmail());
             passwordField.setText(user.getPassword());
@@ -36,70 +88,7 @@ public class AddEditUserController {
         }
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
-    public void setRoleFilter(UUID allowedRoleId) throws SQLException {
-        // Фильтруем роли, оставляем только ту, что соответствует allowedRoleId
-        List<UserRole> roles = userRoleDao.findAll().stream()
-                .filter(role -> role.getId().equals(allowedRoleId))
-                .toList();
-        roleComboBox.getItems().setAll(roles);
-        if (!roles.isEmpty()) {
-            roleComboBox.setValue(roles.get(0)); // Устанавливаем роль по умолчанию
-        }
-    }
-
-    @FXML
-    private void initialize() throws SQLException {
-        List<UserRole> roles = userRoleDao.findAll();
-        System.out.println("Loaded roles count: " + roles.size());
-        for (UserRole role : roles) {
-            System.out.println("Loaded role: id=" + role.getId() + ", name=" + role.getRoleName());
-        }
-        roleComboBox.getItems().setAll(roles);
-    }
-
-    @FXML
-    private void save() throws SQLException {
-        if (validateInput()) {
-            if (user == null) {
-                String email = emailField.getText();
-                String password = passwordField.getText();
-                UserRole selectedRole = roleComboBox.getValue();
-                if (selectedRole == null) {
-                    System.out.println("Error: No role selected");
-                    return;
-                }
-                user = new User(email, password, selectedRole, LocalDateTime.now());
-                System.out.println("Saving new user: email=" + user.getEmail() + ", role=" + user.getUserRole().getRoleName());
-            } else {
-                user.setEmail(emailField.getText());
-                user.setPassword(passwordField.getText());
-                UserRole selectedRole = roleComboBox.getValue();
-                if (selectedRole != null) {
-                    user.setUserRole(selectedRole);
-                }
-                System.out.println("Updating user: email=" + user.getEmail() + ", role=" + user.getUserRole().getRoleName());
-            }
-            userDao.save(user);
-            stage.close();
-        }
-    }
-
-    private boolean validateInput() {
-        String email = emailField.getText();
-        String password = passwordField.getText();
-        if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty() || roleComboBox.getValue() == null) {
-            System.out.println("Validation failed: Empty fields or no role selected");
-            return false;
-        }
-        return true;
-    }
-
-    @FXML
-    private void cancel() {
-        stage.close();
+    public void setFixedUserRole(UserRole role) {
+        this.userRole = role;
     }
 }

@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="de.fhzwickau.reisewelle.controller.admin.AdminDriversController"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.AdminDriverController"
       spacing="10" prefHeight="400.0" prefWidth="600.0" style="-fx-padding: 10;">
     <children>
         <Label text="Drivers" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
@@ -18,9 +18,9 @@
         </TableView>
         <HBox spacing="10">
             <children>
-                <Button fx:id="addButton" text="Add" onAction="#addDriver" />
-                <Button fx:id="editButton" text="Edit" onAction="#editDriver" disable="true" />
-                <Button fx:id="deleteButton" text="Delete" onAction="#deleteDriver" disable="true" />
+                <Button fx:id="addButton" text="Add" onAction="#onAdd" />
+                <Button fx:id="editButton" text="Edit" onAction="#onEdit" disable="true" />
+                <Button fx:id="deleteButton" text="Delete" onAction="#onDelete" disable="true" />
             </children>
         </HBox>
     </children>
