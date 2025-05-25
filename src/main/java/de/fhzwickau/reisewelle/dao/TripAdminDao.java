@@ -1,16 +1,10 @@
 package de.fhzwickau.reisewelle.dao;
 
 import de.fhzwickau.reisewelle.config.JDBCConfig;
-import de.fhzwickau.reisewelle.model.Bus;
+import de.fhzwickau.reisewelle.model.*;
 import de.fhzwickau.reisewelle.model.Driver;
-import de.fhzwickau.reisewelle.model.Trip;
-import de.fhzwickau.reisewelle.model.TripStatus;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

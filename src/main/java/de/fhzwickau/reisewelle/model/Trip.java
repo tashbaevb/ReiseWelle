@@ -1,3 +1,4 @@
+// Trip.java
 package de.fhzwickau.reisewelle.model;
 
 import java.util.UUID;
@@ -11,14 +12,14 @@ public class Trip {
     private LocalDate departureDate;
     private TripStatus status;
 
+    public Trip() {
+    }
+
     public Trip(Bus bus, Driver driver, LocalDate departureDate, TripStatus status) {
         this.bus = bus;
         this.driver = driver;
         this.departureDate = departureDate;
         this.status = status;
-    }
-
-    public Trip() {
     }
 
     public UUID getId() {
