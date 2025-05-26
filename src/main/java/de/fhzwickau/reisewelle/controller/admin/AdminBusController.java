@@ -2,7 +2,9 @@ package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.BusDao;
+import de.fhzwickau.reisewelle.dao.TripAdminDao;
 import de.fhzwickau.reisewelle.model.Bus;
+import de.fhzwickau.reisewelle.model.Trip;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
@@ -20,9 +22,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Controller for Bus administration table
+ */
 public class AdminBusController extends BaseTableController<Bus> {
 
-    @FXML private TableView<Bus>          busesTable;
+    @FXML private TableView<Bus> busesTable;
     @FXML private TableColumn<Bus, String> busNumberColumn;
     @FXML private TableColumn<Bus, Integer> totalSeatsColumn;
     @FXML private TableColumn<Bus, Integer> bikeSpacesColumn;
@@ -33,6 +38,7 @@ public class AdminBusController extends BaseTableController<Bus> {
     @FXML private Button deleteButton;
 
     private final BaseDao<Bus> busDao = new BusDao();
+    private final TripAdminDao tripDao = new TripAdminDao();
 
     @FXML
     protected void initialize() {
@@ -50,7 +56,7 @@ public class AdminBusController extends BaseTableController<Bus> {
                 new SimpleStringProperty(cd.getValue().getStatus().getName())
         );
 
-        // disable edit/delete until a row is selected
+        // disable edit/delete when nothing selected
         editButton.setDisable(true);
         deleteButton.setDisable(true);
         busesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
@@ -100,6 +106,22 @@ public class AdminBusController extends BaseTableController<Bus> {
         Bus selected = busesTable.getSelectionModel().getSelectedItem();
         if (selected == null) return;
 
+        // check if this bus is used in any trip
+        try {
+            boolean inUse = tripDao.findAll().stream()
+                    .anyMatch(trip -> trip.getBus().getId().equals(selected.getId()));
+            if (inUse) {
+                showError("Cannot delete bus",
+                        "This bus is assigned to one or more trips.\n" +
+                                "Please reassign or delete those trips first.");
+                return;
+            }
+        } catch (SQLException ex) {
+            showError("Error checking trips", ex.getMessage());
+            return;
+        }
+
+        // confirm deletion
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setHeaderText("Delete bus?");
         confirm.setContentText("ID: " + selected.getId());
@@ -163,7 +185,7 @@ public class AdminBusController extends BaseTableController<Bus> {
     }
 
     private void showError(String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+        Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
