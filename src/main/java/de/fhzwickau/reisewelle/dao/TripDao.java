@@ -5,7 +5,6 @@ import de.fhzwickau.reisewelle.dto.TripDetailsDTO;
 import de.fhzwickau.reisewelle.dto.TripSegmentDTO;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,70 +16,81 @@ import java.util.UUID;
 
 public class TripDao {
 
-    public List<TripSegmentDTO> searchTrips(String fromCity, String toCity, LocalDateTime dateTime, int adults, int children, int bicycles) throws SQLException {
+    public List<TripSegmentDTO> searchTrips(String fromCity, String toCity, LocalDateTime dateTime, Integer adults, Integer children, Integer bicycles) throws SQLException {
         Connection connection = JDBCConfig.getInstance();
         List<TripSegmentDTO> segments = new ArrayList<>();
+
+        System.out.println("searchTrips called with:");
+        System.out.println("fromCity = " + fromCity);
+        System.out.println("toCity = " + toCity);
+        System.out.println("dateTime = " + dateTime);
+        System.out.println("adults = " + adults);
+        System.out.println("children = " + children);
+        System.out.println("bicycles = " + bicycles);
+
         String sql = """
-        SELECT t.id as trip_id,
-               ss.id as start_id,
-               se.id as end_id,
-               ss.departure_time AS departure_time,
-               se.arrival_time AS arrival_time,
-               cs.name AS from_city,
-               ce.name AS to_city,
-               (
-                   SELECT MIN(sa.available_seats)
-                   FROM SeatAvailability sa
-                   WHERE sa.trip_id = t.id
-                     AND sa.start_stop_id = ss.id
-                     AND sa.end_stop_id = se.id
-               ) AS min_available,
-               (
-                   SELECT MIN(sa.available_bicycle_seats)
-                   FROM SeatAvailability sa
-                   WHERE sa.trip_id = t.id
-                     AND sa.start_stop_id = ss.id
-                     AND sa.end_stop_id = se.id
-               ) AS min_bikes,
-               (
-                   SELECT pto.price_from_start_adult - pfrom.price_from_start_adult
-                   FROM TripStopPrice pto
-                   JOIN TripStopPrice pfrom ON pto.trip_id = pfrom.trip_id
-                   WHERE pto.stop_id = se.id AND pfrom.stop_id = ss.id AND pto.trip_id = t.id
-               ) AS price_adult,
-               (
-                   SELECT pto.price_from_start_kinder - pfrom.price_from_start_kinder
-                   FROM TripStopPrice pto
-                   JOIN TripStopPrice pfrom ON pto.trip_id = pfrom.trip_id
-                   WHERE pto.stop_id = se.id AND pfrom.stop_id = ss.id AND pto.trip_id = t.id
-               ) AS price_child
-        FROM Trip t
-        JOIN Stop ss ON ss.trip_id = t.id
-        JOIN City cs ON ss.city_id = cs.id
-        JOIN Stop se ON se.trip_id = t.id
-        JOIN City ce ON se.city_id = ce.id
-        WHERE cs.name = ?
-          AND ce.name = ?
-          AND t.departure_date = ?
-          AND ss.departure_time >= ?
-          AND ss.stop_order < se.stop_order
-    """;
+                    SELECT
+                        t.id as trip_id,
+                        ss.id as start_id,
+                        se.id as end_id,
+                        ss.departure_time AS departure_time,
+                        se.arrival_time AS arrival_time,
+                        cs.name AS from_city,
+                        ce.name AS to_city,
+                        (
+                            SELECT MIN(sa.available_seats)
+                            FROM SeatAvailability sa
+                            WHERE sa.trip_id = t.id
+                              AND sa.start_stop_id = ss.id
+                              AND sa.end_stop_id = se.id
+                        ) AS min_available,
+                        (
+                            SELECT MIN(sa.available_bicycle_seats)
+                            FROM SeatAvailability sa
+                            WHERE sa.trip_id = t.id
+                              AND sa.start_stop_id = ss.id
+                              AND sa.end_stop_id = se.id
+                        ) AS min_bikes,
+                        (
+                            SELECT MAX(pto.price_from_start_adult - pfrom.price_from_start_adult)
+                            FROM TripStopPrice pto
+                            JOIN TripStopPrice pfrom ON pto.trip_id = pfrom.trip_id
+                            WHERE pto.stop_id = se.id AND pfrom.stop_id = ss.id AND pto.trip_id = t.id
+                        ) AS price_adult,
+                        (
+                            SELECT MAX(pto.price_from_start_kinder - pfrom.price_from_start_kinder)
+                            FROM TripStopPrice pto
+                            JOIN TripStopPrice pfrom ON pto.trip_id = pfrom.trip_id
+                            WHERE pto.stop_id = se.id AND pfrom.stop_id = ss.id AND pto.trip_id = t.id
+                        ) AS price_child
+                    FROM Trip t
+                    JOIN Stop ss ON ss.trip_id = t.id
+                    JOIN City cs ON ss.city_id = cs.id
+                    JOIN Stop se ON se.trip_id = t.id
+                    JOIN City ce ON se.city_id = ce.id
+                    WHERE cs.name = ?
+                      AND ce.name = ?
+                      AND ss.departure_time >= ?
+                      AND ss.stop_order < se.stop_order;
+                """;
 
         int totalPassengers = adults + children;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, fromCity);
             stmt.setString(2, toCity);
-            stmt.setDate(3, Date.valueOf(dateTime.toLocalDate()));
-            stmt.setTimestamp(4, Timestamp.valueOf(dateTime));
+            stmt.setTimestamp(3, Timestamp.valueOf(dateTime));
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 int seats = rs.getInt("min_available");
                 int bikes = rs.getInt("min_bikes");
 
+                // Проверка доступности мест и велосипедов
                 if (seats >= totalPassengers && bikes >= bicycles) {
                     UUID tripId = UUID.fromString(rs.getString("trip_id"));
+                    System.out.println("TRIP ID = " + tripId);
+
                     String from = rs.getString("from_city");
                     String to = rs.getString("to_city");
                     LocalDateTime departure = rs.getTimestamp("departure_time").toLocalDateTime();
@@ -100,38 +110,37 @@ public class TripDao {
                         TripSegmentDTO dto = new TripSegmentDTO(tripId, from, to, departure, arrival, price, seats, bikes);
                         segments.add(dto);
                     }
-
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw e;
         }
 
         return segments;
     }
 
-
     public TripDetailsDTO getTripDetails(UUID tripId) throws SQLException {
         Connection connection = JDBCConfig.getInstance();
 
         String sql = """
-            SELECT
-                d.first_name,
-                d.last_name,
-                b.bus_number,
-                sa.available_seats,
-                c.name AS city_name,
-                s.departure_time,
-                s.stop_order
-            FROM Trip t
-            JOIN Driver d ON t.driver_id = d.id
-            JOIN Bus b ON t.bus_id = b.id
-            LEFT JOIN SeatAvailability sa ON sa.trip_id = t.id
-            JOIN Stop s ON s.trip_id = t.id
-            JOIN City c ON s.city_id = c.id
-            WHERE t.id = ?
-            ORDER BY s.stop_order
-        """;
+                    SELECT
+                        d.first_name,
+                        d.last_name,
+                        b.bus_number,
+                        sa.available_seats,
+                        c.name AS city_name,
+                        s.departure_time,
+                        s.stop_order
+                    FROM Trip t
+                    JOIN Driver d ON t.driver_id = d.id
+                    JOIN Bus b ON t.bus_id = b.id
+                    LEFT JOIN SeatAvailability sa ON sa.trip_id = t.id
+                    JOIN Stop s ON s.trip_id = t.id
+                    JOIN City c ON s.city_id = c.id
+                    WHERE t.id = ?
+                    ORDER BY s.stop_order
+                """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setObject(1, tripId);
@@ -151,7 +160,7 @@ public class TripDao {
 
                 String city = rs.getString("city_name");
                 Timestamp departure = rs.getTimestamp("departure_time");
-                String timeString = departure != null ? departure.toLocalDateTime().toLocalTime().toString() : "время неизвестно";
+                String timeString = departure != null ? departure.toLocalDateTime().toLocalTime().toString() : "Ende";
                 stops.add(city + " - " + timeString);
             }
 
