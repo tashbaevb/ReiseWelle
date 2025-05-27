@@ -1,8 +1,8 @@
 package de.fhzwickau.reisewelle.controller.admin;
 
+import de.fhzwickau.reisewelle.dao.UserDao;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.model.User;
-import de.fhzwickau.reisewelle.dao.UserDao;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,32 +15,41 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class AdminUserController extends BaseTableController<User> {
 
-    @FXML
-    private TableView<User> usersTable;
-    @FXML
-    private TableColumn<User, String> emailColumn;
-    @FXML
-    private TableColumn<User, String> roleColumn;
-    @FXML
-    private TableColumn<User, String> createdAtColumn;
-    @FXML
-    private Button deleteButton;
+    @FXML private TableView<User> usersTable;
+    @FXML private TableColumn<User, String> emailColumn;
+    @FXML private TableColumn<User, String> roleColumn;
+    @FXML private TableColumn<User, String> createdAtColumn;
+    @FXML private Button editButton;
+    @FXML private Button deleteButton;
 
-    private final BaseDao<User> userDao = new UserDao();
+    private final UserDao userDao = new UserDao();
 
     @FXML
+    @Override
     protected void initialize() throws SQLException {
-        emailColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
-        roleColumn.setCellValueFactory(cellData -> {
-            User user = cellData.getValue();
-            String roleName = user.getUserRole() != null ? user.getUserRole().getRoleName() : "N/A";
-            return new SimpleStringProperty(roleName);
+        // set up columns
+        emailColumn.setCellValueFactory(c ->
+                new SimpleStringProperty(c.getValue().getEmail())
+        );
+        roleColumn.setCellValueFactory(c -> {
+            var r = c.getValue().getUserRole();
+            return new SimpleStringProperty(r == null ? "" : r.getRoleName());
         });
-        createdAtColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt() != null ? cellData.getValue().getCreatedAt().toString() : ""));
+        createdAtColumn.setCellValueFactory(c ->
+                new SimpleStringProperty(
+                        c.getValue().getCreatedAt() == null
+                                ? ""
+                                : c.getValue().getCreatedAt().toString()
+                )
+        );
+
+        // let the base class do the rest (wiring up the table, selection listeners, etc)
         super.initialize();
     }
 
@@ -55,6 +64,11 @@ public class AdminUserController extends BaseTableController<User> {
     }
 
     @Override
+    protected Button getEditButton() {
+        return editButton;
+    }
+
+    @Override
     protected Button getDeleteButton() {
         return deleteButton;
     }
@@ -65,30 +79,36 @@ public class AdminUserController extends BaseTableController<User> {
     }
 
     @Override
+    protected String getDeleteConfirmationMessage(User user) {
+        return "Delete passenger: " + user.getEmail() + "?";
+    }
+
+    @Override
     protected Stage showAddEditDialog(User user) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/admin/add-edit-user.fxml"));
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/de/fhzwickau/reisewelle/admin/add-edit-user.fxml")
+        );
         Stage stage = new Stage();
         stage.setScene(new Scene(loader.load()));
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(user == null ? "Add User" : "Edit User");
+        stage.setTitle(user == null ? "Add Passenger" : "Edit Passenger");
 
-        AddEditUserController controller = loader.getController();
-        controller.setUser(user);
+        AddEditUserController ctrl = loader.getController();
+        ctrl.setUser(user);
 
-        stage.setOnHidden(event -> refreshData());
+        // refresh when dialog closes
+        stage.setOnHidden(e -> refreshData());
         stage.show();
 
         return stage;
     }
 
     @Override
-    protected String getDeleteConfirmationMessage(User user) {
-        return "Delete user: " + user.getEmail() + "?";
-    }
-
-    // Not Realized
-    @Override
-    protected Button getEditButton() {
-        return null;
+    protected List<User> applyFilter(List<User> all) {
+        // show only those whose role name is "passenger"
+        return all.stream()
+                .filter(u -> u.getUserRole() != null
+                        && "passenger".equalsIgnoreCase(u.getUserRole().getRoleName()))
+                .collect(Collectors.toList());
     }
 }
