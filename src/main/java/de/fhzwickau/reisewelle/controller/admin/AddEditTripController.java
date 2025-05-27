@@ -106,7 +106,7 @@ public class AddEditTripController extends BaseAddEditController<Trip> {
 
     @Override
     protected void saveEntity() throws SQLException {
-        // Save or update Trip
+        // Если это новая сущность — создаём её, иначе — обновляем поля
         if (entity == null) {
             entity = new Trip(
                     busComboBox.getValue(),
@@ -120,9 +120,14 @@ public class AddEditTripController extends BaseAddEditController<Trip> {
             entity.setDepartureDate(departureDatePicker.getValue());
             entity.setStatus(statusComboBox.getValue());
         }
+
+        // 1) Сохраняем или обновляем сам Trip
         tripDao.save(entity);
 
-        // Save stops
+        // 2) Удаляем все старые записи цен, чтобы не возник конфликтов FK при удалении остановок
+        priceDao.deleteAllForTrip(entity.getId());
+
+        // 3) Сохраняем (batch) все остановки для рейса
         int ord = 1;
         for (Stop s : stopsTable.getItems()) {
             s.setTrip(entity);
@@ -130,12 +135,13 @@ public class AddEditTripController extends BaseAddEditController<Trip> {
         }
         stopDao.saveAllForTrip(entity.getId(), stopsTable.getItems());
 
-        // Save prices
+        // 4) Сохраняем (batch) новые цены
         for (TripStopPrice p : priceTable.getItems()) {
             p.setTrip(entity);
         }
         priceDao.saveAllForTrip(entity.getId(), priceTable.getItems());
 
+        // Закрываем диалог/окно
         close();
     }
 
