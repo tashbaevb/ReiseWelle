@@ -3,33 +3,56 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.geometry.Insets?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="de.fhzwickau.reisewelle.controller.user.TripController">
     <VBox>
-        <HBox spacing="5">
-            <TextField fx:id="fromCityField" promptText="Откуда"/>
-            <TextField fx:id="toCityField" promptText="Куда"/>
-            <AnchorPane fx:id="datetimePickerContainer" prefHeight="40" prefWidth="250"/>
-
-        </HBox>
-        <HBox spacing="5">
-            <Label text="Взрослые:"/>
-            <Spinner fx:id="adultSpinner"/>
-            <Label text="Дети:"/>
-            <Spinner fx:id="childSpinner"/>
-            <Label text="Велосипеды:"/>
-            <Spinner fx:id="bikeSpinner"/>
-            <Button text="Поиск" onAction="#onSearchClicked"/>
+        <HBox spacing="4">
+            <TextField fx:id="fromCityField" promptText="Woher"/>
+            <TextField fx:id="toCityField" promptText="Wohin"/>
+            <AnchorPane fx:id="datetimePickerContainer" prefHeight="40" prefWidth="480"/>
         </HBox>
 
+        <HBox spacing="4" alignment="CENTER_LEFT">
+            <Label text="Erwachsene:"/>
+            <Spinner fx:id="adultSpinner" prefWidth="60">
+                <HBox.margin>
+                    <Insets left="4" right="20"/>
+                </HBox.margin>
+            </Spinner>
+
+            <Label text="Kinder:"/>
+            <Spinner fx:id="childSpinner" prefWidth="60">
+                <HBox.margin>
+                    <Insets left="4" right="20"/>
+                </HBox.margin>
+            </Spinner>
+
+            <Label text="Fahrräder:"/>
+            <Spinner fx:id="bikeSpinner" prefWidth="60">
+                <HBox.margin>
+                    <Insets left="4" right="200"/>
+                </HBox.margin>
+            </Spinner>
+
+            <Button text="Suche" onAction="#onSearchClicked"/>
+        </HBox>
+
+        <HBox alignment="CENTER" spacing="40">
+            <VBox.margin>
+                <Insets top="30" bottom="15"/>
+            </VBox.margin>
+            <Separator HBox.hgrow="ALWAYS" style="-fx-border-color: white; -fx-border-width: 0 0 2 0;"/>
+            <Label text="TRIPS" style="-fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 18px;"/>
+            <Separator HBox.hgrow="ALWAYS" style="-fx-border-color: white; -fx-border-width: 0 0 2 0;"/>
+        </HBox>
 
         <TableView fx:id="tripTable" onMouseClicked="#onTripSelected">
             <columns>
-                <TableColumn fx:id="fromColumn" text="Откуда"/>
-                <TableColumn fx:id="toColumn" text="Куда"/>
-                <TableColumn fx:id="departureColumn" text="Отправление"/>
-                <TableColumn fx:id="arrivalColumn" text="Прибытие"/>
-                <TableColumn fx:id="priceColumn" text="Цена"/>
-                <TableColumn fx:id="seatsColumn" text="Свободные места"/>
+                <TableColumn fx:id="fromColumn" text="Woher"/>
+                <TableColumn fx:id="toColumn" text="Wohin"/>
+                <TableColumn fx:id="departureColumn" text="Abfahrt"/>
+                <TableColumn fx:id="arrivalColumn" text="Ankunft"/>
+                <TableColumn fx:id="priceColumn" text="Preis"/>
             </columns>
         </TableView>
     </VBox>

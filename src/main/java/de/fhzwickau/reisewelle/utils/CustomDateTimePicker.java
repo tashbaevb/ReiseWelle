@@ -1,5 +1,6 @@
 package de.fhzwickau.reisewelle.utils;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class CustomDateTimePicker extends HBox {
+
     private final DatePicker datePicker = new DatePicker();
     private final Spinner<Integer> hourSpinner = new Spinner<>(0, 23, 12);
     private final Spinner<Integer> minuteSpinner = new Spinner<>(0, 59, 0);
@@ -17,7 +19,14 @@ public class CustomDateTimePicker extends HBox {
         setSpacing(5);
         hourSpinner.setPrefWidth(60);
         minuteSpinner.setPrefWidth(60);
-        getChildren().addAll(datePicker, new Label("H:"), hourSpinner, new Label("M:"), minuteSpinner);
+
+        Label hourLabel = new Label("H:");
+        hourLabel.setStyle("-fx-font-weight: bold;");
+
+        Label minuteLabel = new Label("M:");
+        minuteLabel.setStyle("-fx-font-weight: bold;");
+
+        getChildren().addAll(datePicker, hourLabel, hourSpinner, minuteLabel, minuteSpinner);
     }
 
     public LocalDateTime getDateTimeValue() {

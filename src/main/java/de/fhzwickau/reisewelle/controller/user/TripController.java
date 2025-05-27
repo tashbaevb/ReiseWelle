@@ -15,7 +15,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -44,7 +43,6 @@ public class TripController implements Initializable {
     @FXML private TableColumn<TripSegmentDTO, LocalDateTime> departureColumn;
     @FXML private TableColumn<TripSegmentDTO, LocalDateTime> arrivalColumn;
     @FXML private TableColumn<TripSegmentDTO, Double> priceColumn;
-    @FXML private TableColumn<TripSegmentDTO, Integer> seatsColumn;
 
     private final TripDao tripRepo = new TripDao();
 
@@ -55,7 +53,6 @@ public class TripController implements Initializable {
         departureColumn.setCellValueFactory(new PropertyValueFactory<>("departureTime"));
         arrivalColumn.setCellValueFactory(new PropertyValueFactory<>("arrivalTime"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-        seatsColumn.setCellValueFactory(new PropertyValueFactory<>("availableSeats"));
 
         adultSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 40, 1));
         childSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 40, 0));
@@ -88,6 +85,7 @@ public class TripController implements Initializable {
                 setText(empty || item == null ? "" : item.format(formatter));
             }
         });
+        tripTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
     }
 
@@ -107,7 +105,7 @@ public class TripController implements Initializable {
 
 
     @FXML
-    public void onTripSelected(MouseEvent event) throws IOException, SQLException {
+    public void onTripSelected() throws IOException, SQLException {
         TripSegmentDTO selected = tripTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/user/detail_trip.fxml"));
