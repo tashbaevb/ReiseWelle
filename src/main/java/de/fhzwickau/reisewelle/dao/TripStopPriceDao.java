@@ -1,4 +1,3 @@
-// src/main/java/de/fhzwickau/reisewelle/dao/TripStopPriceDao.java
 package de.fhzwickau.reisewelle.dao;
 
 import de.fhzwickau.reisewelle.config.JDBCConfig;
@@ -13,35 +12,30 @@ public class TripStopPriceDao implements BaseDao<TripStopPrice> {
 
     private final StopDao stopDao = new StopDao();
 
-    /** Удаляет старые цены и вставляет новые для рейса */
     public void saveAllForTrip(UUID tripId, List<TripStopPrice> prices) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        try (PreparedStatement del = conn.prepareStatement(
-                "DELETE FROM TripStopPrice WHERE trip_id = ?"
-        )) {
+        try (PreparedStatement del = conn.prepareStatement("DELETE FROM TripStopPrice WHERE trip_id = ?")) {
             del.setString(1, tripId.toString());
             del.executeUpdate();
         }
-        String sql = "INSERT INTO TripStopPrice (id, trip_id, stop_id, price_from_start) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO TripStopPrice (id, trip_id, stop_id, price_from_start_adult, price_from_start_kinder) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement ins = conn.prepareStatement(sql)) {
             for (TripStopPrice p : prices) {
                 if (p.getId() == null) p.setId(UUID.randomUUID());
                 ins.setString(1, p.getId().toString());
                 ins.setString(2, tripId.toString());
                 ins.setString(3, p.getStop().getId().toString());
-                ins.setDouble(4, p.getPriceFromStart());
+                ins.setDouble(4, p.getPriceFromStartAdult());
+                ins.setDouble(5, p.getPriceFromStartChild());
                 ins.addBatch();
             }
             ins.executeBatch();
         }
     }
 
-    /** Каскадное удаление по рейсу */
     public void deleteAllForTrip(UUID tripId) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        try (PreparedStatement stmt = conn.prepareStatement(
-                "DELETE FROM TripStopPrice WHERE trip_id = ?"
-        )) {
+        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM TripStopPrice WHERE trip_id = ?")) {
             stmt.setString(1, tripId.toString());
             stmt.executeUpdate();
         }
@@ -50,7 +44,7 @@ public class TripStopPriceDao implements BaseDao<TripStopPrice> {
     @Override
     public TripStopPrice findById(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = "SELECT trip_id, stop_id, price_from_start FROM TripStopPrice WHERE id = ?";
+        String sql = "SELECT trip_id, stop_id, price_from_start_adult FROM TripStopPrice WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
@@ -58,7 +52,8 @@ public class TripStopPriceDao implements BaseDao<TripStopPrice> {
                     TripStopPrice p = new TripStopPrice(
                             null,
                             null,
-                            rs.getDouble("price_from_start")
+                            rs.getDouble("price_from_start_adult"),
+                            rs.getDouble("price_from_start_kinder")
                     );
                     p.setId(id);
                     return p;
@@ -71,7 +66,7 @@ public class TripStopPriceDao implements BaseDao<TripStopPrice> {
     @Override
     public List<TripStopPrice> findAll() throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = "SELECT id, trip_id, stop_id, price_from_start FROM TripStopPrice";
+        String sql = "SELECT id, trip_id, stop_id, price_from_start_adult FROM TripStopPrice";
         List<TripStopPrice> list = new ArrayList<>();
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -79,7 +74,8 @@ public class TripStopPriceDao implements BaseDao<TripStopPrice> {
                 TripStopPrice p = new TripStopPrice(
                         null,
                         null,
-                        rs.getDouble("price_from_start")
+                        rs.getDouble("price_from_start_adult"),
+                        rs.getDouble("price_from_start_kinder")
                 );
                 p.setId(UUID.fromString(rs.getString("id")));
                 list.add(p);
@@ -96,30 +92,27 @@ public class TripStopPriceDao implements BaseDao<TripStopPrice> {
     @Override
     public void delete(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        try (PreparedStatement stmt = conn.prepareStatement(
-                "DELETE FROM TripStopPrice WHERE id = ?"
-        )) {
+        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM TripStopPrice WHERE id = ?")) {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
         }
     }
 
-    /** Загрузка всех цен рейса */
     public List<TripStopPrice> findByTripId(UUID tripId) throws SQLException {
         List<Stop> stops = stopDao.findByTripId(tripId);
         Map<UUID, Stop> stopMap = stops.stream()
                 .collect(Collectors.toMap(Stop::getId, s -> s));
 
         Connection conn = JDBCConfig.getInstance();
-        String sql = "SELECT id, stop_id, price_from_start FROM TripStopPrice WHERE trip_id = ?";
+        String sql = "SELECT id, stop_id, price_from_start_adult, price_from_start_kinder FROM TripStopPrice WHERE trip_id = ?";
         List<TripStopPrice> list = new ArrayList<>();
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, tripId.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     UUID priceId = UUID.fromString(rs.getString("id"));
-                    UUID stopId  = UUID.fromString(rs.getString("stop_id"));
-                    TripStopPrice p = new TripStopPrice(null, stopMap.get(stopId), rs.getDouble("price_from_start"));
+                    UUID stopId = UUID.fromString(rs.getString("stop_id"));
+                    TripStopPrice p = new TripStopPrice(null, stopMap.get(stopId), rs.getDouble("price_from_start_adult"), rs.getDouble("price_from_start_kinder"));
                     p.setId(priceId);
                     list.add(p);
                 }

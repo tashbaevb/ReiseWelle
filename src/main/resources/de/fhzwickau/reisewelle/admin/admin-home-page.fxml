@@ -1,28 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="de.fhzwickau.reisewelle.controller.admin.AdminHomeController"
             prefHeight="400.0" prefWidth="600.0">
+
     <left>
         <VBox spacing="10" alignment="TOP_CENTER" style="-fx-padding: 10;">
             <children>
-                <Button text="Users" fx:id="usersButton" onAction="#showUsers" />
-                <Button text="Company Representatives" fx:id="employee" onAction="#showEmployee" />
-                <Button text="Buses" fx:id="busesButton" onAction="#showBuses" />
-                <Button text="Drivers" fx:id="driversButton" onAction="#showDrivers" />
-                <Button text="Trips" fx:id="tripsButton" onAction="#showTrips" />
+                <Button text="Die Kunden" fx:id="usersButton" onAction="#showUsers"/>
+                <Button text="Die Mitarbeiter" fx:id="employee" onAction="#showEmployee"/>
+                <Button text="Die Busse" fx:id="busesButton" onAction="#showBuses"/>
+                <Button text="Die Fahrer" fx:id="driversButton" onAction="#showDrivers"/>
+                <Button text="Die Reisen" fx:id="tripsButton" onAction="#showTrips"/>
             </children>
         </VBox>
     </left>
     <center>
-        <StackPane fx:id="contentPane" />
+        <StackPane fx:id="contentPane"/>
     </center>
 </BorderPane>

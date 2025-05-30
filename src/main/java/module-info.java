@@ -20,4 +20,14 @@ module de.fhzwickau.reisewelle {
     exports de.fhzwickau.reisewelle.controller.user;
     opens de.fhzwickau.reisewelle.controller.user to javafx.fxml;
     exports de.fhzwickau.reisewelle.dto;
+    exports de.fhzwickau.reisewelle.controller.admin.bus;
+    opens de.fhzwickau.reisewelle.controller.admin.bus to javafx.fxml;
+    exports de.fhzwickau.reisewelle.controller.admin.driver;
+    opens de.fhzwickau.reisewelle.controller.admin.driver to javafx.fxml;
+    exports de.fhzwickau.reisewelle.controller.admin.user;
+    opens de.fhzwickau.reisewelle.controller.admin.user to javafx.fxml;
+    exports de.fhzwickau.reisewelle.controller.admin.trip;
+    opens de.fhzwickau.reisewelle.controller.admin.trip to javafx.fxml;
+    exports de.fhzwickau.reisewelle.controller.admin.employee;
+    opens de.fhzwickau.reisewelle.controller.admin.employee to javafx.fxml;
 }

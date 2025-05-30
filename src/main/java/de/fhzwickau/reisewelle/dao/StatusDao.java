@@ -16,7 +16,7 @@ public class StatusDao implements BaseDao<Status> {
     @Override
     public List<Status> findAll() throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = "SELECT id, name FROM Status";
+        String sql = "SELECT * FROM Status";
         List<Status> statuses = new ArrayList<>();
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
@@ -32,7 +32,7 @@ public class StatusDao implements BaseDao<Status> {
     @Override
     public Status findById(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = "SELECT id, name FROM Status WHERE id = ?";
+        String sql = "SELECT * FROM Status WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());

@@ -3,21 +3,27 @@ package de.fhzwickau.reisewelle.model;
 import java.util.UUID;
 
 public class Bus {
+
     private UUID id;
     private String busNumber;
-    private int totalSeats;
+    private Integer totalSeats;
+    private Integer bicycleSpaces;
     private Status status;
-    private int bikeSpaces;    // new field
 
-    public Bus(String busNumber, int totalSeats, Status status, int bikeSpaces) {
-        this.id = UUID.randomUUID();
+    public Bus(String busNumber, Integer totalSeats, Status status, Integer bicycleSpaces) {
         this.busNumber = busNumber;
         this.totalSeats = totalSeats;
         this.status = status;
-        this.bikeSpaces = bikeSpaces;
+        this.bicycleSpaces = bicycleSpaces;
     }
 
-    public Bus() { }
+    public Bus(UUID id, String busNumber, Integer totalSeats, Status status, Integer bicycleSpaces) {
+        this.id = id;
+        this.busNumber = busNumber;
+        this.totalSeats = totalSeats;
+        this.status = status;
+        this.bicycleSpaces = bicycleSpaces;
+    }
 
     public UUID getId() {
         return id;
@@ -35,12 +41,20 @@ public class Bus {
         this.busNumber = busNumber;
     }
 
-    public int getTotalSeats() {
+    public Integer getTotalSeats() {
         return totalSeats;
     }
 
-    public void setTotalSeats(int totalSeats) {
+    public void setTotalSeats(Integer totalSeats) {
         this.totalSeats = totalSeats;
+    }
+
+    public Integer getBicycleSpaces() {
+        return bicycleSpaces;
+    }
+
+    public void setBicycleSpaces(Integer bicycleSpaces) {
+        this.bicycleSpaces = bicycleSpaces;
     }
 
     public Status getStatus() {
@@ -51,11 +65,8 @@ public class Bus {
         this.status = status;
     }
 
-    public int getBikeSpaces() {
-        return bikeSpaces;
-    }
-
-    public void setBikeSpaces(int bikeSpaces) {
-        this.bikeSpaces = bikeSpaces;
+    @Override
+    public String toString() {
+        return busNumber;
     }
 }

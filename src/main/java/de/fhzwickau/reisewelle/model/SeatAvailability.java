@@ -9,15 +9,14 @@ public class SeatAvailability {
     private Stop startStop;
     private Stop endStop;
     private Integer availableSeats;
-    private Integer availableBikes;
+    private Integer availableBicycleSeats;
 
-    public SeatAvailability(Trip trip, Stop startStop, Stop endStop, Integer availableSeats, Integer availableBikes) {
-        this.id = UUID.randomUUID();
+    public SeatAvailability(Trip trip, Stop startStop, Stop endStop, Integer availableSeats, Integer availableBicycleSeats) {
         this.trip = trip;
         this.startStop = startStop;
         this.endStop = endStop;
         this.availableSeats = availableSeats;
-        this.availableBikes = availableBikes;
+        this.availableBicycleSeats = availableBicycleSeats;
     }
 
     public UUID getId() {
@@ -64,11 +63,11 @@ public class SeatAvailability {
         this.availableSeats = availableSeats;
     }
 
-    public Integer getAvailableBikes() {
-        return availableBikes;
+    public Integer getAvailableBicycleSeats() {
+        return availableBicycleSeats;
     }
 
-    public void setAvailableBikes(Integer availableBikes) {
-        this.availableBikes = availableBikes;
+    public void setAvailableBicycleSeats(Integer availableBicycleSeats) {
+        this.availableBicycleSeats = availableBicycleSeats;
     }
 }

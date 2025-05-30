@@ -1,4 +1,3 @@
-// src/main/java/de/fhzwickau/reisewelle/dao/CityDao.java
 package de.fhzwickau.reisewelle.dao;
 
 import de.fhzwickau.reisewelle.config.JDBCConfig;

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.Button?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.trip.AddEditTripController"
+      spacing="10" prefWidth="700" prefHeight="600" style="-fx-padding:10;">
+
+    <GridPane hgap="10" vgap="5">
+        <columnConstraints>
+            <ColumnConstraints halignment="RIGHT"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+            <ColumnConstraints halignment="RIGHT"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+
+        <rowConstraints>
+            <RowConstraints vgrow="NEVER"/>
+            <RowConstraints vgrow="NEVER"/>
+        </rowConstraints>
+
+        <Label text="Bus:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="busComboBox" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Fahrer:" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+        <ComboBox fx:id="driverComboBox" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+        <Label text="Abreise:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="departureDatePicker" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Stand:" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+        <ComboBox fx:id="statusComboBox" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+    </GridPane>
+
+    <HBox spacing="20">
+        <VBox>
+            <Label text="Stationen:"/>
+
+            <TableView fx:id="stopsTable" prefHeight="200" prefWidth="350">
+                <columns>
+                    <TableColumn text="№" fx:id="orderColumn"/>
+                    <TableColumn text="Stadt" fx:id="cityColumn"/>
+                    <TableColumn text="Ankunft" fx:id="arrivalColumn"/>
+                    <TableColumn text="Abfahrt" fx:id="departureColumn"/>
+                </columns>
+            </TableView>
+
+            <HBox spacing="10">
+                <Button text="Station hinzufügen" onAction="#addStop"/>
+                <Button text="Entfernen" onAction="#removeStop"/>
+                <Button text="Nach Oben" onAction="#moveStopUp"/>
+                <Button text="Nach Unten" onAction="#moveStopDown"/>
+                <Button text="Als Start einstellen" onAction="#markAsStart"/>
+            </HBox>
+        </VBox>
+
+        <!-- Pricing panel: shows only stops after the start -->
+        <VBox>
+            <Label text="Preise (Preis ab Start bis zu jeder Station):"/>
+
+            <TableView fx:id="priceTable" prefHeight="150" prefWidth="300" editable="true">
+                <columns>
+                    <TableColumn text="Stadt" fx:id="priceCityColumn"/>
+                    <TableColumn text="Preis (Erwachsene)" fx:id="priceAdultColumn"/>
+                    <TableColumn text="Preis (Kinder)" fx:id="priceChildColumn"/>
+                </columns>
+            </TableView>
+
+            <Button text="Preise aktualisieren" onAction="#updatePrices"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Speichern" onAction="#save"/>
+        <Button text="Abbrechen" onAction="#cancel"/>
+    </HBox>
+</VBox>

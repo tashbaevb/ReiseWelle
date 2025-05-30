@@ -17,7 +17,6 @@ public class Ticket {
     private LocalDateTime purchaseDate;
 
     public Ticket(User user, Trip trip, Stop startStop, Stop endStop, Integer adultCount, Integer childCount, Integer bikeCount, Double totalPrice, LocalDateTime purchaseDate) {
-        this.id = UUID.randomUUID();
         this.user = user;
         this.trip = trip;
         this.startStop = startStop;

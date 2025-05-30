@@ -11,9 +11,6 @@ public class TripStatus {
         this.name = name;
     }
 
-    public TripStatus() {
-    }
-
     public UUID getId() {
         return id;
     }

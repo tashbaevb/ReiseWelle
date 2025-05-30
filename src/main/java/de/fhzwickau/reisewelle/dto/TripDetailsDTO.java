@@ -4,24 +4,14 @@ import java.util.List;
 
 public class TripDetailsDTO {
 
-    private String driverName;
     private String busNumber;
-    private Integer availableSeats;
     private List<String> stops;
+    private Double price;
 
-    public TripDetailsDTO(String driverName, String busNumber, Integer availableSeats, List<String> stops) {
-        this.driverName = driverName;
+    public TripDetailsDTO(String busNumber, List<String> stops, Double price) {
         this.busNumber = busNumber;
-        this.availableSeats = availableSeats;
         this.stops = stops;
-    }
-
-    public String getDriverName() {
-        return driverName;
-    }
-
-    public void setDriverName(String driverName) {
-        this.driverName = driverName;
+        this.price = price;
     }
 
     public String getBusNumber() {
@@ -32,19 +22,19 @@ public class TripDetailsDTO {
         this.busNumber = busNumber;
     }
 
-    public Integer getAvailableSeats() {
-        return availableSeats;
-    }
-
-    public void setAvailableSeats(Integer availableSeats) {
-        this.availableSeats = availableSeats;
-    }
-
     public List<String> getStops() {
         return stops;
     }
 
     public void setStops(List<String> stops) {
         this.stops = stops;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 }

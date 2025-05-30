@@ -1,4 +1,3 @@
-// src/main/java/de/fhzwickau/reisewelle/dao/SeatAvailabilityDao.java
 package de.fhzwickau.reisewelle.dao;
 
 import de.fhzwickau.reisewelle.config.JDBCConfig;
@@ -16,7 +15,7 @@ public class SeatAvailabilityDao implements BaseDao<SeatAvailability> {
     @Override
     public List<SeatAvailability> findAll() throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = "SELECT id, trip_id, start_stop_id, end_stop_id, available_seats, available_bikes FROM SeatAvailability";
+        String sql = "SELECT id, trip_id, start_stop_id, end_stop_id, available_seats, available_bicycle_spaces FROM SeatAvailability";
         List<SeatAvailability> list = new ArrayList<>();
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -28,7 +27,7 @@ public class SeatAvailabilityDao implements BaseDao<SeatAvailability> {
     @Override
     public SeatAvailability findById(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = "SELECT trip_id, start_stop_id, end_stop_id, available_seats, available_bikes FROM SeatAvailability WHERE id = ?";
+        String sql = "SELECT trip_id, start_stop_id, end_stop_id, available_seats, available_bicycle_spaces FROM SeatAvailability WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
@@ -47,8 +46,8 @@ public class SeatAvailabilityDao implements BaseDao<SeatAvailability> {
         Connection conn = JDBCConfig.getInstance();
         boolean isNew = sa.getId() == null;
         String sql = isNew
-                ? "INSERT INTO SeatAvailability (id, trip_id, start_stop_id, end_stop_id, available_seats, available_bikes) VALUES (?, ?, ?, ?, ?, ?)"
-                : "UPDATE SeatAvailability SET trip_id=?, start_stop_id=?, end_stop_id=?, available_seats=?, available_bikes=? WHERE id=?";
+                ? "INSERT INTO SeatAvailability (id, trip_id, start_stop_id, end_stop_id, available_seats, available_bicycle_spaces) VALUES (?, ?, ?, ?, ?, ?)"
+                : "UPDATE SeatAvailability SET trip_id=?, start_stop_id=?, end_stop_id=?, available_seats=?, available_bicycle_spaces=? WHERE id=?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             int i = 1;
             if (isNew) {
@@ -59,7 +58,7 @@ public class SeatAvailabilityDao implements BaseDao<SeatAvailability> {
             stmt.setString(i++, sa.getStartStop().getId().toString());
             stmt.setString(i++, sa.getEndStop().getId().toString());
             stmt.setInt(i++, sa.getAvailableSeats());
-            stmt.setInt(i++, sa.getAvailableBikes());
+            stmt.setInt(i++, sa.getAvailableBicycleSeats());
             if (!isNew) stmt.setString(i, sa.getId().toString());
             stmt.executeUpdate();
         }
@@ -68,9 +67,7 @@ public class SeatAvailabilityDao implements BaseDao<SeatAvailability> {
     @Override
     public void delete(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        try (PreparedStatement stmt = conn.prepareStatement(
-                "DELETE FROM SeatAvailability WHERE id = ?"
-        )) {
+        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM SeatAvailability WHERE id = ?")) {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
         }
@@ -78,9 +75,7 @@ public class SeatAvailabilityDao implements BaseDao<SeatAvailability> {
 
     public void deleteAllForTrip(UUID tripId) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        try (PreparedStatement stmt = conn.prepareStatement(
-                "DELETE FROM SeatAvailability WHERE trip_id = ?"
-        )) {
+        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM SeatAvailability WHERE trip_id = ?")) {
             stmt.setString(1, tripId.toString());
             stmt.executeUpdate();
         }
@@ -88,9 +83,7 @@ public class SeatAvailabilityDao implements BaseDao<SeatAvailability> {
 
     public void deleteAllForStop(UUID stopId) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        try (PreparedStatement stmt = conn.prepareStatement(
-                "DELETE FROM SeatAvailability WHERE start_stop_id = ? OR end_stop_id = ?"
-        )) {
+        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM SeatAvailability WHERE start_stop_id = ? OR end_stop_id = ?")) {
             stmt.setString(1, stopId.toString());
             stmt.setString(2, stopId.toString());
             stmt.executeUpdate();
@@ -98,11 +91,10 @@ public class SeatAvailabilityDao implements BaseDao<SeatAvailability> {
     }
 
     private SeatAvailability mapRow(ResultSet rs) throws SQLException {
-        UUID tripId  = UUID.fromString(rs.getString("trip_id"));
+        UUID tripId = UUID.fromString(rs.getString("trip_id"));
         UUID startId = UUID.fromString(rs.getString("start_stop_id"));
-        UUID endId   = UUID.fromString(rs.getString("end_stop_id"));
+        UUID endId = UUID.fromString(rs.getString("end_stop_id"));
 
-        // локально создаём TripAdminDao
         TripAdminDao tripDao = new TripAdminDao();
 
         return new SeatAvailability(
@@ -110,7 +102,7 @@ public class SeatAvailabilityDao implements BaseDao<SeatAvailability> {
                 stopDao.findById(startId),
                 stopDao.findById(endId),
                 rs.getInt("available_seats"),
-                rs.getInt("available_bikes")
+                rs.getInt("available_bicycle_spaces")
         );
     }
 }

@@ -13,12 +13,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class UserDao implements BaseDao<User> {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
     private final UserRoleDao userRoleDao = new UserRoleDao();
 
     @Override
@@ -33,7 +30,6 @@ public class UserDao implements BaseDao<User> {
                 User user = mapUser(rs);
                 if (user != null) {
                     users.add(user);
-                    logger.info("Loaded user: email={}, role={}", user.getEmail(), user.getUserRole().getRoleName());
                 }
             }
         }
@@ -62,17 +58,15 @@ public class UserDao implements BaseDao<User> {
     public void save(User user) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
         boolean isNew = user.getId() == null;
-        String sql =  isNew
+        String sql = isNew
                 ? "INSERT INTO [dbo].[User] (id, email, password, user_role_id, created_at) VALUES (?, ?, ?, ?, ?)"
                 : "UPDATE [dbo].[User] SET email = ?, password = ?, user_role_id = ?, created_at = ? WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (isNew) {
                 prepareInsert(stmt, user);
-                logger.info("Executing INSERT: id=" + user.getId() + ", email=" + user.getEmail() + ", roleId=" + user.getUserRole().getId());
             } else {
                 prepareUpdate(stmt, user);
-                logger.info("Executing UPDATE: id=" + user.getId() + ", email=" + user.getEmail() + ", roleId=" + user.getUserRole().getId());
             }
             stmt.executeUpdate();
         }
@@ -89,31 +83,10 @@ public class UserDao implements BaseDao<User> {
         }
     }
 
-    public List<User> findEmployees() throws SQLException {
-        Connection conn = JDBCConfig.getInstance();
-        String sql = """
-                SELECT u.id, u.email, u.password, u.user_role_id, u.created_at
-                FROM [User] u
-                JOIN UserRole r ON u.user_role_id = r.id
-                WHERE r.role_name = 'employee'
-                """;
-        List<User> companyReps = new ArrayList<>();
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                companyReps.add(mapUser(rs));
-            }
-        }
-
-        return companyReps;
-    }
-
     private User mapUser(ResultSet rs) throws SQLException {
         UUID roleId = UUID.fromString(rs.getString("user_role_id"));
         UserRole userRole = userRoleDao.findById(roleId);
         if (userRole == null) {
-            logger.warn("UserRole not found for roleId: {}", roleId);
             return null;
         }
 
@@ -123,7 +96,7 @@ public class UserDao implements BaseDao<User> {
                 userRole,
                 rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null
         );
-        user.setId(roleId);
+        user.setId(UUID.fromString(rs.getString("id")));
 
         return user;
     }

@@ -12,9 +12,11 @@ public class TripSegmentDTO {
     private LocalDateTime arrivalTime;
     private Double price;
     private Integer availableSeats;
-    private Integer availableBikes;
+    private Integer availableBicycleSpaces;
+    private UUID startStopId;
+    private UUID endStopId;
 
-    public TripSegmentDTO(UUID tripId, String fromCity, String toCity, LocalDateTime departureTime, LocalDateTime arrivalTime, double price, int availableSeats, int availableBikes) {
+    public TripSegmentDTO(UUID tripId, String fromCity, String toCity, LocalDateTime departureTime, LocalDateTime arrivalTime, Double price, Integer availableSeats, Integer availableBicycleSpaces, UUID startStopId, UUID endStopId) {
         this.tripId = tripId;
         this.fromCity = fromCity;
         this.toCity = toCity;
@@ -22,7 +24,9 @@ public class TripSegmentDTO {
         this.arrivalTime = arrivalTime;
         this.price = price;
         this.availableSeats = availableSeats;
-        this.availableBikes = availableBikes;
+        this.availableBicycleSpaces = availableBicycleSpaces;
+        this.startStopId = startStopId;
+        this.endStopId = endStopId;
     }
 
     public UUID getTripId() {
@@ -65,27 +69,43 @@ public class TripSegmentDTO {
         this.arrivalTime = arrivalTime;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public int getAvailableSeats() {
+    public Integer getAvailableSeats() {
         return availableSeats;
     }
 
-    public void setAvailableSeats(int availableSeats) {
+    public void setAvailableSeats(Integer availableSeats) {
         this.availableSeats = availableSeats;
     }
 
-    public int getAvailableBikes() {
-        return availableBikes;
+    public Integer getAvailableBicycleSpaces() {
+        return availableBicycleSpaces;
     }
 
-    public void setAvailableBikes(int availableBikes) {
-        this.availableBikes = availableBikes;
+    public void setAvailableBicycleSpaces(Integer availableBicycleSpaces) {
+        this.availableBicycleSpaces = availableBicycleSpaces;
+    }
+
+    public UUID getStartStopId() {
+        return startStopId;
+    }
+
+    public void setStartStopId(UUID startStopId) {
+        this.startStopId = startStopId;
+    }
+
+    public UUID getEndStopId() {
+        return endStopId;
+    }
+
+    public void setEndStopId(UUID endStopId) {
+        this.endStopId = endStopId;
     }
 }

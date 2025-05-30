@@ -16,7 +16,7 @@ public class TripStatusDao implements BaseDao<TripStatus> {
     @Override
     public List<TripStatus> findAll() throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = "SELECT id, name FROM TripStatus";
+        String sql = "SELECT * FROM TripStatus";
         List<TripStatus> tripStatuses = new ArrayList<>();
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
@@ -32,7 +32,7 @@ public class TripStatusDao implements BaseDao<TripStatus> {
     @Override
     public TripStatus findById(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = "SELECT id, name FROM TripStatus WHERE id = ?";
+        String sql = "SELECT * FROM TripStatus WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());

@@ -1,5 +1,6 @@
-package de.fhzwickau.reisewelle.controller.admin;
+package de.fhzwickau.reisewelle.controller.admin.driver;
 
+import de.fhzwickau.reisewelle.controller.admin.BaseAddEditController;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.model.Driver;
 import de.fhzwickau.reisewelle.model.Status;
@@ -14,10 +15,10 @@ import java.sql.SQLException;
 
 public class AddEditDriverController extends BaseAddEditController<Driver> {
 
-    @FXML private TextField firstNameField;
-    @FXML private TextField lastNameField;
-    @FXML private TextField licenseNumberField;
-    @FXML private ComboBox<Status> statusComboBox;
+    @FXML
+    private TextField firstNameField, lastNameField, licenseNumberField;
+    @FXML
+    private ComboBox<Status> statusComboBox;
 
     private final BaseDao<Driver> driverDao = new DriverDao();
     private final BaseDao<Status> statusDao = new StatusDao();
@@ -30,12 +31,8 @@ public class AddEditDriverController extends BaseAddEditController<Driver> {
     @Override
     protected void saveEntity() throws SQLException {
         if (entity == null) {
-            entity = new Driver(
-                    firstNameField.getText(),
-                    lastNameField.getText(),
-                    licenseNumberField.getText(),
-                    statusComboBox.getValue()
-            );
+            entity = new Driver(firstNameField.getText(), lastNameField.getText(),
+                    licenseNumberField.getText(), statusComboBox.getValue());
         } else {
             entity.setFirstName(firstNameField.getText());
             entity.setLastName(lastNameField.getText());

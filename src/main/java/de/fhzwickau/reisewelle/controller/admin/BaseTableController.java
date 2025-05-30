@@ -26,7 +26,9 @@ public abstract class BaseTableController<T> {
 
     protected abstract String getDeleteConfirmationMessage(T item);
 
-    protected abstract Button getEditButton();
+    protected Button getEditButton() {
+        return null;
+    }
 
     protected abstract Button getDeleteButton();
 
@@ -39,9 +41,12 @@ public abstract class BaseTableController<T> {
         items.setAll(filtered);
         getTableView().setItems(items);
 
+        Button editBtn = getEditButton();
+        Button deleteBtn = getDeleteButton();
+
         getTableView().getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            getEditButton().setDisable(newSelection == null);
-            getDeleteButton().setDisable(newSelection == null);
+            if (editBtn != null) editBtn.setDisable(newSelection == null);
+            if (deleteBtn != null) deleteBtn.setDisable(newSelection == null);
         });
     }
 
@@ -63,8 +68,8 @@ public abstract class BaseTableController<T> {
         T selected = getTableView().getSelectionModel().getSelectedItem();
         if (selected != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirm Deletion");
-            alert.setHeaderText("Are you sure you want to delete?");
+            alert.setTitle("Bestätigung");
+            alert.setHeaderText("Möchten Sie wirklich löschen?");
             alert.setContentText(getDeleteConfirmationMessage(selected));
 
             if (alert.showAndWait().get() == ButtonType.OK) {
@@ -91,9 +96,9 @@ public abstract class BaseTableController<T> {
 
     protected void showErrorDialog() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
+        alert.setTitle("Fehler");
         alert.setHeaderText(null);
-        alert.setContentText("Could not reload data");
+        alert.setContentText("Daten konnten nicht neu geladen werden");
         alert.showAndWait();
     }
 }

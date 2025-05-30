@@ -30,21 +30,23 @@ public class TripController implements Initializable {
 
     private CustomDateTimePicker dateTimePicker;
 
-    @FXML private TextField fromCityField;
-    @FXML private TextField toCityField;
-    @FXML private Spinner<Integer> adultSpinner;
-    @FXML private Spinner<Integer> childSpinner;
-    @FXML private Spinner<Integer> bikeSpinner;
-    @FXML private AnchorPane datetimePickerContainer;
+    @FXML
+    private TextField fromCityField, toCityField;
+    @FXML
+    private Spinner<Integer> adultSpinner, childSpinner, bikeSpinner;
+    @FXML
+    private AnchorPane datetimePickerContainer;
 
-    @FXML private TableView<TripSegmentDTO> tripTable;
-    @FXML private TableColumn<TripSegmentDTO, String> fromColumn;
-    @FXML private TableColumn<TripSegmentDTO, String> toColumn;
-    @FXML private TableColumn<TripSegmentDTO, LocalDateTime> departureColumn;
-    @FXML private TableColumn<TripSegmentDTO, LocalDateTime> arrivalColumn;
-    @FXML private TableColumn<TripSegmentDTO, Double> priceColumn;
+    @FXML
+    private TableView<TripSegmentDTO> tripTable;
+    @FXML
+    private TableColumn<TripSegmentDTO, String> fromColumn, toColumn;
+    @FXML
+    private TableColumn<TripSegmentDTO, LocalDateTime> departureColumn, arrivalColumn;
+    @FXML
+    private TableColumn<TripSegmentDTO, Double> priceColumn;
 
-    private final TripDao tripRepo = new TripDao();
+    private final TripDao tripDao = new TripDao();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -86,7 +88,6 @@ public class TripController implements Initializable {
             }
         });
         tripTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
     }
 
     @FXML
@@ -99,7 +100,7 @@ public class TripController implements Initializable {
         int children = childSpinner.getValue();
         int bikes = bikeSpinner.getValue();
 
-        List<TripSegmentDTO> trips = tripRepo.searchTrips(from, to, dateTime, adults, children, bikes);
+        List<TripSegmentDTO> trips = tripDao.searchTrips(from, to, dateTime, adults, children, bikes);
         tripTable.getItems().setAll(trips);
     }
 
@@ -110,8 +111,18 @@ public class TripController implements Initializable {
         if (selected != null) {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/user/detail_trip.fxml"));
             Parent root = loader.load();
+
             DetailTripController controller = loader.getController();
-            controller.loadTripDetails(selected.getTripId());
+            controller.loadTripDetails(
+                    selected.getTripId(),
+                    selected.getPrice(),
+                    selected.getStartStopId().toString(),
+                    selected.getEndStopId().toString(),
+                    adultSpinner.getValue(),
+                    childSpinner.getValue(),
+                    bikeSpinner.getValue()
+            );
+
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.show();

@@ -1,4 +1,3 @@
-// Trip.java
 package de.fhzwickau.reisewelle.model;
 
 import java.util.UUID;
@@ -11,9 +10,6 @@ public class Trip {
     private Driver driver;
     private LocalDate departureDate;
     private TripStatus status;
-
-    public Trip() {
-    }
 
     public Trip(Bus bus, Driver driver, LocalDate departureDate, TripStatus status) {
         this.bus = bus;

@@ -1,30 +1,39 @@
-// src/main/java/de/fhzwickau/reisewelle/dao/TicketDao.java
 package de.fhzwickau.reisewelle.dao;
 
 import de.fhzwickau.reisewelle.config.JDBCConfig;
+import de.fhzwickau.reisewelle.model.Stop;
 import de.fhzwickau.reisewelle.model.Ticket;
+import de.fhzwickau.reisewelle.model.User;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class TicketDao implements BaseDao<Ticket> {
-    private final UserDao userDao   = new UserDao();
-    private final StopDao stopDao   = new StopDao();
+
+    private final BaseDao<User> userDao = new UserDao();
+    private final BaseDao<Stop> stopDao = new StopDao();
 
     @Override
     public List<Ticket> findAll() throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = """
-            SELECT id, user_id, trip_id, start_stop_id, end_stop_id,
-                   adult_count, child_count, bike_count, total_price, purchase_date
-              FROM Ticket
-        """;
         List<Ticket> list = new ArrayList<>();
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) list.add(mapRow(rs));
+
+        String sql = """
+                    SELECT id, user_id, trip_id, start_stop_id, end_stop_id, adult_count,
+                        child_count, bike_count, total_price, purchase_date 
+                    FROM Ticket
+                """;
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
         }
         return list;
     }
@@ -33,10 +42,11 @@ public class TicketDao implements BaseDao<Ticket> {
     public Ticket findById(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
         String sql = """
-            SELECT user_id, trip_id, start_stop_id, end_stop_id,
-                   adult_count, child_count, bike_count, total_price, purchase_date
-              FROM Ticket WHERE id = ?
-        """;
+                    SELECT user_id, trip_id, start_stop_id, end_stop_id,
+                        adult_count, child_count, bike_count, total_price, purchase_date
+                    FROM Ticket WHERE id = ?
+                """;
+
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
@@ -57,6 +67,7 @@ public class TicketDao implements BaseDao<Ticket> {
         String sql = isNew
                 ? "INSERT INTO Ticket (id, user_id, trip_id, start_stop_id, end_stop_id, adult_count, child_count, bike_count, total_price, purchase_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 : "UPDATE Ticket SET user_id=?, trip_id=?, start_stop_id=?, end_stop_id=?, adult_count=?, child_count=?, bike_count=?, total_price=?, purchase_date=? WHERE id=?";
+
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             int i = 1;
             if (isNew) {
@@ -80,9 +91,7 @@ public class TicketDao implements BaseDao<Ticket> {
     @Override
     public void delete(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        try (PreparedStatement stmt = conn.prepareStatement(
-                "DELETE FROM Ticket WHERE id = ?"
-        )) {
+        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM Ticket WHERE id = ?")) {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
         }
@@ -90,9 +99,7 @@ public class TicketDao implements BaseDao<Ticket> {
 
     public void deleteAllForTrip(UUID tripId) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        try (PreparedStatement stmt = conn.prepareStatement(
-                "DELETE FROM Ticket WHERE trip_id = ?"
-        )) {
+        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM Ticket WHERE trip_id = ?")) {
             stmt.setString(1, tripId.toString());
             stmt.executeUpdate();
         }
@@ -100,9 +107,7 @@ public class TicketDao implements BaseDao<Ticket> {
 
     public void deleteAllForStop(UUID stopId) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        try (PreparedStatement stmt = conn.prepareStatement(
-                "DELETE FROM Ticket WHERE start_stop_id = ? OR end_stop_id = ?"
-        )) {
+        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM Ticket WHERE start_stop_id = ? OR end_stop_id = ?")) {
             stmt.setString(1, stopId.toString());
             stmt.setString(2, stopId.toString());
             stmt.executeUpdate();
@@ -110,12 +115,11 @@ public class TicketDao implements BaseDao<Ticket> {
     }
 
     private Ticket mapRow(ResultSet rs) throws SQLException {
-        UUID userId  = UUID.fromString(rs.getString("user_id"));
-        UUID tripId  = UUID.fromString(rs.getString("trip_id"));
+        UUID userId = UUID.fromString(rs.getString("user_id"));
+        UUID tripId = UUID.fromString(rs.getString("trip_id"));
         UUID startId = UUID.fromString(rs.getString("start_stop_id"));
-        UUID endId   = UUID.fromString(rs.getString("end_stop_id"));
+        UUID endId = UUID.fromString(rs.getString("end_stop_id"));
 
-        // создаём TripAdminDao локально, чтобы не заводить поле
         TripAdminDao tripDao = new TripAdminDao();
 
         return new Ticket(

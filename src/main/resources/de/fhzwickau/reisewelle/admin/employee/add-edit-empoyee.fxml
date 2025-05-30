@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.employee.AddEditEmployeeController"
+      spacing="10" prefWidth="300.0" prefHeight="200.0" style="-fx-padding: 10;">
+
+    <children>
+
+        <Label text="Vorname"/>
+        <TextField fx:id="vornameField"/>
+
+        <Label text="Nachname"/>
+        <TextField fx:id="nachnameField"/>
+
+        <Label text="Email"/>
+        <TextField fx:id="emailField"/>
+
+        <Label text="Passwort" fx:id="passwordLabel"/>
+        <TextField fx:id="passwordField"/>
+
+        <HBox spacing="10" alignment="CENTER">
+            <children>
+                <Button text="Speichern" onAction="#save"/>
+                <Button text="Abbrechen" onAction="#cancel"/>
+            </children>
+        </HBox>
+    </children>
+</VBox>

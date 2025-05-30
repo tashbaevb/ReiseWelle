@@ -1,16 +1,15 @@
-package de.fhzwickau.reisewelle.controller.admin;
+package de.fhzwickau.reisewelle.controller.admin.driver;
 
+import de.fhzwickau.reisewelle.controller.admin.BaseTableController;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.DriverDao;
 import de.fhzwickau.reisewelle.dao.TripAdminDao;
 import de.fhzwickau.reisewelle.model.Driver;
 import de.fhzwickau.reisewelle.model.Trip;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
@@ -27,36 +26,23 @@ import java.util.UUID;
  */
 public class AdminDriverController extends BaseTableController<Driver> {
 
-    @FXML private TableView<Driver> driversTable;
-    @FXML private TableColumn<Driver, String> firstNameColumn;
-    @FXML private TableColumn<Driver, String> lastNameColumn;
-    @FXML private TableColumn<Driver, String> licenseNumberColumn;
-    @FXML private TableColumn<Driver, String> statusColumn;
+    @FXML
+    private TableView<Driver> driversTable;
+    @FXML
+    private TableColumn<Driver, String> firstNameColumn, lastNameColumn, licenseNumberColumn, statusColumn;
+    @FXML
+    private Button editButton, deleteButton;
 
-    @FXML private Button addButton;
-    @FXML private Button editButton;
-    @FXML private Button deleteButton;
-
-    private final BaseDao<Driver> driverDao     = new DriverDao();
-    private final TripAdminDao     tripDao       = new TripAdminDao();
+    private final BaseDao<Driver> driverDao = new DriverDao();
+    private final BaseDao<Trip> tripDao = new TripAdminDao();
 
     @FXML
     protected void initialize() {
-        // Configure table columns
-        firstNameColumn.setCellValueFactory(cd ->
-                new SimpleStringProperty(cd.getValue().getFirstName())
-        );
-        lastNameColumn.setCellValueFactory(cd ->
-                new SimpleStringProperty(cd.getValue().getLastName())
-        );
-        licenseNumberColumn.setCellValueFactory(cd ->
-                new SimpleStringProperty(cd.getValue().getLicenseNumber())
-        );
-        statusColumn.setCellValueFactory(cd ->
-                new SimpleStringProperty(cd.getValue().getStatus().getName())
-        );
+        firstNameColumn.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getFirstName()));
+        lastNameColumn.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getLastName()));
+        licenseNumberColumn.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getLicenseNumber()));
+        statusColumn.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getStatus().getName()));
 
-        // Disable Edit/Delete until a row is selected
         editButton.setDisable(true);
         deleteButton.setDisable(true);
         driversTable.getSelectionModel().selectedItemProperty()
@@ -77,7 +63,7 @@ public class AdminDriverController extends BaseTableController<Driver> {
             }
         };
         task.setOnSucceeded(e -> driversTable.getItems().setAll(task.getValue()));
-        task.setOnFailed(e -> showError("Error loading drivers", task.getException().getMessage()));
+        task.setOnFailed(e -> showError("Fehler beim Laden der Fahrer", task.getException().getMessage()));
         new Thread(task, "LoadDriversThread").start();
     }
 
@@ -85,8 +71,8 @@ public class AdminDriverController extends BaseTableController<Driver> {
     protected void onAdd() {
         try {
             showAddEditDialog(null);
-        } catch (IOException ex) {
-            showError("Error opening Add dialog", ex.getMessage());
+        } catch (IOException ioe) {
+            showError("Fehler beim Öffnen des Dialogfelds „Hinzufügen“", ioe.getMessage());
         }
     }
 
@@ -96,8 +82,8 @@ public class AdminDriverController extends BaseTableController<Driver> {
         if (selected != null) {
             try {
                 showAddEditDialog(selected);
-            } catch (IOException ex) {
-                showError("Error opening Edit dialog", ex.getMessage());
+            } catch (IOException ioe) {
+                showError("Fehler beim Öffnen des Dialogfelds „Ändern“", ioe.getMessage());
             }
         }
     }
@@ -107,32 +93,28 @@ public class AdminDriverController extends BaseTableController<Driver> {
         Driver selected = driversTable.getSelectionModel().getSelectedItem();
         if (selected == null) return;
 
-        // Prevent deletion if driver is assigned to any trips
         try {
-            boolean inUse = tripDao.findAll().stream()
-                    .anyMatch(trip -> trip.getDriver().getId().equals(selected.getId()));
+            boolean inUse = tripDao.findAll().stream().anyMatch(trip -> trip.getDriver().getId().equals(selected.getId()));
             if (inUse) {
-                showError("Cannot delete driver",
-                        "This driver is assigned to one or more trips.\n" +
-                                "Please reassign or delete those trips first.");
+                showError("Fahrer kann nicht gelöscht werden",
+                        "Der Fahrer ist einer oder mehreren Fahrten zugewiesen. Bitte weisen Sie diese Fahrten zuerst neu zu oder löschen Sie sie.");
                 return;
             }
-        } catch (SQLException ex) {
-            showError("Error checking trips", ex.getMessage());
+        } catch (SQLException sqle) {
+            showError("Fehlerprüfung", sqle.getMessage());
             return;
         }
 
-        // Confirm deletion
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setHeaderText("Delete driver?");
-        confirm.setContentText("Driver License Number: " + selected.getLicenseNumber());
+        confirm.setHeaderText("Den Fahrer löschen?");
+        confirm.setContentText("Fahrer: " + selected.getLicenseNumber());
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 driverDao.delete(selected.getId());
                 loadDriversAsync();
-            } catch (SQLException ex) {
-                showError("Error deleting driver", ex.getMessage());
+            } catch (SQLException sqle) {
+                showError("Fehler beim Löschen des Fahrers", sqle.getMessage());
             }
         }
     }
@@ -165,12 +147,12 @@ public class AdminDriverController extends BaseTableController<Driver> {
     @Override
     protected Stage showAddEditDialog(Driver driver) throws IOException {
         FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/de/fhzwickau/reisewelle/admin/add-edit-driver.fxml")
+                getClass().getResource("/de/fhzwickau/reisewelle/admin/driver/add-edit-driver.fxml")
         );
         Stage stage = new Stage();
         stage.setScene(new Scene(loader.load()));
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(driver == null ? "Add Driver" : "Edit Driver");
+        stage.setTitle(driver == null ? "Den Fahrer hinzufügen" : "Den Fahrer bearbeiten");
 
         AddEditDriverController controller = loader.getController();
         controller.setDriver(driver);
@@ -182,7 +164,7 @@ public class AdminDriverController extends BaseTableController<Driver> {
 
     @Override
     protected String getDeleteConfirmationMessage(Driver driver) {
-        return "Driver License Number: " + driver.getLicenseNumber();
+        return "Führerscheinnummer: " + driver.getLicenseNumber();
     }
 
     private void showError(String header, String content) {

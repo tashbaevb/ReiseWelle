@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.bus.AddEditBusController" spacing="10" prefWidth="300.0"
+      prefHeight="250.0" style="-fx-padding: 10;">
+
+    <Label text="Bus Nummer"/>
+    <TextField fx:id="busNumberField"/>
+
+    <Label text="Gesamtzahl der Sitzplätze"/>
+    <TextField fx:id="totalSeatsField"/>
+
+    <Label text="Fahrradstellplätze"/>
+    <TextField fx:id="bikeSpacesField"/>
+
+    <Label text="Stand"/>
+    <ComboBox fx:id="statusComboBox" prefWidth="150.0"/>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Speichern" onAction="#save"/>
+        <Button text="Abbrechen" onAction="#cancel"/>
+    </HBox>
+</VBox>

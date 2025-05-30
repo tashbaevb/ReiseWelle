@@ -1,5 +1,6 @@
-package de.fhzwickau.reisewelle.controller.admin;
+package de.fhzwickau.reisewelle.controller.admin.bus;
 
+import de.fhzwickau.reisewelle.controller.admin.BaseTableController;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.BusDao;
 import de.fhzwickau.reisewelle.dao.TripAdminDao;
@@ -27,36 +28,26 @@ import java.util.UUID;
  */
 public class AdminBusController extends BaseTableController<Bus> {
 
-    @FXML private TableView<Bus> busesTable;
-    @FXML private TableColumn<Bus, String> busNumberColumn;
-    @FXML private TableColumn<Bus, Integer> totalSeatsColumn;
-    @FXML private TableColumn<Bus, Integer> bikeSpacesColumn;
-    @FXML private TableColumn<Bus, String> statusColumn;
+    @FXML
+    private TableView<Bus> busesTable;
+    @FXML
+    private TableColumn<Bus, String> busNumberColumn, statusColumn;
+    @FXML
+    private TableColumn<Bus, Integer> totalSeatsColumn, bikeSpacesColumn;
 
-    @FXML private Button addButton;
-    @FXML private Button editButton;
-    @FXML private Button deleteButton;
+    @FXML
+    private Button editButton, deleteButton;
 
     private final BaseDao<Bus> busDao = new BusDao();
-    private final TripAdminDao tripDao = new TripAdminDao();
+    private final BaseDao<Trip> tripDao = new TripAdminDao();
 
     @FXML
     protected void initialize() {
-        // configure columns
-        busNumberColumn.setCellValueFactory(cd ->
-                new SimpleStringProperty(cd.getValue().getBusNumber())
-        );
-        totalSeatsColumn.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getTotalSeats())
-        );
-        bikeSpacesColumn.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getBikeSpaces())
-        );
-        statusColumn.setCellValueFactory(cd ->
-                new SimpleStringProperty(cd.getValue().getStatus().getName())
-        );
+        busNumberColumn.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getBusNumber()));
+        totalSeatsColumn.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue().getTotalSeats()));
+        bikeSpacesColumn.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue().getBicycleSpaces()));
+        statusColumn.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getStatus().getName()));
 
-        // disable edit/delete when nothing selected
         editButton.setDisable(true);
         deleteButton.setDisable(true);
         busesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
@@ -76,7 +67,7 @@ public class AdminBusController extends BaseTableController<Bus> {
             }
         };
         task.setOnSucceeded(e -> busesTable.getItems().setAll(task.getValue()));
-        task.setOnFailed(e -> showError("Error loading buses", task.getException().getMessage()));
+        task.setOnFailed(e -> showError("Fehler beim Laden der Busse", task.getException().getMessage()));
         new Thread(task, "LoadBusesThread").start();
     }
 
@@ -84,8 +75,8 @@ public class AdminBusController extends BaseTableController<Bus> {
     protected void onAdd() {
         try {
             showAddEditDialog(null);
-        } catch (IOException ex) {
-            showError("Error opening Add dialog", ex.getMessage());
+        } catch (IOException ioe) {
+            showError("Fehler beim Öffnen des Dialogfelds „Hinzufügen“", ioe.getMessage());
         }
     }
 
@@ -95,8 +86,8 @@ public class AdminBusController extends BaseTableController<Bus> {
         if (selected != null) {
             try {
                 showAddEditDialog(selected);
-            } catch (IOException ex) {
-                showError("Error opening Edit dialog", ex.getMessage());
+            } catch (IOException ioe) {
+                showError("Fehler beim Öffnen des Dialogfelds „Ändern“", ioe.getMessage());
             }
         }
     }
@@ -105,33 +96,28 @@ public class AdminBusController extends BaseTableController<Bus> {
     protected void onDelete() {
         Bus selected = busesTable.getSelectionModel().getSelectedItem();
         if (selected == null) return;
-
-        // check if this bus is used in any trip
         try {
-            boolean inUse = tripDao.findAll().stream()
-                    .anyMatch(trip -> trip.getBus().getId().equals(selected.getId()));
+            boolean inUse = tripDao.findAll().stream().anyMatch(trip -> trip.getBus().getId().equals(selected.getId()));
             if (inUse) {
-                showError("Cannot delete bus",
-                        "This bus is assigned to one or more trips.\n" +
-                                "Please reassign or delete those trips first.");
+                showError("Bus kann nicht gelöscht werden",
+                        "Dieser Bus ist einer oder mehreren Fahrten zugewiesen. Bitte weisen Sie diese Fahrten zuerst neu zu oder löschen Sie sie.");
                 return;
             }
-        } catch (SQLException ex) {
-            showError("Error checking trips", ex.getMessage());
+        } catch (SQLException sqle) {
+            showError("Fehlerprüfung", sqle.getMessage());
             return;
         }
 
-        // confirm deletion
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setHeaderText("Delete bus?");
-        confirm.setContentText("ID: " + selected.getId());
+        confirm.setHeaderText("Das Bus löschen?");
+        confirm.setContentText("Bus Nummer: " + selected.getBusNumber());
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 busDao.delete(selected.getId());
                 loadBusesAsync();
             } catch (SQLException ex) {
-                showError("Error deleting bus", ex.getMessage());
+                showError("Fehler beim Löschen", ex.getMessage());
             }
         }
     }
@@ -164,7 +150,7 @@ public class AdminBusController extends BaseTableController<Bus> {
     @Override
     protected Stage showAddEditDialog(Bus bus) throws IOException {
         FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/de/fhzwickau/reisewelle/admin/add-edit-bus.fxml")
+                getClass().getResource("/de/fhzwickau/reisewelle/admin/bus/add-edit-bus.fxml")
         );
         Parent root = loader.load();
         AddEditBusController controller = loader.getController();
@@ -173,7 +159,7 @@ public class AdminBusController extends BaseTableController<Bus> {
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(bus == null ? "Add Bus" : "Edit Bus");
+        stage.setTitle(bus == null ? "Bus hinzufügen" : "Bus bearbeiten");
         stage.setOnHidden(e -> loadBusesAsync());
         stage.show();
         return stage;
@@ -181,7 +167,7 @@ public class AdminBusController extends BaseTableController<Bus> {
 
     @Override
     protected String getDeleteConfirmationMessage(Bus bus) {
-        return bus.getId().toString();
+        return bus.getBusNumber().toString();
     }
 
     private void showError(String header, String content) {

@@ -11,15 +11,7 @@ public class User {
     private UserRole userRole;
     private LocalDateTime created_at;
 
-    public User() {
-        this.email = "";
-        this.password = "";
-        this.userRole = null;
-        this.created_at = null;
-    }
-
     public User(String email, String password, UserRole userRole, LocalDateTime created_at) {
-
         this.email = email;
         this.password = password;
         this.userRole = userRole;

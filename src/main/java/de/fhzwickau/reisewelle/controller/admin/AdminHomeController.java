@@ -14,27 +14,27 @@ public class AdminHomeController {
 
     @FXML
     private void showUsers() {
-        loadContent("admin-user.fxml");
+        loadContent("user/admin-user.fxml");
     }
 
     @FXML
     private void showEmployee() {
-        loadContent("admin-employee.fxml");
+        loadContent("employee/admin-employee.fxml");
     }
 
     @FXML
     private void showBuses() {
-        loadContent("admin-bus.fxml");
+        loadContent("bus/admin-bus.fxml");
     }
 
     @FXML
     private void showDrivers() {
-        loadContent("admin-drivers.fxml");
+        loadContent("driver/admin-driver.fxml");
     }
 
     @FXML
     private void showTrips() {
-        loadContent("admin-trip.fxml");
+        loadContent("trip/admin-trip.fxml");
     }
 
     private void loadContent(String fxmlFile) {

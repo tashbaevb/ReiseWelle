@@ -1,22 +1,25 @@
-// src/main/java/de/fhzwickau/reisewelle/dao/TripAdminDao.java
 package de.fhzwickau.reisewelle.dao;
 
 import de.fhzwickau.reisewelle.config.JDBCConfig;
 import de.fhzwickau.reisewelle.model.Trip;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class TripAdminDao implements BaseDao<Trip> {
 
-    private final BusDao busDao               = new BusDao();
-    private final DriverDao driverDao         = new DriverDao();
-    private final TripStatusDao statusDao     = new TripStatusDao();
-    private final TripStopPriceDao priceDao   = new TripStopPriceDao();
+    private final BusDao busDao = new BusDao();
+    private final DriverDao driverDao = new DriverDao();
+    private final TripStatusDao statusDao = new TripStatusDao();
+    private final TripStopPriceDao priceDao = new TripStopPriceDao();
     private final SeatAvailabilityDao seatDao = new SeatAvailabilityDao();
-    private final StopDao stopDao             = new StopDao();
+    private final StopDao stopDao = new StopDao();
 
     @Override
     public List<Trip> findAll() throws SQLException {
@@ -74,28 +77,21 @@ public class TripAdminDao implements BaseDao<Trip> {
     @Override
     public void delete(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        // 1) цены
         priceDao.deleteAllForTrip(id);
-        // 2) билеты
         new TicketDao().deleteAllForTrip(id);
-        // 3) доступность мест
         seatDao.deleteAllForTrip(id);
-        // 4) остановки
         stopDao.deleteAllForTrip(id);
-        // 5) сам рейс
-        try (PreparedStatement stmt = conn.prepareStatement(
-                "DELETE FROM Trip WHERE id = ?"
-        )) {
+        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM Trip WHERE id = ?")) {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
         }
     }
 
     private Trip mapRow(ResultSet rs) throws SQLException {
-        UUID id       = UUID.fromString(rs.getString("id"));
-        UUID busId    = UUID.fromString(rs.getString("bus_id"));
-        UUID drvId    = UUID.fromString(rs.getString("driver_id"));
-        UUID stId     = UUID.fromString(rs.getString("status_id"));
+        UUID id = UUID.fromString(rs.getString("id"));
+        UUID busId = UUID.fromString(rs.getString("bus_id"));
+        UUID drvId = UUID.fromString(rs.getString("driver_id"));
+        UUID stId = UUID.fromString(rs.getString("status_id"));
         Trip trip = new Trip(
                 busDao.findById(busId),
                 driverDao.findById(drvId),

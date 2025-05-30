@@ -17,7 +17,7 @@ public class BusDao implements BaseDao<Bus> {
         Connection conn = JDBCConfig.getInstance();
         String sql = """
                 SELECT b.id, b.bus_number, b.total_seats,
-                       b.bike_spaces,
+                       b.total_bicycle_spaces,
                        s.id AS status_id, s.name AS status_name 
                 FROM Bus b
                 JOIN Status s ON b.status_id = s.id
@@ -36,7 +36,7 @@ public class BusDao implements BaseDao<Bus> {
         Connection conn = JDBCConfig.getInstance();
         String sql = """
                 SELECT b.id, b.bus_number, b.total_seats,
-                       b.bike_spaces,
+                       b.total_bicycle_spaces,
                        s.id AS status_id, s.name AS status_name 
                 FROM Bus b
                 JOIN Status s ON b.status_id = s.id
@@ -58,8 +58,8 @@ public class BusDao implements BaseDao<Bus> {
         boolean isNew = bus.getId() == null;
 
         String sql = isNew
-                ? "INSERT INTO Bus (id, bus_number, total_seats, bike_spaces, status_id) VALUES (?, ?, ?, ?, ?)"
-                : "UPDATE Bus SET bus_number = ?, total_seats = ?, bike_spaces = ?, status_id = ? WHERE id = ?";
+                ? "INSERT INTO Bus (id, bus_number, total_seats, status_id,  total_bicycle_spaces) VALUES (?, ?, ?, ?, ?)"
+                : "UPDATE Bus SET bus_number = ?, total_seats = ?, status_id = ?, total_bicycle_spaces = ? WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (isNew) {
@@ -67,13 +67,13 @@ public class BusDao implements BaseDao<Bus> {
                 stmt.setString(1, bus.getId().toString());
                 stmt.setString(2, bus.getBusNumber());
                 stmt.setInt(3, bus.getTotalSeats());
-                stmt.setInt(4, bus.getBikeSpaces());
-                stmt.setString(5, bus.getStatus().getId().toString());
+                stmt.setString(4, bus.getStatus().getId().toString());
+                stmt.setInt(5, bus.getBicycleSpaces());
             } else {
                 stmt.setString(1, bus.getBusNumber());
                 stmt.setInt(2, bus.getTotalSeats());
-                stmt.setInt(3, bus.getBikeSpaces());
-                stmt.setString(4, bus.getStatus().getId().toString());
+                stmt.setString(3, bus.getStatus().getId().toString());
+                stmt.setInt(4, bus.getBicycleSpaces());
                 stmt.setString(5, bus.getId().toString());
             }
             stmt.executeUpdate();
@@ -92,12 +92,10 @@ public class BusDao implements BaseDao<Bus> {
         UUID id = UUID.fromString(rs.getString("id"));
         String busNumber = rs.getString("bus_number");
         int totalSeats = rs.getInt("total_seats");
-        int bikeSpaces = rs.getInt("bike_spaces");
+        int bikeSpaces = rs.getInt("total_bicycle_spaces");
         UUID statusId = UUID.fromString(rs.getString("status_id"));
         Status status = statusDao.findById(statusId);
 
-        Bus bus = new Bus(busNumber, totalSeats, status, bikeSpaces);
-        bus.setId(id);
-        return bus;
+        return new Bus(id, busNumber, totalSeats, status, bikeSpaces);
     }
 }
