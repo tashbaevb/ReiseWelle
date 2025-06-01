@@ -68,4 +68,9 @@ public class RegistrationController {
             AlertUtil.showError("Fehler", "Registrierung fehlgeschlagen: " + e.getMessage());
         }
     }
+
+    @FXML
+    public void openLoginWindow(javafx.scene.input.MouseEvent event) {
+        WindowUtil.openWindow("/de/fhzwickau/reisewelle/login-page.fxml", "Login", event);
+    }
 }
