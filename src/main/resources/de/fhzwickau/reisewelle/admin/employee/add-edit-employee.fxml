@@ -8,27 +8,27 @@
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="de.fhzwickau.reisewelle.controller.admin.employee.AddEditEmployeeController"
-      spacing="10" prefWidth="300.0" prefHeight="200.0" style="-fx-padding: 10;">
+      spacing="18" prefWidth="360.0" prefHeight="340.0"
+      style="-fx-padding: 30; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
 
-    <children>
+    <Label text="Mitarbeiter hinzufügen / bearbeiten"
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d3b50; -fx-padding: 0 0 18 0;"/>
+    <Label text="Vorname" style="-fx-font-size: 13px;"/>
+    <TextField fx:id="vornameField" promptText="z.B. Anna" style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
 
-        <Label text="Vorname"/>
-        <TextField fx:id="vornameField"/>
+    <Label text="Nachname" style="-fx-font-size: 13px;"/>
+    <TextField fx:id="nachnameField" promptText="z.B. Schmidt" style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
 
-        <Label text="Nachname"/>
-        <TextField fx:id="nachnameField"/>
+    <Label text="E-Mail" style="-fx-font-size: 13px;"/>
+    <TextField fx:id="emailField" promptText="z.B. anna.schmidt@email.de" style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
 
-        <Label text="Email"/>
-        <TextField fx:id="emailField"/>
+    <Label text="Passwort" style="-fx-font-size: 13px;"/>
+    <TextField fx:id="passwordField" promptText="Mindestens 8 Zeichen" style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
 
-        <Label text="Passwort" fx:id="passwordLabel"/>
-        <TextField fx:id="passwordField"/>
-
-        <HBox spacing="10" alignment="CENTER">
-            <children>
-                <Button text="Speichern" onAction="#save"/>
-                <Button text="Abbrechen" onAction="#cancel"/>
-            </children>
-        </HBox>
-    </children>
+    <HBox spacing="18" alignment="CENTER_RIGHT" style="-fx-padding: 18 0 0 0;">
+        <Button text="Speichern" onAction="#save"
+                style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px;"/>
+        <Button text="Abbrechen" onAction="#cancel"
+                style="-fx-background-color: #efefef; -fx-text-fill: #6a6f7a; -fx-background-radius: 8; -fx-font-size: 15px;"/>
+    </HBox>
 </VBox>

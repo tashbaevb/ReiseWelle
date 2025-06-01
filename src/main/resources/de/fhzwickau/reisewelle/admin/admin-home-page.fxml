@@ -4,23 +4,77 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
-<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+<BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.fhzwickau.reisewelle.controller.admin.AdminHomeController"
-            prefHeight="400.0" prefWidth="600.0">
+            prefHeight="600.0" prefWidth="1080.0"
+            style="-fx-background-color: #eef1f7;">
 
     <left>
-        <VBox spacing="10" alignment="TOP_CENTER" style="-fx-padding: 10;">
+        <VBox spacing="16" alignment="TOP_CENTER"
+              style="-fx-padding: 30 10 30 10; -fx-background-color: #f7fafd; -fx-background-radius: 0 22 22 0;">
             <children>
-                <Button text="Die Kunden" fx:id="usersButton" onAction="#showUsers"/>
-                <Button text="Die Mitarbeiter" fx:id="employee" onAction="#showEmployee"/>
-                <Button text="Die Busse" fx:id="busesButton" onAction="#showBuses"/>
-                <Button text="Die Fahrer" fx:id="driversButton" onAction="#showDrivers"/>
-                <Button text="Die Reisen" fx:id="tripsButton" onAction="#showTrips"/>
+                <Button fx:id="usersButton" onAction="#showUsers"
+                        style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-font-weight: bold; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/users.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Kunden
+                </Button>
+                <Button fx:id="employee" onAction="#showEmployee"
+                        style="-fx-background-color: #ffd447; -fx-text-fill: #2d3b50; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/employees.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Mitarbeiter
+                </Button>
+                <Button fx:id="busesButton" onAction="#showBuses"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/bus.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Busse
+                </Button>
+                <Button fx:id="driversButton" onAction="#showDrivers"
+                        style="-fx-background-color: #8ec6f6; -fx-text-fill: #2d3b50; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/driver.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Fahrer
+                </Button>
+                <Button fx:id="tripsButton" onAction="#showTrips"
+                        style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/trip.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Reisen
+                </Button>
             </children>
         </VBox>
     </left>
     <center>
-        <StackPane fx:id="contentPane"/>
+        <StackPane fx:id="contentPane" style="-fx-padding: 32;"/>
     </center>
 </BorderPane>

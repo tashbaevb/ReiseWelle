@@ -9,21 +9,22 @@
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="de.fhzwickau.reisewelle.controller.admin.user.AdminUserController"
-      spacing="10" prefHeight="400.0" prefWidth="600.0" style="-fx-padding: 10;">
+      spacing="18" prefHeight="480.0" prefWidth="600.0"
+      style="-fx-padding: 32; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
 
     <children>
-        <Label text="Kunden" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-
-        <TableView fx:id="usersTable" prefHeight="300.0">
+        <Label text="Kunden"
+               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2d3b50; -fx-padding: 0 0 18 0;"/>
+        <TableView fx:id="usersTable" prefHeight="320.0" style="-fx-background-radius: 12;">
             <columns>
-                <TableColumn fx:id="emailColumn" text="Email" prefWidth="200.0"/>
-                <TableColumn fx:id="createdAtColumn" text="Erstellt am" prefWidth="150.0"/>
+                <TableColumn fx:id="emailColumn" text="E-Mail" prefWidth="230.0"/>
+                <TableColumn fx:id="createdAtColumn" text="Erstellt am" prefWidth="170.0"/>
             </columns>
         </TableView>
-
-        <HBox spacing="10">
+        <HBox spacing="18" alignment="CENTER_RIGHT" style="-fx-padding: 14 0 0 0;">
             <children>
-                <Button fx:id="deleteButton" text="Löschen" onAction="#onDelete" disable="true"/>
+                <Button fx:id="deleteButton" text="Löschen" onAction="#onDelete" disable="true"
+                        style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px;"/>
             </children>
         </HBox>
     </children>

@@ -9,25 +9,27 @@
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="de.fhzwickau.reisewelle.controller.admin.driver.AdminDriverController"
-      spacing="10" prefHeight="400.0" prefWidth="600.0" style="-fx-padding: 10;">
-
+      spacing="18" prefHeight="480.0" prefWidth="740.0"
+      style="-fx-padding: 32; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
     <children>
-        <Label text="Die Fahrer" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-
-        <TableView fx:id="driversTable" prefHeight="300.0">
+        <Label text="Fahrer verwalten"
+               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2d3b50; -fx-padding: 0 0 18 0;"/>
+        <TableView fx:id="driversTable" prefHeight="320.0" style="-fx-background-radius: 12;">
             <columns>
-                <TableColumn fx:id="firstNameColumn" text="Vorname" prefWidth="150.0" />
-                <TableColumn fx:id="lastNameColumn" text="Nachname" prefWidth="150.0" />
-                <TableColumn fx:id="licenseNumberColumn" text="Führerscheinnummer" prefWidth="150.0" />
-                <TableColumn fx:id="statusColumn" text="Stand" prefWidth="100.0" />
+                <TableColumn fx:id="firstNameColumn" text="Vorname" prefWidth="170.0"/>
+                <TableColumn fx:id="lastNameColumn" text="Nachname" prefWidth="170.0"/>
+                <TableColumn fx:id="licenseNumberColumn" text="Führerscheinnummer" prefWidth="190.0"/>
+                <TableColumn fx:id="statusColumn" text="Status" prefWidth="120.0"/>
             </columns>
         </TableView>
-
-        <HBox spacing="10">
+        <HBox spacing="18" alignment="CENTER_RIGHT" style="-fx-padding: 14 0 0 0;">
             <children>
-                <Button fx:id="addButton" text="Hinzufügen" onAction="#onAdd" />
-                <Button fx:id="editButton" text="Ändern" onAction="#onEdit" disable="true" />
-                <Button fx:id="deleteButton" text="Löschen" onAction="#onDelete" disable="true" />
+                <Button fx:id="addButton" text="Hinzufügen" onAction="#onAdd"
+                        style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px;"/>
+                <Button fx:id="editButton" text="Bearbeiten" onAction="#onEdit" disable="true"
+                        style="-fx-background-color: #ffd447; -fx-text-fill: #2d3b50; -fx-background-radius: 8; -fx-font-size: 15px;"/>
+                <Button fx:id="deleteButton" text="Löschen" onAction="#onDelete" disable="true"
+                        style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px;"/>
             </children>
         </HBox>
     </children>

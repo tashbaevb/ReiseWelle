@@ -12,56 +12,39 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="de.fhzwickau.reisewelle.controller.user.TripController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="de.fhzwickau.reisewelle.controller.user.TripController"
+            prefHeight="500.0" prefWidth="840.0"
+            style="-fx-background-color: #f6fafd;">
 
-    <VBox>
-        <HBox spacing="4">
-            <TextField fx:id="fromCityField" promptText="Woher"/>
-            <TextField fx:id="toCityField" promptText="Wohin"/>
-            <AnchorPane fx:id="datetimePickerContainer" prefHeight="40" prefWidth="480"/>
+    <VBox spacing="20" alignment="TOP_CENTER"
+          style="-fx-background-color: #ffffff; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.10),16,0,0,4); -fx-padding: 32;">
+        <HBox spacing="10" alignment="CENTER">
+            <TextField fx:id="fromCityField" promptText="Von" style="-fx-background-radius: 8; -fx-font-size: 15px;" prefWidth="110"/>
+            <TextField fx:id="toCityField" promptText="Nach" style="-fx-background-radius: 8; -fx-font-size: 15px;" prefWidth="110"/>
+            <AnchorPane fx:id="datetimePickerContainer" prefHeight="36" prefWidth="170"/>
+            <Label text="Erwachsene:" style="-fx-font-size: 14px;"/>
+            <Spinner fx:id="adultSpinner" prefWidth="56"/>
+            <Label text="Kinder:" style="-fx-font-size: 14px;"/>
+            <Spinner fx:id="childSpinner" prefWidth="56"/>
+            <Label text="Fahrräder:" style="-fx-font-size: 14px;"/>
+            <Spinner fx:id="bikeSpinner" prefWidth="56"/>
+            <Button text="Suchen" onAction="#onSearchClicked"
+                    style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px; -fx-font-weight: bold;"/>
         </HBox>
 
-        <HBox spacing="4" alignment="CENTER_LEFT">
-            <Label text="Erwachsene:"/>
-            <Spinner fx:id="adultSpinner" prefWidth="60">
-                <HBox.margin>
-                    <Insets left="4" right="20"/>
-                </HBox.margin>
-            </Spinner>
-
-            <Label text="Kinder:"/>
-            <Spinner fx:id="childSpinner" prefWidth="60">
-                <HBox.margin>
-                    <Insets left="4" right="20"/>
-                </HBox.margin>
-            </Spinner>
-
-            <Label text="Fahrräder:"/>
-            <Spinner fx:id="bikeSpinner" prefWidth="60">
-                <HBox.margin>
-                    <Insets left="4" right="200"/>
-                </HBox.margin>
-            </Spinner>
-
-            <Button text="Suche" onAction="#onSearchClicked"/>
+        <HBox alignment="CENTER" spacing="26">
+            <Separator HBox.hgrow="ALWAYS" style="-fx-background-color: #e6e6e6;"/>
+            <Label text="Gefundene Fahrten" style="-fx-text-fill: #2d3b50; -fx-font-weight: bold; -fx-font-size: 19px;"/>
+            <Separator HBox.hgrow="ALWAYS" style="-fx-background-color: #e6e6e6;"/>
         </HBox>
 
-        <HBox alignment="CENTER" spacing="40">
-            <VBox.margin>
-                <Insets top="30" bottom="15"/>
-            </VBox.margin>
-            <Separator HBox.hgrow="ALWAYS" style="-fx-border-color: white; -fx-border-width: 0 0 2 0;"/>
-            <Label text="TRIPS" style="-fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 18px;"/>
-            <Separator HBox.hgrow="ALWAYS" style="-fx-border-color: white; -fx-border-width: 0 0 2 0;"/>
-        </HBox>
-
-        <TableView fx:id="tripTable" onMouseClicked="#onTripSelected">
+        <TableView fx:id="tripTable" onMouseClicked="#onTripSelected" prefHeight="260" style="-fx-background-radius: 10;">
             <columns>
-                <TableColumn fx:id="fromColumn" text="Woher"/>
-                <TableColumn fx:id="toColumn" text="Wohin"/>
-                <TableColumn fx:id="departureColumn" text="Abfahrt"/>
-                <TableColumn fx:id="arrivalColumn" text="Ankunft"/>
-                <TableColumn fx:id="priceColumn" text="Preis"/>
+                <TableColumn fx:id="fromColumn" text="Von" prefWidth="120"/>
+                <TableColumn fx:id="toColumn" text="Nach" prefWidth="120"/>
+                <TableColumn fx:id="departureColumn" text="Abfahrt" prefWidth="110"/>
+                <TableColumn fx:id="arrivalColumn" text="Ankunft" prefWidth="110"/>
+                <TableColumn fx:id="priceColumn" text="Preis" prefWidth="100"/>
             </columns>
         </TableView>
     </VBox>

@@ -10,52 +10,47 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
-            prefWidth="600.0" style="-fx-background-color: #76B2E4;" xmlns="http://javafx.com/javafx/19"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.fhzwickau.reisewelle.controller.LoginController">
+<BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.fhzwickau.reisewelle.controller.LoginController"
+            prefHeight="440.0" prefWidth="720.0"
+            style="-fx-background-color: #eaf4fb;">
     <left>
-        <AnchorPane prefHeight="400.0" prefWidth="280.0"
-                    style="-fx-border-color: #FFFFFF; -fx-border-width: 2px; -fx-border-radius: 5px;"
-                    BorderPane.alignment="CENTER">
+        <AnchorPane prefWidth="350.0" prefHeight="440.0"
+                    style="-fx-background-color: #fafdff; -fx-border-color: #d3e2ef; -fx-border-width: 0 2 0 0; -fx-border-radius: 14 0 0 14; -fx-background-radius: 14 0 0 14; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.10),16,0,0,2);">
             <children>
-                <TextField fx:id="emailField" layoutX="16.0" layoutY="192.0" prefHeight="26.0" prefWidth="245.0" promptText="Email"/>
-                <PasswordField fx:id="passwordField" layoutX="17.0" layoutY="228.0" prefHeight="26.0" prefWidth="244.0" promptText="Passwort"/>
-
-                <Button fx:id="loginbutton" layoutX="51.0" layoutY="281.0" mnemonicParsing="false" onAction="#login"
-                        prefHeight="42.0" prefWidth="178.0"
-                        style="-fx-background-color: #76B2E4; -fx-border-color: #FFFFFF; -fx-border-width: 2px;"
-                        text="Login" textAlignment="JUSTIFY">
-                    <font>
-                        <Font name="Broadway" size="20.0"/>
-                    </font>
-                </Button>
-
-                <ImageView fitHeight="95.0" fitWidth="112.0" layoutX="77.0" layoutY="59.0" pickOnBounds="true"
-                           preserveRatio="true">
+                <ImageView fitHeight="90.0" fitWidth="90.0" layoutX="130.0" layoutY="44.0" pickOnBounds="true" preserveRatio="true">
                     <image>
                         <Image url="@images/Lupa.png"/>
                     </image>
                 </ImageView>
-
-                <Label layoutX="59.0" layoutY="345.0" text="Sie haben noch kein Konto? Anmelden" textAlignment="JUSTIFY"
-                       onMouseClicked="#openRegisterWindow">
-                    <font>
-                        <Font size="10.0"/>
-                    </font>
-                </Label>
+                <Label layoutX="60.0" layoutY="145.0" text="Anmeldung" style="-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: #3776c7;"/>
+                <TextField fx:id="emailField" layoutX="40.0" layoutY="195.0" prefHeight="32.0" prefWidth="260.0"
+                           promptText="E-Mail"
+                           style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
+                <PasswordField fx:id="passwordField" layoutX="40.0" layoutY="240.0" prefHeight="32.0" prefWidth="260.0"
+                               promptText="Passwort"
+                               style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
+                <Button fx:id="loginbutton" layoutX="85.0" layoutY="295.0" prefHeight="40.0" prefWidth="180.0"
+                        onAction="#login"
+                        style="-fx-background-color: #3776c7; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 16px; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian,rgba(55,118,199,0.10),7,0,0,1);">
+                    Einloggen
+                </Button>
+                <Label layoutX="60.0" layoutY="360.0"
+                       text="Sie haben noch kein Konto? Jetzt registrieren"
+                       style="-fx-font-size: 12px; -fx-text-fill: #548dc1; -fx-underline: true; -fx-cursor: hand;"
+                       onMouseClicked="#openRegisterWindow"/>
             </children>
         </AnchorPane>
     </left>
-    <right>
-        <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+    <center>
+        <AnchorPane prefHeight="440.0" prefWidth="370.0">
             <children>
-                <ImageView fitHeight="489.0" fitWidth="307.0" layoutX="-18.0" layoutY="-1.0" pickOnBounds="true"
-                           preserveRatio="true">
+                <ImageView fitHeight="340.0" fitWidth="340.0" layoutX="15.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true">
                     <image>
                         <Image url="@images/RyanGosling.png"/>
                     </image>
                 </ImageView>
             </children>
         </AnchorPane>
-    </right>
+    </center>
 </BorderPane>

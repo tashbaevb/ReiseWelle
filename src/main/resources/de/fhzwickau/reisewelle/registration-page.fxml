@@ -8,16 +8,16 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
-            prefWidth="600.0" style="-fx-background-color: #89CFF0;" xmlns="http://javafx.com/javafx/19"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.fhzwickau.reisewelle.controller.RegistrationController">
+<BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.fhzwickau.reisewelle.controller.RegistrationController"
+            prefHeight="440.0" prefWidth="720.0"
+            style="-fx-background-color: #eaf4fb;">
     <left>
-        <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <AnchorPane prefWidth="340.0" prefHeight="440.0"
+                    style="-fx-background-color: #fafdff; -fx-border-color: #d3e2ef; -fx-border-width: 0 2 0 0; -fx-border-radius: 14 0 0 14; -fx-background-radius: 14 0 0 14; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.10),16,0,0,2);">
             <children>
-                <ImageView fitHeight="140.0" fitWidth="192.0" layoutX="4.0" layoutY="240.0">
+                <ImageView fitHeight="160.0" fitWidth="180.0" layoutX="80.0" layoutY="140.0" pickOnBounds="true" preserveRatio="true">
                     <image>
                         <Image url="@images/pngwing.com.png"/>
                     </image>
@@ -25,38 +25,25 @@
             </children>
         </AnchorPane>
     </left>
-    <right>
-        <AnchorPane prefHeight="400.0" prefWidth="390.0" style="-fx-border-color: white; -fx-border-width: 2px;"
-                    BorderPane.alignment="CENTER">
+    <center>
+        <AnchorPane prefHeight="440.0" prefWidth="380.0"
+                    style="-fx-background-color: #ffffff; -fx-background-radius: 0 14 14 0;">
             <children>
-                <Label layoutX="78.0" layoutY="39.0" prefHeight="77.0" prefWidth="207.0"
-                       style="-fx-border-color: white; -fx-border-width: 2px;" text=" Registration"
-                       textAlignment="RIGHT" wrapText="true">
-                    <font>
-                        <Font name="Courier New Bold" size="25.0"/>
-                    </font>
-                </Label>
-                <TextField fx:id="emailIdField" layoutX="60.0" layoutY="162.0" prefHeight="26.0" prefWidth="253.0"
-                           promptText="E-Mail">
-                    <font>
-                        <Font name="Courier New" size="13.0"/>
-                    </font>
-                </TextField>
-                <PasswordField fx:id="passwordField" layoutX="60.0" layoutY="202.0" prefHeight="25.0" prefWidth="253.0"
-                               promptText="Passwort">
-                    <font>
-                        <Font name="Courier New" size="13.0"/>
-                    </font>
-                </PasswordField>
-                <Button fx:id="submitButton" layoutX="126.0" layoutY="282.0" mnemonicParsing="false"
-                        onAction="#register" prefHeight="41.0" prefWidth="118.0"
-                        style="-fx-background-color: #89CFF0; -fx-border-color: white; -fx-border-width: 2px;"
-                        text="Weiter">
-                    <font>
-                        <Font name="Courier New Bold" size="20.0"/>
-                    </font>
+                <Label layoutX="87.0" layoutY="44.0"
+                       text="Registrierung"
+                       style="-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: #3776c7;"/>
+                <TextField fx:id="emailIdField" layoutX="60.0" layoutY="120.0" prefHeight="32.0" prefWidth="260.0"
+                           promptText="E-Mail"
+                           style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
+                <PasswordField fx:id="passwordField" layoutX="60.0" layoutY="170.0" prefHeight="32.0" prefWidth="260.0"
+                               promptText="Passwort"
+                               style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
+                <Button fx:id="submitButton" layoutX="115.0" layoutY="240.0" prefHeight="40.0" prefWidth="150.0"
+                        onAction="#register"
+                        style="-fx-background-color: #3776c7; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 16px; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian,rgba(55,118,199,0.10),7,0,0,1);">
+                    Registrieren
                 </Button>
             </children>
         </AnchorPane>
-    </right>
+    </center>
 </BorderPane>

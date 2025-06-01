@@ -8,23 +8,28 @@
 <?import javafx.scene.control.Button?>
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="de.fhzwickau.reisewelle.controller.admin.bus.AddEditBusController" spacing="10" prefWidth="300.0"
-      prefHeight="250.0" style="-fx-padding: 10;">
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.bus.AddEditBusController"
+      spacing="18" prefWidth="360.0" prefHeight="340.0"
+      style="-fx-padding: 30; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
+    <Label text="Bus hinzufügen / bearbeiten"
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d3b50; -fx-padding: 0 0 18 0;"/>
+    <Label text="Busnummer" style="-fx-font-size: 13px;"/>
+    <TextField fx:id="busNumberField" promptText="z.B. B123" style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
 
-    <Label text="Bus Nummer"/>
-    <TextField fx:id="busNumberField"/>
+    <Label text="Sitzplätze gesamt" style="-fx-font-size: 13px;"/>
+    <TextField fx:id="totalSeatsField" promptText="z.B. 50" style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
 
-    <Label text="Gesamtzahl der Sitzplätze"/>
-    <TextField fx:id="totalSeatsField"/>
+    <Label text="Fahrradstellplätze" style="-fx-font-size: 13px;"/>
+    <TextField fx:id="bikeSpacesField" promptText="z.B. 6" style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
 
-    <Label text="Fahrradstellplätze"/>
-    <TextField fx:id="bikeSpacesField"/>
+    <Label text="Status" style="-fx-font-size: 13px;"/>
+    <ComboBox fx:id="statusComboBox" prefWidth="200.0" promptText="Status auswählen"
+              style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
 
-    <Label text="Stand"/>
-    <ComboBox fx:id="statusComboBox" prefWidth="150.0"/>
-
-    <HBox spacing="10" alignment="CENTER">
-        <Button text="Speichern" onAction="#save"/>
-        <Button text="Abbrechen" onAction="#cancel"/>
+    <HBox spacing="18" alignment="CENTER_RIGHT" style="-fx-padding: 18 0 0 0;">
+        <Button text="Speichern" onAction="#save"
+                style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px;"/>
+        <Button text="Abbrechen" onAction="#cancel"
+                style="-fx-background-color: #efefef; -fx-text-fill: #6a6f7a; -fx-background-radius: 8; -fx-font-size: 15px;"/>
     </HBox>
 </VBox>
