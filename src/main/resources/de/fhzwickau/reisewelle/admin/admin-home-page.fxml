@@ -71,6 +71,30 @@
                     </graphic>
                     Reisen
                 </Button>
+
+                <Button fx:id="countriesButton" onAction="#showCountries"
+                        style="-fx-background-color: #9055ff; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/countries.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Länder
+                </Button>
+
+                <Button fx:id="citiesButton" onAction="#showCities"
+                        style="-fx-background-color: #b7c9e2; -fx-text-fill: #2d3b50; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/cities.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Städte
+                </Button>
             </children>
         </VBox>
     </left>

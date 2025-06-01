@@ -30,4 +30,22 @@ module de.fhzwickau.reisewelle {
     opens de.fhzwickau.reisewelle.controller.admin.trip to javafx.fxml;
     exports de.fhzwickau.reisewelle.controller.admin.employee;
     opens de.fhzwickau.reisewelle.controller.admin.employee to javafx.fxml;
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // ДОБАВЬ вот это для Country CRUD:
+    exports de.fhzwickau.reisewelle.controller.admin.country;
+    opens de.fhzwickau.reisewelle.controller.admin.country to javafx.fxml;
+
+    // Если будешь делать CRUD для города:
+    exports de.fhzwickau.reisewelle.controller.admin.city;
+    opens de.fhzwickau.reisewelle.controller.admin.city to javafx.fxml;
+
+    // Для статусов (если отдельный пакет):
+//    exports de.fhzwickau.reisewelle.controller.admin.status;
+//    opens de.fhzwickau.reisewelle.controller.admin.status to javafx.fxml;
+
+    // Для статусов трипа (если отдельный пакет):
+//    exports de.fhzwickau.reisewelle.controller.admin.tripstatus;
+//    opens de.fhzwickau.reisewelle.controller.admin.tripstatus to javafx.fxml;
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 }

@@ -37,6 +37,15 @@ public class AdminHomeController {
         loadContent("trip/admin-trip.fxml");
     }
 
+    @FXML private void showCountries() {
+        loadContent("country/admin-country.fxml");
+    }
+
+    public void showCities() {
+        loadContent("city/admin-city.fxml");
+    }
+
+
     private void loadContent(String fxmlFile) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/admin/" + fxmlFile));

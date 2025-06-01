@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.country.AddEditCountryController"
+      spacing="16" prefWidth="340.0" prefHeight="160.0"
+      style="-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-padding: 26;">
+    <Label text="Land"
+           style="-fx-font-size: 19px; -fx-font-weight: bold; -fx-text-fill: #2d3b50;"/>
+    <TextField fx:id="nameField" promptText="Name des Landes" style="-fx-background-radius: 8; -fx-font-size: 15px;"/>
+    <HBox spacing="12" alignment="CENTER_RIGHT">
+        <Button text="Speichern" onAction="#onSave"
+                style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px;"/>
+        <Button text="Abbrechen" onAction="#onCancel"
+                style="-fx-background-radius: 8; -fx-font-size: 15px;"/>
+    </HBox>
+</VBox>
