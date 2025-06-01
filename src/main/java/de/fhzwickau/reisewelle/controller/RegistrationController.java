@@ -6,6 +6,7 @@ import de.fhzwickau.reisewelle.model.User;
 import de.fhzwickau.reisewelle.utils.AlertUtil;
 import de.fhzwickau.reisewelle.utils.FormValidator;
 import de.fhzwickau.reisewelle.utils.PasswordHasher;
+import de.fhzwickau.reisewelle.utils.Session;
 import de.fhzwickau.reisewelle.utils.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -51,6 +52,8 @@ public class RegistrationController {
 
             userDao.save(user);
 
+            Session.getInstance().setCurrentUser(user);
+
             AlertUtil.showAlert(
                     javafx.scene.control.Alert.AlertType.CONFIRMATION,
                     "Erfolg",
@@ -60,7 +63,6 @@ public class RegistrationController {
             );
 
             WindowUtil.openWindow("/de/fhzwickau/reisewelle/user/trips_page.fxml", "Benutzerbereich", event);
-
         } catch (Exception e) {
             e.printStackTrace();
             AlertUtil.showError("Fehler", "Registrierung fehlgeschlagen: " + e.getMessage());

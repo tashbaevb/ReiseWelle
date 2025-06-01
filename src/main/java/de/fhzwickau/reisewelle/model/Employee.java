@@ -3,19 +3,19 @@ package de.fhzwickau.reisewelle.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class Employee {
+public class Employee implements Authenticatable {
 
     private UUID id;
     private String vorname, nachname;
-    private String email, passwort, salt;
+    private String email, password, salt;
     private LocalDateTime erstelltAm;
     private UserRole userRole;
 
-    public Employee(String vorname, String nachname, String email, String passwort, String salt , UserRole userRole) {
+    public Employee(String vorname, String nachname, String email, String password, String salt , UserRole userRole) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.email = email;
-        this.passwort = passwort;
+        this.password = password;
         this.salt = salt;
         this.userRole = userRole;
         erstelltAm = LocalDateTime.now();
@@ -60,12 +60,12 @@ public class Employee {
         this.email = email;
     }
 
-    public String getPasswort() {
-        return passwort;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswort(String password) {
-        this.passwort = passwort;
+    public void setPassword(String password) {
+        this.password = this.password;
     }
 
     public String getSalt() {

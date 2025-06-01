@@ -117,6 +117,22 @@ public class TicketDao implements BaseDao<Ticket> {
         }
     }
 
+    public List<Ticket> findByUserId(UUID id) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
+        List<Ticket> tickets = new ArrayList<>();
+        String sql = """
+                SELECT * FROM Ticket WHERE user_id = ?
+                """;
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id.toString());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) tickets.add(mapRow(rs));
+            }
+        }
+
+        return tickets;
+    }
+
     private Ticket mapRow(ResultSet rs) throws SQLException {
         UUID userId = UUID.fromString(rs.getString("user_id"));
         UUID tripId = UUID.fromString(rs.getString("trip_id"));
@@ -137,4 +153,6 @@ public class TicketDao implements BaseDao<Ticket> {
                 rs.getTimestamp("purchase_date").toLocalDateTime()
         );
     }
+
+
 }

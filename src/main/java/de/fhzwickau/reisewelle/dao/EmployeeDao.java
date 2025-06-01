@@ -84,6 +84,19 @@ public class EmployeeDao implements BaseDao<Employee> {
         }
     }
 
+    public Employee findByEmail(String email) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
+        String sql = "SELECT * FROM Mitarbeiter WHERE email = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return mapEmployee(rs);
+            }
+        }
+        return null;
+    }
+
     private Employee mapEmployee(ResultSet rs) throws SQLException {
         UUID id = UUID.fromString(rs.getString("id"));
         String vorname = rs.getString("vorname");
@@ -105,7 +118,7 @@ public class EmployeeDao implements BaseDao<Employee> {
         stmt.setString(2, employee.getVorname());
         stmt.setString(3, employee.getNachname());
         stmt.setString(4, employee.getEmail());
-        stmt.setString(5, employee.getPasswort());
+        stmt.setString(5, employee.getPassword());
         stmt.setString(6, employee.getSalt());
         stmt.setString(7, employee.getUserRole().getId().toString());
         stmt.setTimestamp(8, Timestamp.valueOf(employee.getErstelltAm() != null ? employee.getErstelltAm() : LocalDateTime.now()));

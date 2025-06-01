@@ -13,6 +13,7 @@ import de.fhzwickau.reisewelle.model.User;
 import de.fhzwickau.reisewelle.utils.AlertUtil;
 import de.fhzwickau.reisewelle.utils.Session;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import de.fhzwickau.reisewelle.dto.TripDetailsDTO;
@@ -39,9 +40,16 @@ public class DetailTripController {
     private Label busLabel, priceLabel;
     @FXML
     private ListView<String> stopsList;
+    @FXML
+    private Button buyBtn;
 
     private final TripDao tripDao = new TripDao();
     private final TripAdminDao tripAdminDao = new TripAdminDao();
+    private boolean isViewingTicket = false;
+
+    public void setViewingTicket(boolean viewingTicket) {
+        this.isViewingTicket = viewingTicket;
+    }
 
     public void loadTripDetails(UUID tripId, Double price, String startStopId, String endStopId, int adults, int children, int bikes) throws SQLException {
         this.tripId = tripId;
@@ -51,6 +59,7 @@ public class DetailTripController {
         this.children = children;
         this.bikes = bikes;
         this.price = price;
+        buyBtn.setVisible(!isViewingTicket);
 
         TripDetailsDTO trip = tripDao.getTripDetails(tripId, price);
         if (trip == null) {

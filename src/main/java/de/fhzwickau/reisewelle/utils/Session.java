@@ -1,11 +1,12 @@
 package de.fhzwickau.reisewelle.utils;
 
+import de.fhzwickau.reisewelle.model.Authenticatable;
 import de.fhzwickau.reisewelle.model.User;
 
 public class Session {
 
     private static Session instance;
-    private User currentUser;
+    private Authenticatable currentUser;
 
     private Session() {
     }
@@ -15,11 +16,11 @@ public class Session {
         return instance;
     }
 
-    public User getCurrentUser() {
+    public Authenticatable getCurrentUser() {
         return currentUser;
     }
 
-    public void setCurrentUser(User currentUser) {
+    public void setCurrentUser(Authenticatable currentUser) {
         this.currentUser = currentUser;
     }
 

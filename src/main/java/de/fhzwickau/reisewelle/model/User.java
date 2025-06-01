@@ -3,7 +3,7 @@ package de.fhzwickau.reisewelle.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class User {
+public class User implements Authenticatable {
 
     private UUID id;
     private String email;

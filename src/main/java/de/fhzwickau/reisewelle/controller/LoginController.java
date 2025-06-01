@@ -1,7 +1,6 @@
 package de.fhzwickau.reisewelle.controller;
 
-import de.fhzwickau.reisewelle.dao.UserDao;
-import de.fhzwickau.reisewelle.model.User;
+import de.fhzwickau.reisewelle.model.Authenticatable;
 import de.fhzwickau.reisewelle.utils.AlertUtil;
 import de.fhzwickau.reisewelle.utils.FormValidator;
 import de.fhzwickau.reisewelle.utils.PasswordHasher;
@@ -20,7 +19,7 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
-    private final UserDao userDao = new UserDao();
+    private final AuthenticationService authService = new AuthenticationService();
 
     public void login(ActionEvent event) {
         if (FormValidator.hasEmptyFields(emailField, passwordField)) {
@@ -32,7 +31,7 @@ public class LoginController {
         String password = passwordField.getText().trim();
 
         try {
-            User user = userDao.findByEmail(email);
+            Authenticatable user = authService.findByEmail(email);
             if (user == null) {
                 AlertUtil.showError("Login fehlgeschlagen", "E-Mail wurde nicht gefunden.");
                 return;
@@ -56,7 +55,7 @@ public class LoginController {
                     WindowUtil.openWindow("/de/fhzwickau/reisewelle/admin/admin-home-page.fxml", "Mitarbeiter Dashboard", event);
                     break;
                 case "USER":
-                    WindowUtil.openWindow("/de/fhzwickau/reisewelle/user/trips_page.fxml", "Benutzerbereich", event);
+                    WindowUtil.openWindow("/de/fhzwickau/reisewelle/user/user-profile-page.fxml", "Benutzerbereich", event);
                     break;
                 default:
                     AlertUtil.showError("Unbekannte Rolle", "Unbekannter Benutzerrolle: " + role);

@@ -118,6 +118,8 @@ public class TripController implements Initializable {
             Parent root = loader.load();
 
             DetailTripController controller = loader.getController();
+            controller.setViewingTicket(false);
+
             controller.loadTripDetails(
                     selected.getTripId(),
                     selected.getPrice(),
