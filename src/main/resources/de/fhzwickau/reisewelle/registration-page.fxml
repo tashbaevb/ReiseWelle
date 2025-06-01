@@ -11,38 +11,44 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.fhzwickau.reisewelle.controller.RegistrationController"
-            prefHeight="440.0" prefWidth="720.0"
+            prefHeight="560.0" prefWidth="920.0"
             style="-fx-background-color: #eaf4fb;">
+
     <left>
-        <AnchorPane prefWidth="340.0" prefHeight="440.0"
-                    style="-fx-background-color: #fafdff; -fx-border-color: #d3e2ef; -fx-border-width: 0 2 0 0; -fx-border-radius: 14 0 0 14; -fx-background-radius: 14 0 0 14; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.10),16,0,0,2);">
+        <AnchorPane prefWidth="360.0" prefHeight="560.0"
+                    style="-fx-background-color: #fafdff; -fx-border-color: #d3e2ef; -fx-border-width: 0 2 0 0; -fx-border-radius: 16 0 0 16; -fx-background-radius: 16 0 0 16; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.10),18,0,0,3);">
             <children>
-                <ImageView fitHeight="160.0" fitWidth="180.0" layoutX="80.0" layoutY="140.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fitHeight="160.0" fitWidth="180.0" layoutX="90.0" layoutY="200.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@images/pngwing.com.png"/>
+                        <Image url="@images/suitcase.png"/>
                     </image>
                 </ImageView>
             </children>
         </AnchorPane>
     </left>
+
     <center>
-        <AnchorPane prefHeight="440.0" prefWidth="380.0"
-                    style="-fx-background-color: #ffffff; -fx-background-radius: 0 14 14 0;">
+        <AnchorPane prefHeight="560.0" prefWidth="560.0"
+                    style="-fx-background-color: #ffffff; -fx-background-radius: 0 16 16 0;">
             <children>
-                <Label layoutX="87.0" layoutY="44.0"
+                <Label layoutX="165.0" layoutY="60.0"
                        text="Registrierung"
-                       style="-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: #3776c7;"/>
-                <TextField fx:id="emailIdField" layoutX="60.0" layoutY="120.0" prefHeight="32.0" prefWidth="260.0"
+                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #3776c7;"/>
+                <TextField fx:id="emailIdField" layoutX="120.0" layoutY="150.0" prefHeight="38.0" prefWidth="320.0"
                            promptText="E-Mail"
-                           style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
-                <PasswordField fx:id="passwordField" layoutX="60.0" layoutY="170.0" prefHeight="32.0" prefWidth="260.0"
+                           style="-fx-background-radius: 10; -fx-font-size: 16px;"/>
+                <PasswordField fx:id="passwordField" layoutX="120.0" layoutY="205.0" prefHeight="38.0" prefWidth="320.0"
                                promptText="Passwort"
-                               style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
-                <Button fx:id="submitButton" layoutX="115.0" layoutY="240.0" prefHeight="40.0" prefWidth="150.0"
+                               style="-fx-background-radius: 10; -fx-font-size: 16px;"/>
+                <Button fx:id="submitButton" layoutX="190.0" layoutY="270.0" prefHeight="46.0" prefWidth="180.0"
                         onAction="#register"
-                        style="-fx-background-color: #3776c7; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 16px; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian,rgba(55,118,199,0.10),7,0,0,1);">
+                        style="-fx-background-color: #3776c7; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 18px; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian,rgba(55,118,199,0.09),7,0,0,1);">
                     Registrieren
                 </Button>
+                <Label layoutX="180.0" layoutY="340.0"
+                       text="Schon ein Konto? Jetzt anmelden"
+                       style="-fx-font-size: 14px; -fx-text-fill: #548dc1; -fx-underline: true; -fx-cursor: hand;"
+                       onMouseClicked="#openLoginWindow"/>
             </children>
         </AnchorPane>
     </center>
