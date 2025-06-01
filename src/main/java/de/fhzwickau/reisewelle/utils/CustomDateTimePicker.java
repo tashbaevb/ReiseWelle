@@ -32,12 +32,4 @@ public class CustomDateTimePicker extends HBox {
         if (datePicker.getValue() == null) return null;
         return LocalDateTime.of(datePicker.getValue(), LocalTime.of(hourSpinner.getValue(), minuteSpinner.getValue()));
     }
-
-    public void setDateTimeValue(LocalDateTime value) {
-        if (value != null) {
-            datePicker.setValue(value.toLocalDate());
-            hourSpinner.getValueFactory().setValue(value.getHour());
-            minuteSpinner.getValueFactory().setValue(value.getMinute());
-        }
-    }
 }

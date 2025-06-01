@@ -19,6 +19,7 @@ import de.fhzwickau.reisewelle.model.Stop;
 import de.fhzwickau.reisewelle.model.Trip;
 import de.fhzwickau.reisewelle.model.TripStatus;
 import de.fhzwickau.reisewelle.model.TripStopPrice;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
 import de.fhzwickau.reisewelle.utils.FormValidator;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -28,7 +29,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -140,7 +140,7 @@ public class AddEditTripController extends BaseAddEditController<Trip> {
 
         boolean hasTickets = ticketDao.hasTicketsForTrip(entity.getId());
         if (hasTickets) {
-            showError("Fehler", "Die Haltestellen und Preise können nicht geändert werden, da bereits Tickets verkauft wurden.");
+            AlertUtil.showError("Fehler", "Die Haltestellen und Preise können nicht geändert werden, da bereits Tickets verkauft wurden.");
             return;
         }
 
@@ -198,7 +198,7 @@ public class AddEditTripController extends BaseAddEditController<Trip> {
         try {
             cityCombo.getItems().setAll(cityDao.findAll());
         } catch (SQLException sqle) {
-            showError("Städte können nicht geladen werden", sqle.getMessage());
+            AlertUtil.showError("Städte können nicht geladen werden", sqle.getMessage());
             return;
         }
 
@@ -386,12 +386,5 @@ public class AddEditTripController extends BaseAddEditController<Trip> {
             list.get(i).setStopOrder(i + 1);
         }
         stopsTable.refresh();
-    }
-
-    private void showError(String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

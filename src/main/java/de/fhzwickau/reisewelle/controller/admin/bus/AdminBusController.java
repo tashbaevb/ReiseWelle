@@ -6,16 +6,14 @@ import de.fhzwickau.reisewelle.dao.BusDao;
 import de.fhzwickau.reisewelle.dao.TripAdminDao;
 import de.fhzwickau.reisewelle.model.Bus;
 import de.fhzwickau.reisewelle.model.Trip;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
+import de.fhzwickau.reisewelle.utils.WindowUtil;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -54,7 +52,7 @@ public class AdminBusController extends BaseTableController<Bus> {
         try {
             return tripDao.findAll().stream().anyMatch(trip -> trip.getBus().getId().equals(bus.getId()));
         } catch (SQLException e) {
-            showError("Fehler bei Verwendungskontrolle", e.getMessage());
+            AlertUtil.showError("Fehler bei Verwendungskontrolle", e.getMessage());
             return true;
         }
     }
@@ -76,18 +74,12 @@ public class AdminBusController extends BaseTableController<Bus> {
 
     @Override
     protected Stage showAddEditDialog(Bus bus) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/admin/bus/add-edit-bus.fxml"));
-        Parent root = loader.load();
-        AddEditBusController controller = loader.getController();
-        controller.setBus(bus);
-
-        Stage stage = new Stage();
-        stage.setScene(new Scene(root));
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(bus == null ? "Bus hinzufügen" : "Bus bearbeiten");
-        stage.setOnHidden(e -> loadDataAsync());
-        stage.show();
-        return stage;
+        return WindowUtil.showModalWindow(
+                "/de/fhzwickau/reisewelle/admin/bus/add-edit-bus.fxml",
+                bus == null ? "Bus hinzufügen" : "Bus bearbeiten",
+                controller -> ((AddEditBusController) controller).setBus(bus),
+                this::loadDataAsync
+        );
     }
 
     @Override

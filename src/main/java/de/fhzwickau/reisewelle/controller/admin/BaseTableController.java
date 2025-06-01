@@ -1,6 +1,7 @@
 package de.fhzwickau.reisewelle.controller.admin;
 
 import de.fhzwickau.reisewelle.dao.BaseDao;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -56,7 +57,7 @@ public abstract class BaseTableController<T> {
             items.setAll(task.getValue());
         });
         task.setOnFailed(e -> {
-            showError("Fehler beim Laden", task.getException().getMessage());
+            AlertUtil.showError("Fehler beim Laden", task.getException().getMessage());
         });
         new Thread(task, "LoadDataThread").start();
     }
@@ -66,7 +67,7 @@ public abstract class BaseTableController<T> {
         try {
             showAddEditDialog(null);
         } catch (IOException e) {
-            showError("Fehler beim Öffnen des Dialogfelds „Hinzufügen“", e.getMessage());
+            AlertUtil.showError("Fehler beim Öffnen des Dialogfelds „Hinzufügen“", e.getMessage());
         }
     }
 
@@ -77,33 +78,28 @@ public abstract class BaseTableController<T> {
             try {
                 showAddEditDialog(selected);
             } catch (IOException e) {
-                showError("Fehler beim Öffnen des Dialogfelds „Ändern“", e.getMessage());
+                AlertUtil.showError("Fehler beim Öffnen des Dialogfelds „Ändern“", e.getMessage());
             }
         }
     }
 
     @FXML
-    protected void onDelete() {
+    protected void onDelete() throws SQLException {
         T selected = tableView.getSelectionModel().getSelectedItem();
         if (selected == null) return;
 
         if (isInUse(selected)) {
-            showError("Element kann nicht gelöscht werden",
-                    getInUseMessage());
+            AlertUtil.showError("Element kann nicht gelöscht werden", getInUseMessage());
             return;
         }
 
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setHeaderText("Löschen bestätigen");
-        confirm.setContentText(getDeleteConfirmationMessage(selected));
-        Optional<ButtonType> result = confirm.showAndWait();
-
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        boolean confirmed = AlertUtil.showConfirmation("Löschen bestätigen", getDeleteConfirmationMessage(selected));
+        if (confirmed) {
             try {
                 dao.delete(getId(selected));
                 loadDataAsync();
             } catch (SQLException ex) {
-                showError("Fehler beim Löschen", ex.getMessage());
+                AlertUtil.showError("Fehler beim Löschen", ex.getMessage());
             }
         }
     }
@@ -117,13 +113,6 @@ public abstract class BaseTableController<T> {
     protected abstract String getDeleteConfirmationMessage(T entity);
 
     protected abstract Stage showAddEditDialog(T entity) throws IOException;
-
-    protected void showError(String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
 
     protected abstract TableView<T> getTableView();
 }

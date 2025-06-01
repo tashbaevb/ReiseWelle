@@ -8,14 +8,16 @@ public class User {
     private UUID id;
     private String email;
     private String password;
+    private String salt;
     private UserRole userRole;
     private LocalDateTime created_at;
 
-    public User(String email, String password, UserRole userRole, LocalDateTime created_at) {
+    public User(String email, String password, String salt, UserRole userRole, LocalDateTime created_at) {
         this.email = email;
         this.password = password;
         this.userRole = userRole;
         this.created_at = created_at;
+        this.salt = salt;
     }
 
     public UUID getId() {
@@ -55,6 +57,22 @@ public class User {
     }
 
     public void setCreatedAt(LocalDateTime created_at) {
+        this.created_at = created_at;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    public LocalDateTime getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(LocalDateTime created_at) {
         this.created_at = created_at;
     }
 }

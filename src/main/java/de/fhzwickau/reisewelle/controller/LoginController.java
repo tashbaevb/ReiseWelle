@@ -1,42 +1,75 @@
 package de.fhzwickau.reisewelle.controller;
 
-import de.fhzwickau.reisewelle.ReiseWelleApplication;
+import de.fhzwickau.reisewelle.dao.UserDao;
+import de.fhzwickau.reisewelle.model.User;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
+import de.fhzwickau.reisewelle.utils.FormValidator;
+import de.fhzwickau.reisewelle.utils.PasswordHasher;
+import de.fhzwickau.reisewelle.utils.Session;
+import de.fhzwickau.reisewelle.utils.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-
-import java.io.IOException;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 
 public class LoginController {
 
     @FXML
-    private void onTripsButtonClick(ActionEvent event) {
-        openNewWindow(event, "/de/fhzwickau/reisewelle/user/trips_page.fxml", "Trips Page");
+    private TextField emailField;
+
+    @FXML
+    private PasswordField passwordField;
+
+    private final UserDao userDao = new UserDao();
+
+    public void login(ActionEvent event) {
+        if (FormValidator.hasEmptyFields(emailField, passwordField)) {
+            AlertUtil.showError("Login Fehler", "Bitte geben Sie E-Mail und Passwort ein.");
+            return;
+        }
+
+        String email = emailField.getText().trim();
+        String password = passwordField.getText().trim();
+
+        try {
+            User user = userDao.findByEmail(email);
+            if (user == null) {
+                AlertUtil.showError("Login fehlgeschlagen", "E-Mail wurde nicht gefunden.");
+                return;
+            }
+
+            boolean passwordMatch = PasswordHasher.verifyPassword(password, user.getPassword(), user.getSalt());
+
+            if (!passwordMatch) {
+                AlertUtil.showError("Login fehlgeschlagen", "Falsches Passwort.");
+                return;
+            }
+
+            Session.getInstance().setCurrentUser(user);
+            String role = user.getUserRole().toString().toUpperCase();
+
+            switch (role) {
+                case "ADMIN":
+                    WindowUtil.openWindow("/de/fhzwickau/reisewelle/admin/admin-home-page.fxml", "Admin Dashboard", event);
+                    break;
+                case "EMPLOYEE":
+                    WindowUtil.openWindow("/de/fhzwickau/reisewelle/admin/admin-home-page.fxml", "Mitarbeiter Dashboard", event);
+                    break;
+                case "USER":
+                    WindowUtil.openWindow("/de/fhzwickau/reisewelle/user/trips_page.fxml", "Benutzerbereich", event);
+                    break;
+                default:
+                    AlertUtil.showError("Unbekannte Rolle", "Unbekannter Benutzerrolle: " + role);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertUtil.showError("Fehler", "Ein Fehler ist aufgetreten: " + e.getMessage());
+        }
     }
 
     @FXML
-    protected void onAdminButtonClick(ActionEvent event) {
-        openNewWindow(event, "/de/fhzwickau/reisewelle/admin/admin-home-page.fxml", "Admin Home Page");
-    }
-
-    private void openNewWindow(ActionEvent event, String fxmlFileName, String title) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(ReiseWelleApplication.class.getResource(fxmlFileName));
-            Parent root = fxmlLoader.load();
-            Scene scene = new Scene(root);
-            Stage homeStage = new Stage();
-            homeStage.setTitle(title);
-            homeStage.setScene(scene);
-            homeStage.show();
-
-            Stage loginStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            loginStage.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void openRegisterWindow(javafx.scene.input.MouseEvent event) {
+        WindowUtil.openWindow("/de/fhzwickau/reisewelle/registration-page.fxml", "Registrierung", event);
     }
 }

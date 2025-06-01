@@ -4,14 +4,13 @@ import de.fhzwickau.reisewelle.controller.admin.BaseTableController;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.TripAdminDao;
 import de.fhzwickau.reisewelle.model.Trip;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
+import de.fhzwickau.reisewelle.utils.WindowUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -70,34 +69,23 @@ public class AdminTripController extends BaseTableController<Trip> {
 
     @Override
     protected Stage showAddEditDialog(Trip trip) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/admin/trip/add-edit-trip.fxml"));
-        Stage stage = new Stage();
-        stage.setScene(new Scene(loader.load()));
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(trip == null ? "Reise hinzufügen" : "Reise bearbeiten");
-
-        AddEditTripController controller = loader.getController();
-        try {
-            controller.setTrip(trip);
-        } catch (SQLException ex) {
-            showError("Fehler beim Laden der Reisedaten", ex.getMessage());
-        }
-
-        stage.setOnHidden(e -> loadDataAsync());
-        stage.show();
-        return stage;
+        return WindowUtil.showModalWindow(
+                "/de/fhzwickau/reisewelle/admin/trip/add-edit-trip.fxml",
+                trip == null ? "Reise hinzufügen" : "Reise bearbeiten",
+                controller -> {
+                    try {
+                        ((AddEditTripController) controller).setTrip(trip);
+                    } catch (SQLException sqle) {
+                        AlertUtil.showError("Fehler beim Laden der Reisedaten", sqle.getMessage());
+                    }
+                },
+                this::loadDataAsync
+        );
     }
 
     @Override
     protected String getDeleteConfirmationMessage(Trip trip) {
         return "Reise ID: " + trip.getId();
-    }
-
-    public void showError(String header, String content) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     @Override

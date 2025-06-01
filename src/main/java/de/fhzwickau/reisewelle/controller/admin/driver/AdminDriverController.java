@@ -6,19 +6,19 @@ import de.fhzwickau.reisewelle.dao.DriverDao;
 import de.fhzwickau.reisewelle.dao.TripAdminDao;
 import de.fhzwickau.reisewelle.model.Driver;
 import de.fhzwickau.reisewelle.model.Trip;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
+import de.fhzwickau.reisewelle.utils.WindowUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.stage.Modality;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class AdminDriverController extends BaseTableController<Driver> {
@@ -40,10 +40,7 @@ public class AdminDriverController extends BaseTableController<Driver> {
         licenseNumberColumn.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getLicenseNumber()));
         statusColumn.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getStatus().getName()));
 
-        // Инициализация базового контроллера: dao, таблица, кнопки
         init(driverDao, driversTable, editButton, deleteButton);
-
-        // Загрузка данных асинхронно через переопределённый метод
         loadDataAsync();
     }
 
@@ -59,7 +56,7 @@ public class AdminDriverController extends BaseTableController<Driver> {
         task.setOnFailed(e -> {
             Throwable ex = task.getException();
             ex.printStackTrace();
-            showError("Fehler beim Laden der Fahrer", ex.getMessage());
+            AlertUtil.showError("Fehler beim Laden der Fahrer", ex.getMessage());
         });
         new Thread(task, "LoadDriversThread").start();
     }
@@ -71,8 +68,7 @@ public class AdminDriverController extends BaseTableController<Driver> {
             return trips.stream()
                     .anyMatch(trip -> trip.getDriver() != null && trip.getDriver().getId().equals(driver.getId()));
         } catch (SQLException e) {
-            showError("Fehlerprüfung", e.getMessage());
-            // Если не можем проверить, безопаснее запретить удаление
+            AlertUtil.showError("Fehlerprüfung", e.getMessage());
             return true;
         }
     }
@@ -89,30 +85,17 @@ public class AdminDriverController extends BaseTableController<Driver> {
 
     @Override
     protected Stage showAddEditDialog(Driver driver) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/admin/driver/add-edit-driver.fxml"));
-        Stage stage = new Stage();
-        stage.setScene(new Scene(loader.load()));
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(driver == null ? "Den Fahrer hinzufügen" : "Den Fahrer bearbeiten");
-
-        AddEditDriverController controller = loader.getController();
-        controller.setDriver(driver);
-
-        stage.setOnHidden(event -> loadDataAsync());
-        stage.show();
-        return stage;
+        return WindowUtil.showModalWindow(
+                "/de/fhzwickau/reisewelle/admin/driver/add-edit-driver.fxml",
+                driver == null ? "Den Fahrer hinzufügen" : "Den Fahrer bearbeiten",
+                controller -> ((AddEditDriverController) controller).setDriver(driver),
+                this::loadDataAsync
+        );
     }
 
     @Override
     protected String getDeleteConfirmationMessage(Driver driver) {
         return "Führerscheinnummer: " + driver.getLicenseNumber();
-    }
-
-    public void showError(String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     @Override

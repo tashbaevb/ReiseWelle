@@ -4,14 +4,12 @@ import de.fhzwickau.reisewelle.controller.admin.BaseTableController;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.EmployeeDao;
 import de.fhzwickau.reisewelle.model.Employee;
+import de.fhzwickau.reisewelle.utils.WindowUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -60,18 +58,12 @@ public class AdminEmployeeController extends BaseTableController<Employee> {
 
     @Override
     protected Stage showAddEditDialog(Employee employee) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/admin/employee/add-edit-employee.fxml"));
-        Stage stage = new Stage();
-        stage.setScene(new Scene(loader.load()));
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(employee == null ? "Mitarbeiter hinzufügen" : "Mitarbeiter bearbeiten");
-
-        AddEditEmployeeController controller = loader.getController();
-        controller.setEmployee(employee);
-
-        stage.setOnHidden(event -> loadDataAsync());
-        stage.show();
-        return stage;
+        return WindowUtil.showModalWindow(
+                "/de/fhzwickau/reisewelle/admin/employee/add-edit-employee.fxml",
+                employee == null ? "Mitarbeiter hinzufügen" : "Mitarbeiter bearbeiten",
+                controller -> ((AddEditEmployeeController) controller).setEmployee(employee),
+                this::loadDataAsync
+        );
     }
 
     @Override

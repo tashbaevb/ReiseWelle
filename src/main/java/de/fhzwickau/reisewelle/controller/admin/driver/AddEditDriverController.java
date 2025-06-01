@@ -6,6 +6,7 @@ import de.fhzwickau.reisewelle.model.Driver;
 import de.fhzwickau.reisewelle.model.Status;
 import de.fhzwickau.reisewelle.dao.DriverDao;
 import de.fhzwickau.reisewelle.dao.StatusDao;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
 import de.fhzwickau.reisewelle.utils.ComboBoxUtils;
 import de.fhzwickau.reisewelle.utils.FormValidator;
 import javafx.fxml.FXML;
@@ -33,7 +34,8 @@ public class AddEditDriverController extends BaseAddEditController<Driver> {
     @Override
     protected void saveEntity() throws SQLException {
         if (FormValidator.areFieldsEmpty(firstNameField, lastNameField, licenseNumberField) || FormValidator.isComboBoxEmpty(statusComboBox)) {
-            throw new IllegalArgumentException("Die Validierung ist fehlgeschlagen. Bitte füllen Sie alle Felder aus.");
+            AlertUtil.showError("Fehler", "Die Validierung ist fehlgeschlagen. Bitte füllen Sie alle Felder aus.");
+            return;
         }
 
         if (entity == null) {

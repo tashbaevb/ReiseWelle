@@ -10,10 +10,9 @@ import de.fhzwickau.reisewelle.model.SeatAvailability;
 import de.fhzwickau.reisewelle.model.Stop;
 import de.fhzwickau.reisewelle.model.Ticket;
 import de.fhzwickau.reisewelle.model.User;
-import javafx.event.ActionEvent;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
+import de.fhzwickau.reisewelle.utils.Session;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import de.fhzwickau.reisewelle.dto.TripDetailsDTO;
@@ -22,7 +21,6 @@ import de.fhzwickau.reisewelle.dao.TripDao;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class DetailTripController {
@@ -65,19 +63,17 @@ public class DetailTripController {
         stopsList.getItems().setAll(trip.getStops());
     }
 
-
-    public void onBuy(ActionEvent event) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setHeaderText("Ticket kaufen?");
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            updateTripInfo();
-        }
+    public void onBuy() {
+        AlertUtil.showConfirmation("Ticket kaufen?", confirmed -> {
+            if (confirmed) {
+                updateTripInfo();
+            }
+        });
     }
 
     private void updateTripInfo() {
         try {
-            UUID userId = UUID.fromString("444494BA-8390-468D-B157-F586B8AE3F80");
+            UUID userId = Session.getInstance().getCurrentUser().getId();
             User user = userDao.findById(userId);
 
             UUID startUUID = UUID.fromString(startStopId);
@@ -94,7 +90,7 @@ public class DetailTripController {
             }
 
             if (fromIndex == -1 || toIndex == -1 || fromIndex >= toIndex) {
-                showError("Ungültige Stopps gewählt");
+                AlertUtil.showError("Fehler", "Ungültige Stopps gewählt");
                 return;
             }
 
@@ -105,17 +101,17 @@ public class DetailTripController {
                 SeatAvailability sa = seatDao.findByTripAndStops(tripId, segStartId, segEndId);
 
                 if (sa == null) {
-                    showError("Keine Sitzplatzdaten für Segment " + (i + 1));
+                    AlertUtil.showError("Fehler", "Keine Sitzplatzdaten für Segment " + (i + 1));
                     return;
                 }
 
                 if (sa.getAvailableSeats() < totalPassengers) {
-                    showError("Nicht genug freie Sitzplätze auf Teilstrecke.");
+                    AlertUtil.showError("Fehler", "Nicht genug freie Sitzplätze auf Teilstrecke.");
                     return;
                 }
 
                 if (sa.getAvailableBicycleSeats() < bikes) {
-                    showError("Nicht genug Fahrradplätze auf Teilstrecke.");
+                    AlertUtil.showError("Fehler", "Nicht genug Fahrradplätze auf Teilstrecke.");
                     return;
                 }
             }
@@ -127,7 +123,7 @@ public class DetailTripController {
                 SeatAvailability sa = seatDao.findByTripAndStops(tripId, segStartId, segEndId);
 
                 if (sa == null) {
-                    showError("Fehlende Sitzverfügbarkeitsdaten bei Aktualisierung.");
+                    AlertUtil.showError("Fehler", "Fehlende Sitzverfügbarkeitsdaten bei Aktualisierung.");
                     return;
                 }
 
@@ -149,25 +145,10 @@ public class DetailTripController {
             );
             ticketDao.save(ticket);
 
-            showSuccess("Ticket wurde erfolgreich gekauft!");
+            AlertUtil.showInfo("Erfolgreich!", "Ticket wurde erfolgreich gekauft!");
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Fehler beim Kauf: " + e.getMessage());
+            AlertUtil.showError("Fehler", "Fehler beim Kauf: " + e.getMessage());
         }
-    }
-
-
-    private void showError(String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText("Fehler");
-        alert.setContentText(msg);
-        alert.showAndWait();
-    }
-
-    private void showSuccess(String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText("Erfolg");
-        alert.setContentText(msg);
-        alert.showAndWait();
     }
 }

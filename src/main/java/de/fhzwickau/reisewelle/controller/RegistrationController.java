@@ -1,0 +1,69 @@
+package de.fhzwickau.reisewelle.controller;
+
+import de.fhzwickau.reisewelle.dao.UserDao;
+import de.fhzwickau.reisewelle.dao.UserRoleDao;
+import de.fhzwickau.reisewelle.model.User;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
+import de.fhzwickau.reisewelle.utils.FormValidator;
+import de.fhzwickau.reisewelle.utils.PasswordHasher;
+import de.fhzwickau.reisewelle.utils.WindowUtil;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.stage.Window;
+
+import java.time.LocalDateTime;
+
+public class RegistrationController {
+
+    @FXML
+    private TextField emailIdField;
+
+    @FXML
+    private PasswordField passwordField;
+
+    private final UserDao userDao = new UserDao();
+    private final UserRoleDao userRoleDao = new UserRoleDao();
+
+    @FXML
+    public void register(ActionEvent event) {
+        Window owner = emailIdField.getScene().getWindow();
+
+        if (FormValidator.hasEmptyFields(emailIdField, passwordField)) {
+            AlertUtil.showError("Formularfehler", "Bitte füllen Sie alle Felder aus.");
+            return;
+        }
+
+        try {
+            String email = emailIdField.getText().trim();
+            String password = passwordField.getText().trim();
+
+            PasswordHasher.HashResult hashResult = PasswordHasher.hashPassword(password);
+
+            User user = new User(
+                    email,
+                    hashResult.hashBase64(),
+                    hashResult.saltBase64(),
+                    userRoleDao.findByName("USER"),
+                    LocalDateTime.now()
+            );
+
+            userDao.save(user);
+
+            AlertUtil.showAlert(
+                    javafx.scene.control.Alert.AlertType.CONFIRMATION,
+                    "Erfolg",
+                    null,
+                    "Willkommen " + email,
+                    owner
+            );
+
+            WindowUtil.openWindow("/de/fhzwickau/reisewelle/user/trips_page.fxml", "Benutzerbereich", event);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertUtil.showError("Fehler", "Registrierung fehlgeschlagen: " + e.getMessage());
+        }
+    }
+}

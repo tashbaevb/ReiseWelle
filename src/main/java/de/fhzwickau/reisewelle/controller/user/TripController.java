@@ -2,6 +2,7 @@ package de.fhzwickau.reisewelle.controller.user;
 
 import de.fhzwickau.reisewelle.dto.TripSegmentDTO;
 import de.fhzwickau.reisewelle.dao.TripDao;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
 import de.fhzwickau.reisewelle.utils.CustomDateTimePicker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -92,16 +93,20 @@ public class TripController implements Initializable {
 
     @FXML
     public void onSearchClicked() throws SQLException {
-        String from = fromCityField.getText();
-        String to = toCityField.getText();
-        LocalDateTime dateTime = dateTimePicker.getDateTimeValue();
+        try {
+            String from = fromCityField.getText();
+            String to = toCityField.getText();
+            LocalDateTime dateTime = dateTimePicker.getDateTimeValue();
 
-        int adults = adultSpinner.getValue();
-        int children = childSpinner.getValue();
-        int bikes = bikeSpinner.getValue();
+            int adults = adultSpinner.getValue();
+            int children = childSpinner.getValue();
+            int bikes = bikeSpinner.getValue();
 
-        List<TripSegmentDTO> trips = tripDao.searchTrips(from, to, dateTime, adults, children, bikes);
-        tripTable.getItems().setAll(trips);
+            List<TripSegmentDTO> trips = tripDao.searchTrips(from, to, dateTime, adults, children, bikes);
+            tripTable.getItems().setAll(trips);
+        } catch (SQLException sqle) {
+            AlertUtil.showError("Fehler bei der Suche", sqle.getMessage());
+        }
     }
 
 
@@ -128,4 +133,5 @@ public class TripController implements Initializable {
             stage.show();
         }
     }
+
 }
