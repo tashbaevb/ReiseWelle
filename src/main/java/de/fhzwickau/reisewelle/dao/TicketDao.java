@@ -97,19 +97,22 @@ public class TicketDao implements BaseDao<Ticket> {
         }
     }
 
+    public boolean hasTicketsForTrip(UUID tripId) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
+        String sql = "SELECT COUNT(*) FROM Ticket WHERE trip_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tripId.toString());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
+
     public void deleteAllForTrip(UUID tripId) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
         try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM Ticket WHERE trip_id = ?")) {
             stmt.setString(1, tripId.toString());
-            stmt.executeUpdate();
-        }
-    }
-
-    public void deleteAllForStop(UUID stopId) throws SQLException {
-        Connection conn = JDBCConfig.getInstance();
-        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM Ticket WHERE start_stop_id = ? OR end_stop_id = ?")) {
-            stmt.setString(1, stopId.toString());
-            stmt.setString(2, stopId.toString());
             stmt.executeUpdate();
         }
     }

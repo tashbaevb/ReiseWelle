@@ -2,9 +2,12 @@ package de.fhzwickau.reisewelle.controller.user;
 
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.SeatAvailabilityDao;
+import de.fhzwickau.reisewelle.dao.StopDao;
 import de.fhzwickau.reisewelle.dao.TicketDao;
+import de.fhzwickau.reisewelle.dao.TripAdminDao;
 import de.fhzwickau.reisewelle.dao.UserDao;
 import de.fhzwickau.reisewelle.model.SeatAvailability;
+import de.fhzwickau.reisewelle.model.Stop;
 import de.fhzwickau.reisewelle.model.Ticket;
 import de.fhzwickau.reisewelle.model.User;
 import javafx.event.ActionEvent;
@@ -18,14 +21,16 @@ import de.fhzwickau.reisewelle.dao.TripDao;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class DetailTripController {
 
-    private final BaseDao<SeatAvailability> seatDao = new SeatAvailabilityDao();
+    private final SeatAvailabilityDao seatDao = new SeatAvailabilityDao();
     private final BaseDao<Ticket> ticketDao = new TicketDao();
     private final BaseDao<User> userDao = new UserDao();
+    private final StopDao stopDao = new StopDao();
 
     private UUID tripId;
     private String startStopId, endStopId;
@@ -38,6 +43,7 @@ public class DetailTripController {
     private ListView<String> stopsList;
 
     private final TripDao tripDao = new TripDao();
+    private final TripAdminDao tripAdminDao = new TripAdminDao();
 
     public void loadTripDetails(UUID tripId, Double price, String startStopId, String endStopId, int adults, int children, int bikes) throws SQLException {
         this.tripId = tripId;
@@ -73,38 +79,68 @@ public class DetailTripController {
         try {
             UUID userId = UUID.fromString("444494BA-8390-468D-B157-F586B8AE3F80");
             User user = userDao.findById(userId);
-            System.out.println("userchik = " + user.getId());
 
             UUID startUUID = UUID.fromString(startStopId);
             UUID endUUID = UUID.fromString(endStopId);
 
-            SeatAvailability availability = seatDao.findAll().stream()
-                    .filter(sa -> sa.getTrip().getId().equals(tripId)
-                            && sa.getStartStop().getId().equals(startUUID)
-                            && sa.getEndStop().getId().equals(endUUID))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Keine Verfügbarkeit gefunden"));
-
             int totalPassengers = adults + children;
 
-            if (availability.getAvailableSeats() < (adults + children)) {
-                showError("Nicht genug freie Sitzplätze.");
-                return;
+            List<Stop> allStops = stopDao.findAllByTripOrdered(tripId);
+
+            int fromIndex = -1, toIndex = -1;
+            for (int i = 0; i < allStops.size(); i++) {
+                if (allStops.get(i).getId().equals(startUUID)) fromIndex = i;
+                if (allStops.get(i).getId().equals(endUUID)) toIndex = i;
             }
-            if (availability.getAvailableBicycleSeats() < bikes) {
-                showError("Nicht genug Fahrradplätze.");
+
+            if (fromIndex == -1 || toIndex == -1 || fromIndex >= toIndex) {
+                showError("Ungültige Stopps gewählt");
                 return;
             }
 
-            availability.setAvailableSeats(availability.getAvailableSeats() - totalPassengers);
-            availability.setAvailableBicycleSeats(availability.getAvailableBicycleSeats() - bikes);
-            seatDao.save(availability);
+            // Check availability of seats on all segments
+            for (int i = fromIndex; i < toIndex; i++) {
+                UUID segStartId = allStops.get(i).getId();
+                UUID segEndId = allStops.get(i + 1).getId();
+                SeatAvailability sa = seatDao.findByTripAndStops(tripId, segStartId, segEndId);
+
+                if (sa == null) {
+                    showError("Keine Sitzplatzdaten für Segment " + (i + 1));
+                    return;
+                }
+
+                if (sa.getAvailableSeats() < totalPassengers) {
+                    showError("Nicht genug freie Sitzplätze auf Teilstrecke.");
+                    return;
+                }
+
+                if (sa.getAvailableBicycleSeats() < bikes) {
+                    showError("Nicht genug Fahrradplätze auf Teilstrecke.");
+                    return;
+                }
+            }
+
+            // update the availability of seats on all segments
+            for (int i = fromIndex; i < toIndex; i++) {
+                UUID segStartId = allStops.get(i).getId();
+                UUID segEndId = allStops.get(i + 1).getId();
+                SeatAvailability sa = seatDao.findByTripAndStops(tripId, segStartId, segEndId);
+
+                if (sa == null) {
+                    showError("Fehlende Sitzverfügbarkeitsdaten bei Aktualisierung.");
+                    return;
+                }
+
+                sa.setAvailableSeats(sa.getAvailableSeats() - totalPassengers);
+                sa.setAvailableBicycleSeats(sa.getAvailableBicycleSeats() - bikes);
+                seatDao.save(sa);
+            }
 
             Ticket ticket = new Ticket(
                     user,
-                    availability.getTrip(),
-                    availability.getStartStop(),
-                    availability.getEndStop(),
+                    tripAdminDao.findById(tripId),
+                    stopDao.findById(startUUID),
+                    stopDao.findById(endUUID),
                     adults,
                     children,
                     bikes,
@@ -119,6 +155,7 @@ public class DetailTripController {
             showError("Fehler beim Kauf: " + e.getMessage());
         }
     }
+
 
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

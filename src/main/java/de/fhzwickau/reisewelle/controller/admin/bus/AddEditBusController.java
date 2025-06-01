@@ -6,6 +6,7 @@ import de.fhzwickau.reisewelle.model.Status;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.BusDao;
 import de.fhzwickau.reisewelle.dao.StatusDao;
+import de.fhzwickau.reisewelle.utils.ComboBoxUtils;
 import de.fhzwickau.reisewelle.utils.FormValidator;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -28,14 +29,13 @@ public class AddEditBusController extends BaseAddEditController<Bus> {
     private final BaseDao<Status> statusDao = new StatusDao();
 
     @FXML
-    private void initialize() throws SQLException {
-        statusComboBox.getItems().setAll(statusDao.findAll());
+    private void initialize() {
+        ComboBoxUtils.populate(statusComboBox, statusDao);
     }
 
     @Override
     protected void saveEntity() throws SQLException {
-        if (FormValidator.isFieldEmpty(busNumberField) || FormValidator.isFieldEmpty(totalSeatsField)
-                || FormValidator.isFieldEmpty(bikeSpacesField) || FormValidator.isComboBoxEmpty(statusComboBox)) {
+        if (FormValidator.areFieldsEmpty(busNumberField, totalSeatsField, bikeSpacesField) || FormValidator.isComboBoxEmpty(statusComboBox)) {
             throw new IllegalArgumentException("Die Validierung ist fehlgeschlagen. Bitte füllen Sie alle Felder aus.");
         }
 
@@ -53,7 +53,11 @@ public class AddEditBusController extends BaseAddEditController<Bus> {
             entity.setStatus(status);
         }
 
-        busDao.save(entity);
+        try {
+            busDao.save(entity);
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
     }
 
     @Override

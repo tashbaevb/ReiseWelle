@@ -6,6 +6,8 @@ import de.fhzwickau.reisewelle.model.Driver;
 import de.fhzwickau.reisewelle.model.Status;
 import de.fhzwickau.reisewelle.dao.DriverDao;
 import de.fhzwickau.reisewelle.dao.StatusDao;
+import de.fhzwickau.reisewelle.utils.ComboBoxUtils;
+import de.fhzwickau.reisewelle.utils.FormValidator;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
@@ -25,21 +27,29 @@ public class AddEditDriverController extends BaseAddEditController<Driver> {
 
     @FXML
     private void initialize() throws SQLException {
-        statusComboBox.getItems().addAll(statusDao.findAll());
+        ComboBoxUtils.populate(statusComboBox, statusDao);
     }
 
     @Override
     protected void saveEntity() throws SQLException {
+        if (FormValidator.areFieldsEmpty(firstNameField, lastNameField, licenseNumberField) || FormValidator.isComboBoxEmpty(statusComboBox)) {
+            throw new IllegalArgumentException("Die Validierung ist fehlgeschlagen. Bitte füllen Sie alle Felder aus.");
+        }
+
         if (entity == null) {
-            entity = new Driver(firstNameField.getText(), lastNameField.getText(),
-                    licenseNumberField.getText(), statusComboBox.getValue());
+            entity = new Driver(firstNameField.getText(), lastNameField.getText(), licenseNumberField.getText(), statusComboBox.getValue());
         } else {
             entity.setFirstName(firstNameField.getText());
             entity.setLastName(lastNameField.getText());
             entity.setLicenseNumber(licenseNumberField.getText());
             entity.setStatus(statusComboBox.getValue());
         }
-        driverDao.save(entity);
+
+        try {
+            driverDao.save(entity);
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
     }
 
     @Override

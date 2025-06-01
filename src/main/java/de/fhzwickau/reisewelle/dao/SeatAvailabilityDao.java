@@ -81,13 +81,19 @@ public class SeatAvailabilityDao implements BaseDao<SeatAvailability> {
         }
     }
 
-    public void deleteAllForStop(UUID stopId) throws SQLException {
+    public SeatAvailability findByTripAndStops(UUID tripId, UUID startStopId, UUID endStopId) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM SeatAvailability WHERE start_stop_id = ? OR end_stop_id = ?")) {
-            stmt.setString(1, stopId.toString());
-            stmt.setString(2, stopId.toString());
-            stmt.executeUpdate();
+        String sql = "SELECT * FROM SeatAvailability WHERE trip_id = ? AND start_stop_id = ? AND end_stop_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tripId.toString());
+            stmt.setString(2, startStopId.toString());
+            stmt.setString(3, endStopId.toString());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
         }
+        return null;
     }
 
     private SeatAvailability mapRow(ResultSet rs) throws SQLException {

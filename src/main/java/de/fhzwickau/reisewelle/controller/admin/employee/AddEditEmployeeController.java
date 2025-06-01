@@ -7,6 +7,7 @@ import de.fhzwickau.reisewelle.model.Employee;
 import de.fhzwickau.reisewelle.model.User;
 import de.fhzwickau.reisewelle.model.UserRole;
 import de.fhzwickau.reisewelle.dao.UserRoleDao;
+import de.fhzwickau.reisewelle.utils.FormValidator;
 import de.fhzwickau.reisewelle.utils.PasswordHasher;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -24,6 +25,7 @@ public class AddEditEmployeeController extends BaseAddEditController<Employee> {
     @FXML
     private Label passwordLabel;
 
+    private static final String EMPLOYEE_ROLE_NAME = "Employee";
     private static final Logger logger = LoggerFactory.getLogger(User.class);
     private final BaseDao<Employee> employeeDao = new EmployeeDao();
     private final UserRoleDao userRoleDao = new UserRoleDao();
@@ -31,7 +33,7 @@ public class AddEditEmployeeController extends BaseAddEditController<Employee> {
 
     @FXML
     private void initialize() throws SQLException {
-        employeeRole = userRoleDao.findByName("Employee");
+        employeeRole = userRoleDao.findByName(EMPLOYEE_ROLE_NAME);
     }
 
     @Override
@@ -83,22 +85,13 @@ public class AddEditEmployeeController extends BaseAddEditController<Employee> {
     }
 
     private boolean validateInput() {
-        String vorname = vornameField.getText();
-        String nachname = nachnameField.getText();
-        String email = emailField.getText();
-        if (vorname.isBlank() || nachname.isBlank() || email == null || email.trim().isEmpty()) {
-            logger.warn("Validierung fehlgeschlagen: leeres Feld für Vorname/Nachname/E-Mail-Adresse");
-            return false;
+        boolean missing = FormValidator.areFieldsEmpty(vornameField, nachnameField, emailField);
+        if (entity == null && FormValidator.areFieldsEmpty(passwordField)) {
+            missing = true;
         }
-
-        if (entity == null) {
-            String password = passwordField.getText();
-            if (password == null || password.trim().isEmpty()) {
-                logger.warn("Validierung fehlgeschlagen: Passwort ist leer");
-                return false;
-            }
+        if (missing) {
+            logger.warn("Validierung fehlgeschlagen: Felder leer");
         }
-
-        return true;
+        return !missing;
     }
 }

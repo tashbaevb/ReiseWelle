@@ -28,4 +28,5 @@ public abstract class BaseAddEditController<T> {
         Stage stage = (Stage) getAnyControl().getScene().getWindow();
         stage.close();
     }
+
 }

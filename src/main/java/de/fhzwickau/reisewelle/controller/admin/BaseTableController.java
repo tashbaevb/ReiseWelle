@@ -3,102 +3,127 @@ package de.fhzwickau.reisewelle.controller.admin;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class BaseTableController<T> {
 
+    protected BaseDao<T> dao;
+    protected TableView<T> tableView;
+    protected Button editButton;
+    protected Button deleteButton;
+
     protected ObservableList<T> items = FXCollections.observableArrayList();
 
-    protected abstract BaseDao<T> getDao();
+    protected void init(BaseDao<T> dao, TableView<T> tableView, Button editButton, Button deleteButton) {
+        this.dao = dao;
+        this.tableView = tableView;
+        this.editButton = editButton;
+        this.deleteButton = deleteButton;
 
-    protected abstract TableView<T> getTableView();
+        this.tableView.setItems(items);
+        editButton.setDisable(true);
+        deleteButton.setDisable(true);
 
-    protected abstract Object showAddEditDialog(T item) throws IOException;
-
-    protected abstract String getDeleteConfirmationMessage(T item);
-
-    protected Button getEditButton() {
-        return null;
-    }
-
-    protected abstract Button getDeleteButton();
-
-    protected abstract UUID getId(T entity);
-
-    @FXML
-    protected void initialize() throws SQLException {
-        List<T> all = getDao().findAll();
-        List<T> filtered = applyFilter(all);
-        items.setAll(filtered);
-        getTableView().setItems(items);
-
-        Button editBtn = getEditButton();
-        Button deleteBtn = getDeleteButton();
-
-        getTableView().getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (editBtn != null) editBtn.setDisable(newSelection == null);
-            if (deleteBtn != null) deleteBtn.setDisable(newSelection == null);
+        this.tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+            boolean disable = newSel == null;
+            editButton.setDisable(disable);
+            deleteButton.setDisable(disable);
         });
+
+        loadDataAsync();
+    }
+
+    protected void loadDataAsync() {
+        Task<List<T>> task = new Task<>() {
+            @Override
+            protected List<T> call() throws Exception {
+                return dao.findAll();
+            }
+        };
+        task.setOnSucceeded(e -> {
+            items.setAll(task.getValue());
+        });
+        task.setOnFailed(e -> {
+            showError("Fehler beim Laden", task.getException().getMessage());
+        });
+        new Thread(task, "LoadDataThread").start();
     }
 
     @FXML
-    protected void onAdd() throws IOException {
-        showAddEditDialog(null);
-    }
-
-    @FXML
-    protected void onEdit() throws IOException {
-        T selected = getTableView().getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            showAddEditDialog(selected);
+    protected void onAdd() {
+        try {
+            showAddEditDialog(null);
+        } catch (IOException e) {
+            showError("Fehler beim Öffnen des Dialogfelds „Hinzufügen“", e.getMessage());
         }
     }
 
     @FXML
-    protected void onDelete() throws SQLException {
-        T selected = getTableView().getSelectionModel().getSelectedItem();
+    protected void onEdit() {
+        T selected = tableView.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Bestätigung");
-            alert.setHeaderText("Möchten Sie wirklich löschen?");
-            alert.setContentText(getDeleteConfirmationMessage(selected));
-
-            if (alert.showAndWait().get() == ButtonType.OK) {
-                getDao().delete(getId(selected));
-                items.remove(selected);
+            try {
+                showAddEditDialog(selected);
+            } catch (IOException e) {
+                showError("Fehler beim Öffnen des Dialogfelds „Ändern“", e.getMessage());
             }
         }
     }
 
-    protected void refreshData() {
-        try {
-            List<T> all = getDao().findAll();
-            List<T> filtered = applyFilter(all);
-            items.setAll(filtered);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showErrorDialog();
+    @FXML
+    protected void onDelete() {
+        T selected = tableView.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+
+        if (isInUse(selected)) {
+            showError("Element kann nicht gelöscht werden",
+                    getInUseMessage());
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setHeaderText("Löschen bestätigen");
+        confirm.setContentText(getDeleteConfirmationMessage(selected));
+        Optional<ButtonType> result = confirm.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                dao.delete(getId(selected));
+                loadDataAsync();
+            } catch (SQLException ex) {
+                showError("Fehler beim Löschen", ex.getMessage());
+            }
         }
     }
 
-    protected List<T> applyFilter(List<T> items) {
-        return items;
-    }
+    protected abstract boolean isInUse(T entity);
 
-    protected void showErrorDialog() {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Fehler");
-        alert.setHeaderText(null);
-        alert.setContentText("Daten konnten nicht neu geladen werden");
+    protected abstract String getInUseMessage();
+
+    protected abstract UUID getId(T entity);
+
+    protected abstract String getDeleteConfirmationMessage(T entity);
+
+    protected abstract Stage showAddEditDialog(T entity) throws IOException;
+
+    protected void showError(String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
         alert.showAndWait();
     }
+
+    protected abstract TableView<T> getTableView();
 }

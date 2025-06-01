@@ -120,4 +120,52 @@ public class TripStopPriceDao implements BaseDao<TripStopPrice> {
         }
         return list;
     }
+
+    public double getPriceAdult(UUID tripId, UUID fromStopId, UUID toStopId) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
+        String sql = """
+                    SELECT 
+                        (pto.price_from_start_adult - pfrom.price_from_start_adult) AS price
+                    FROM TripStopPrice pto
+                    JOIN TripStopPrice pfrom ON pto.trip_id = pfrom.trip_id
+                    WHERE pto.trip_id = ? AND pfrom.trip_id = ?
+                      AND pto.stop_id = ? AND pfrom.stop_id = ?
+                """;
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tripId.toString());
+            stmt.setString(2, tripId.toString());
+            stmt.setString(3, toStopId.toString());
+            stmt.setString(4, fromStopId.toString());
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble("price");
+            }
+        }
+        throw new SQLException("Preis nicht gefunden für Stops: " + fromStopId + " → " + toStopId);
+    }
+
+    public double getPriceChild(UUID tripId, UUID fromStopId, UUID toStopId) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
+        String sql = """
+                    SELECT 
+                        (pto.price_from_start_kinder - pfrom.price_from_start_kinder) AS price
+                    FROM TripStopPrice pto
+                    JOIN TripStopPrice pfrom ON pto.trip_id = pfrom.trip_id
+                    WHERE pto.trip_id = ? AND pfrom.trip_id = ?
+                      AND pto.stop_id = ? AND pfrom.stop_id = ?
+                """;
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tripId.toString());
+            stmt.setString(2, tripId.toString());
+            stmt.setString(3, toStopId.toString());
+            stmt.setString(4, fromStopId.toString());
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble("price");
+            }
+        }
+        throw new SQLException("Kinderpreis nicht gefunden für Stops: " + fromStopId + " → " + toStopId);
+    }
 }

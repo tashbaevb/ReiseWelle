@@ -21,9 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * Controller for Driver administration table.
- */
 public class AdminDriverController extends BaseTableController<Driver> {
 
     @FXML
@@ -43,100 +40,46 @@ public class AdminDriverController extends BaseTableController<Driver> {
         licenseNumberColumn.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getLicenseNumber()));
         statusColumn.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getStatus().getName()));
 
-        editButton.setDisable(true);
-        deleteButton.setDisable(true);
-        driversTable.getSelectionModel().selectedItemProperty()
-                .addListener((obs, oldSel, newSel) -> {
-                    boolean disable = newSel == null;
-                    editButton.setDisable(disable);
-                    deleteButton.setDisable(disable);
-                });
+        // Инициализация базового контроллера: dao, таблица, кнопки
+        init(driverDao, driversTable, editButton, deleteButton);
 
-        loadDriversAsync();
+        // Загрузка данных асинхронно через переопределённый метод
+        loadDataAsync();
     }
 
-    private void loadDriversAsync() {
+    @Override
+    protected void loadDataAsync() {
         Task<List<Driver>> task = new Task<>() {
             @Override
             protected List<Driver> call() throws Exception {
                 return driverDao.findAll();
             }
         };
-        task.setOnSucceeded(e -> driversTable.getItems().setAll(task.getValue()));
-        task.setOnFailed(e -> showError("Fehler beim Laden der Fahrer", task.getException().getMessage()));
+        task.setOnSucceeded(e -> getTableView().getItems().setAll(task.getValue()));
+        task.setOnFailed(e -> {
+            Throwable ex = task.getException();
+            ex.printStackTrace();
+            showError("Fehler beim Laden der Fahrer", ex.getMessage());
+        });
         new Thread(task, "LoadDriversThread").start();
     }
 
-    @FXML
-    protected void onAdd() {
+    @Override
+    protected boolean isInUse(Driver driver) {
         try {
-            showAddEditDialog(null);
-        } catch (IOException ioe) {
-            showError("Fehler beim Öffnen des Dialogfelds „Hinzufügen“", ioe.getMessage());
-        }
-    }
-
-    @FXML
-    protected void onEdit() {
-        Driver selected = driversTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            try {
-                showAddEditDialog(selected);
-            } catch (IOException ioe) {
-                showError("Fehler beim Öffnen des Dialogfelds „Ändern“", ioe.getMessage());
-            }
-        }
-    }
-
-    @FXML
-    protected void onDelete() {
-        Driver selected = driversTable.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
-
-        try {
-            boolean inUse = tripDao.findAll().stream().anyMatch(trip -> trip.getDriver().getId().equals(selected.getId()));
-            if (inUse) {
-                showError("Fahrer kann nicht gelöscht werden",
-                        "Der Fahrer ist einer oder mehreren Fahrten zugewiesen. Bitte weisen Sie diese Fahrten zuerst neu zu oder löschen Sie sie.");
-                return;
-            }
-        } catch (SQLException sqle) {
-            showError("Fehlerprüfung", sqle.getMessage());
-            return;
-        }
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setHeaderText("Den Fahrer löschen?");
-        confirm.setContentText("Fahrer: " + selected.getLicenseNumber());
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                driverDao.delete(selected.getId());
-                loadDriversAsync();
-            } catch (SQLException sqle) {
-                showError("Fehler beim Löschen des Fahrers", sqle.getMessage());
-            }
+            List<Trip> trips = tripDao.findAll();
+            return trips.stream()
+                    .anyMatch(trip -> trip.getDriver() != null && trip.getDriver().getId().equals(driver.getId()));
+        } catch (SQLException e) {
+            showError("Fehlerprüfung", e.getMessage());
+            // Если не можем проверить, безопаснее запретить удаление
+            return true;
         }
     }
 
     @Override
-    protected BaseDao<Driver> getDao() {
-        return driverDao;
-    }
-
-    @Override
-    protected TableView<Driver> getTableView() {
-        return driversTable;
-    }
-
-    @Override
-    protected Button getEditButton() {
-        return editButton;
-    }
-
-    @Override
-    protected Button getDeleteButton() {
-        return deleteButton;
+    protected String getInUseMessage() {
+        return "Der Fahrer ist einer oder mehreren Fahrten zugewiesen. Bitte weisen Sie diese Fahrten zuerst neu zu oder löschen Sie sie.";
     }
 
     @Override
@@ -146,9 +89,7 @@ public class AdminDriverController extends BaseTableController<Driver> {
 
     @Override
     protected Stage showAddEditDialog(Driver driver) throws IOException {
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/de/fhzwickau/reisewelle/admin/driver/add-edit-driver.fxml")
-        );
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/admin/driver/add-edit-driver.fxml"));
         Stage stage = new Stage();
         stage.setScene(new Scene(loader.load()));
         stage.initModality(Modality.APPLICATION_MODAL);
@@ -157,7 +98,7 @@ public class AdminDriverController extends BaseTableController<Driver> {
         AddEditDriverController controller = loader.getController();
         controller.setDriver(driver);
 
-        stage.setOnHidden(event -> loadDriversAsync());
+        stage.setOnHidden(event -> loadDataAsync());
         stage.show();
         return stage;
     }
@@ -167,10 +108,15 @@ public class AdminDriverController extends BaseTableController<Driver> {
         return "Führerscheinnummer: " + driver.getLicenseNumber();
     }
 
-    private void showError(String header, String content) {
+    public void showError(String header, String content) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    @Override
+    protected TableView<Driver> getTableView() {
+        return driversTable;
     }
 }

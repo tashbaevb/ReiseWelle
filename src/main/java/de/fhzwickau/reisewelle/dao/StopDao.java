@@ -139,4 +139,28 @@ public class StopDao implements BaseDao<Stop> {
         }
         return stops;
     }
+
+    public List<Stop> findAllByTripOrdered(UUID tripId) throws SQLException {
+        Connection conn = JDBCConfig.getInstance();
+        List<Stop> stops = new ArrayList<>();
+        String sql = "SELECT * FROM Stop WHERE trip_id = ? ORDER BY stop_order ASC";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tripId.toString());
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                UUID id = UUID.fromString(rs.getString("id"));
+                City city = cityDao.findById(UUID.fromString(rs.getString("city_id")));
+                Stop s = new Stop(
+                        null,
+                        city,
+                        rs.getTimestamp("arrival_time").toLocalDateTime(),
+                        rs.getTimestamp("departure_time").toLocalDateTime(),
+                        rs.getInt("stop_order")
+                );
+                s.setId(id);
+                stops.add(s);
+            }
+        }
+        return stops;
+    }
 }

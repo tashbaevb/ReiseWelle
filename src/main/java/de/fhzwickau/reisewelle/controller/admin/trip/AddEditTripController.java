@@ -7,6 +7,7 @@ import de.fhzwickau.reisewelle.dao.CityDao;
 import de.fhzwickau.reisewelle.dao.DriverDao;
 import de.fhzwickau.reisewelle.dao.SeatAvailabilityDao;
 import de.fhzwickau.reisewelle.dao.StopDao;
+import de.fhzwickau.reisewelle.dao.TicketDao;
 import de.fhzwickau.reisewelle.dao.TripAdminDao;
 import de.fhzwickau.reisewelle.dao.TripStatusDao;
 import de.fhzwickau.reisewelle.dao.TripStopPriceDao;
@@ -18,6 +19,7 @@ import de.fhzwickau.reisewelle.model.Stop;
 import de.fhzwickau.reisewelle.model.Trip;
 import de.fhzwickau.reisewelle.model.TripStatus;
 import de.fhzwickau.reisewelle.model.TripStopPrice;
+import de.fhzwickau.reisewelle.utils.FormValidator;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -85,6 +87,8 @@ public class AddEditTripController extends BaseAddEditController<Trip> {
     private final StopDao stopDao = new StopDao();
     private final TripStopPriceDao priceDao = new TripStopPriceDao();
     private final BaseDao<City> cityDao = new CityDao();
+    private final TicketDao ticketDao = new TicketDao();
+    private final SeatAvailabilityDao seatAvailabilityDao = new SeatAvailabilityDao();
 
     @FXML
     private void initialize() throws SQLException {
@@ -128,49 +132,27 @@ public class AddEditTripController extends BaseAddEditController<Trip> {
 
     @Override
     protected void saveEntity() throws SQLException {
-        if (entity == null) {
-            entity = new Trip(busComboBox.getValue(), driverComboBox.getValue(), departureDatePicker.getValue(), statusComboBox.getValue());
-        } else {
-            entity.setBus(busComboBox.getValue());
-            entity.setDriver(driverComboBox.getValue());
-            entity.setDepartureDate(departureDatePicker.getValue());
-            entity.setStatus(statusComboBox.getValue());
-        }
+        if (!FormValidator.validateInput(stopsTable, driverComboBox, statusComboBox, busComboBox)) return;
+
+        updateTripEntityFromForm();
 
         tripDao.save(entity);
+
+        boolean hasTickets = ticketDao.hasTicketsForTrip(entity.getId());
+        if (hasTickets) {
+            showError("Fehler", "Die Haltestellen und Preise können nicht geändert werden, da bereits Tickets verkauft wurden.");
+            return;
+        }
+
+        seatAvailabilityDao.deleteAllForTrip(entity.getId());
         priceDao.deleteAllForTrip(entity.getId());
+        stopDao.deleteAllForTrip(entity.getId());
 
-        int ord = 1;
-        for (Stop s : stopsTable.getItems()) {
-            s.setTrip(entity);
-            s.setStopOrder(ord++);
-        }
-        stopDao.saveAllForTrip(entity.getId(), stopsTable.getItems());
-
-        for (TripStopPrice p : priceTable.getItems()) {
-            p.setTrip(entity);
-        }
-        priceDao.saveAllForTrip(entity.getId(), priceTable.getItems());
-
-        SeatAvailabilityDao saDao = new SeatAvailabilityDao();
-        saDao.deleteAllForTrip(entity.getId());
-
-        List<Stop> stops = stopsTable.getItems();
-        int seatCapacity = entity.getBus().getTotalSeats();
-        int bicycleCapacity = entity.getBus().getBicycleSpaces();
-
-        for (int i = 0; i < stops.size() - 1; i++) {
-            for (int j = i + 1; j < stops.size(); j++) {
-                Stop start = stops.get(i);
-                Stop end = stops.get(j);
-
-                SeatAvailability sa = new SeatAvailability(entity, start, end, seatCapacity, bicycleCapacity);
-                saDao.save(sa);
-            }
-        }
-
-        close();
+        saveStops();
+        savePrices();
+        regenerateSeatAvailability();
     }
+
 
     @Override
     protected Node getAnyControl() {
@@ -205,7 +187,8 @@ public class AddEditTripController extends BaseAddEditController<Trip> {
 
         ComboBox<City> cityCombo = new ComboBox<>();
         DatePicker arrDate = new DatePicker();
-        Spinner<Integer> arrHour = new Spinner<>(0, 23, 12);
+        buildSpinner(0, 23, 12);
+        Spinner<Integer> arrHour = buildSpinner(0, 23, 12);
         Spinner<Integer> arrMinute = new Spinner<>(0, 59, 0, 1);
 
         DatePicker depDate = new DatePicker();
@@ -345,6 +328,56 @@ public class AddEditTripController extends BaseAddEditController<Trip> {
             out.add(p);
         }
         priceTable.setItems(out);
+    }
+
+    private void updateTripEntityFromForm() {
+        if (entity == null) {
+            entity = new Trip(busComboBox.getValue(), driverComboBox.getValue(),
+                    departureDatePicker.getValue(), statusComboBox.getValue());
+        } else {
+            entity.setBus(busComboBox.getValue());
+            entity.setDriver(driverComboBox.getValue());
+            entity.setDepartureDate(departureDatePicker.getValue());
+            entity.setStatus(statusComboBox.getValue());
+        }
+    }
+
+    private void saveStops() throws SQLException {
+        int order = 1;
+        for (Stop s : stopsTable.getItems()) {
+            s.setTrip(entity);
+            s.setStopOrder(order++);
+        }
+        stopDao.saveAllForTrip(entity.getId(), stopsTable.getItems());
+    }
+
+    private void savePrices() throws SQLException {
+        priceDao.deleteAllForTrip(entity.getId());
+        for (TripStopPrice p : priceTable.getItems()) {
+            p.setTrip(entity);
+        }
+        priceDao.saveAllForTrip(entity.getId(), priceTable.getItems());
+    }
+
+    private void regenerateSeatAvailability() throws SQLException {
+        SeatAvailabilityDao saDao = new SeatAvailabilityDao();
+        saDao.deleteAllForTrip(entity.getId());
+
+        List<Stop> stops = stopsTable.getItems();
+        int seatCapacity = entity.getBus().getTotalSeats();
+        int bicycleCapacity = entity.getBus().getBicycleSpaces();
+
+        for (int i = 0; i < stops.size() - 1; i++) {
+            for (int j = i + 1; j < stops.size(); j++) {
+                saDao.save(new SeatAvailability(entity, stops.get(i), stops.get(j), seatCapacity, bicycleCapacity));
+            }
+        }
+    }
+
+    private Spinner<Integer> buildSpinner(int min, int max, int initial) {
+        Spinner<Integer> spinner = new Spinner<>(min, max, initial);
+        spinner.setEditable(true);
+        return spinner;
     }
 
     private void renumberStops() {

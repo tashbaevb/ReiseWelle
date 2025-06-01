@@ -16,7 +16,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.UUID;
 
 public class AdminEmployeeController extends BaseTableController<Employee> {
@@ -35,35 +34,23 @@ public class AdminEmployeeController extends BaseTableController<Employee> {
         vornameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getVorname()));
         nachnameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNachname()));
         emailColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
-        createdAt.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getErstelltAm() != null ? cellData.getValue().getErstelltAm().toString() : ""));
-        List<Employee> employees = ((EmployeeDao) employeeDao).findAll();
-        items.setAll(employees);
-        employeeTable.setItems(items);
+        createdAt.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getErstelltAm() != null ? cellData.getValue().getErstelltAm().toString() : ""));
 
-        employeeTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            editButton.setDisable(newSelection == null);
-            deleteButton.setDisable(newSelection == null);
-        });
+        init(employeeDao, employeeTable, editButton, deleteButton);
     }
 
     @Override
-    protected BaseDao<Employee> getDao() {
-        return employeeDao;
+    protected boolean isInUse(Employee employee) {
+        // Логика проверки, используется ли сотрудник в связанных данных
+        // Если нет зависимости — можно просто вернуть false
+        // Если есть, то тут нужно обращаться к нужному DAO и проверять
+        return false;
     }
 
     @Override
-    protected TableView<Employee> getTableView() {
-        return employeeTable;
-    }
-
-    @Override
-    protected Button getEditButton() {
-        return editButton;
-    }
-
-    @Override
-    protected Button getDeleteButton() {
-        return deleteButton;
+    protected String getInUseMessage() {
+        return "Der Mitarbeiter wird derzeit verwendet und kann nicht gelöscht werden.";
     }
 
     @Override
@@ -72,19 +59,24 @@ public class AdminEmployeeController extends BaseTableController<Employee> {
     }
 
     @Override
-    protected Stage showAddEditDialog(Employee user) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/admin/employee/add-edit-empoyee.fxml"));
+    protected Stage showAddEditDialog(Employee employee) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/admin/employee/add-edit-employee.fxml"));
         Stage stage = new Stage();
         stage.setScene(new Scene(loader.load()));
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(user == null ? "Mitarbeiter hinzufügen" : "Mitarbeiter bearbeiten");
+        stage.setTitle(employee == null ? "Mitarbeiter hinzufügen" : "Mitarbeiter bearbeiten");
 
         AddEditEmployeeController controller = loader.getController();
-        controller.setEmployee(user);
+        controller.setEmployee(employee);
 
-        stage.setOnHidden(event -> refreshData());
+        stage.setOnHidden(event -> loadDataAsync());
         stage.show();
         return stage;
+    }
+
+    @Override
+    protected TableView<Employee> getTableView() {
+        return employeeTable;
     }
 
     @Override
