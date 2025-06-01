@@ -7,25 +7,15 @@
 <?import javafx.scene.control.Button?>
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="de.fhzwickau.reisewelle.controller.admin.employee.AddEditEmployeeController"
-      spacing="18" prefWidth="360.0" prefHeight="340.0"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.user_role.AddEditUserRoleController"
+      spacing="18" prefWidth="360.0" prefHeight="320.0"
       style="-fx-padding: 30; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
 
-    <Label text="Mitarbeiter hinzufügen / bearbeiten"
+    <Label text="Die Role hinzufügen / bearbeiten"
            style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d3b50; -fx-padding: 0 0 18 0;"/>
-    <Label text="Vorname" style="-fx-font-size: 13px;"/>
-    <TextField fx:id="vornameField" promptText="z.B. Anna" style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
 
-    <Label text="Nachname" style="-fx-font-size: 13px;"/>
-    <TextField fx:id="nachnameField" promptText="z.B. Schmidt" style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
-
-    <Label text="E-Mail" style="-fx-font-size: 13px;"/>
-    <TextField fx:id="emailField" promptText="z.B. anna.schmidt@email.de"
-               style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
-
-    <Label fx:id="passwordLabel" text="Passwort" style="-fx-font-size: 13px;"/>
-    <TextField fx:id="passwordField" promptText="Mindestens 8 Zeichen"
-               style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
+    <Label text="Name" style="-fx-font-size: 13px;"/>
+    <TextField fx:id="nameField" promptText="z.B. Max" style="-fx-background-radius: 8; -fx-font-size: 14px;"/>
 
     <HBox spacing="18" alignment="CENTER_RIGHT" style="-fx-padding: 18 0 0 0;">
         <Button text="Speichern" onAction="#save"

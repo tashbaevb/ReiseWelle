@@ -71,6 +71,39 @@
                     </graphic>
                     Reisen
                 </Button>
+                <Button fx:id="rolesButton" onAction="#showRoles"
+                        style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/trip.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Rolen
+                </Button>
+                <Button fx:id="permissionsButton" onAction="#showPermissions"
+                        style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/trip.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Permissions
+                </Button>
+                <Button fx:id="rolePermissionsButton" onAction="#showRolePermissions"
+                        style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/trip.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Rolen-Permission
+                </Button>
             </children>
         </VBox>
     </left>

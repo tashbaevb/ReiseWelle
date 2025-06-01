@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.permission.PermissionController"
+      spacing="18" prefHeight="480.0" prefWidth="740.0"
+      style="-fx-padding: 32; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
+
+    <children>
+        <Label text="Die Permission verwalten"
+               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2d3b50; -fx-padding: 0 0 18 0;"/>
+
+        <TableView fx:id="permissionsTable" prefHeight="320.0" style="-fx-background-radius: 12;">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Name" prefWidth="170.0"/>
+            </columns>
+        </TableView>
+
+        <HBox spacing="18" alignment="CENTER_RIGHT" style="-fx-padding: 14 0 0 0;">
+            <children>
+                <Button fx:id="addButton" text="Hinzufügen" onAction="#onAdd"
+                        style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px;"/>
+                <Button fx:id="editButton" text="Bearbeiten" onAction="#onEdit" disable="true"
+                        style="-fx-background-color: #ffd447; -fx-text-fill: #2d3b50; -fx-background-radius: 8; -fx-font-size: 15px;"/>
+                <Button fx:id="deleteButton" text="Löschen" onAction="#onDelete" disable="true"
+                        style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px;"/>
+            </children>
+        </HBox>
+    </children>
+</VBox>

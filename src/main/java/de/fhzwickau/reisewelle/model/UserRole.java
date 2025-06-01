@@ -7,10 +7,6 @@ public class UserRole {
     private UUID id;
     private String roleName;
 
-    public UserRole(String roleName) {
-        this.roleName = roleName;
-    }
-
     public UserRole(UUID id, String roleName) {
         this.id = id;
         this.roleName = roleName;

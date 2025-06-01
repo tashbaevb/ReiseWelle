@@ -21,11 +21,15 @@ public class Employee implements Authenticatable {
         erstelltAm = LocalDateTime.now();
     }
 
-    public Employee(String vorname, String nachname, String email, LocalDateTime erstelltAm) {
+    public Employee(UUID id, String vorname, String nachname, String email, String password, String salt, LocalDateTime erstelltAm, UserRole userRole) {
+        this.id = id;
         this.vorname = vorname;
         this.nachname = nachname;
         this.email = email;
+        this.password = password;
+        this.salt = salt;
         this.erstelltAm = erstelltAm;
+        this.userRole = userRole;
     }
 
     public UUID getId() {
@@ -65,7 +69,7 @@ public class Employee implements Authenticatable {
     }
 
     public void setPassword(String password) {
-        this.password = this.password;
+        this.password = password;
     }
 
     public String getSalt() {

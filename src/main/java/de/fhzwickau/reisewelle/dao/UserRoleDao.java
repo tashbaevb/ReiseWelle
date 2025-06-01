@@ -99,9 +99,9 @@ public class UserRoleDao implements BaseDao<UserRole> {
     }
 
     private UserRole mapUserRole(ResultSet rs) throws SQLException {
-        UserRole userRole = new UserRole(rs.getString("role_name"));
-        userRole.setId(UUID.fromString(rs.getString("id")));
-        return userRole;
+        UUID id = UUID.fromString(rs.getString("id"));
+        String role = rs.getString("role_name");
+        return new UserRole(id, role);
     }
 
     private void prepareInsert(PreparedStatement stmt, UserRole userRole) throws SQLException {

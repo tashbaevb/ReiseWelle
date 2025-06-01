@@ -102,15 +102,13 @@ public class EmployeeDao implements BaseDao<Employee> {
         String vorname = rs.getString("vorname");
         String nachname = rs.getString("nachname");
         String email = rs.getString("email");
+        String password = rs.getString("passwort");
+        String salt = rs.getString("salt");
         LocalDateTime erstelltAm = rs.getTimestamp("erstellt_am").toLocalDateTime();
 
         UserRole role = userRoleDao.findByName("Employee");
 
-        Employee employee = new Employee(vorname, nachname, email, erstelltAm);
-        employee.setId(id);
-        employee.setUserRole(role);
-
-        return employee;
+        return new Employee(id, vorname, nachname, email, password, salt, erstelltAm, role);
     }
 
     private void prepareInsert(PreparedStatement stmt, Employee employee) throws SQLException {

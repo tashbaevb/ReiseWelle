@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.ComboBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.role_permission.AddEditRolePermissionController"
+      spacing="18" prefWidth="360.0" prefHeight="320.0"
+      style="-fx-padding: 30; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
+
+    <Label text="Die Role-Permission hinzufügen / bearbeiten"
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d3b50; -fx-padding: 0 0 18 0;"/>
+
+    <GridPane hgap="14" vgap="7" style="-fx-padding: 0 0 12 0;">
+        <Label text="Role:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="roleComboBox" GridPane.rowIndex="0" GridPane.columnIndex="1" promptText="Die Role wählen"/>
+
+        <Label text="Permission:" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+        <ComboBox fx:id="permissionComboBox" GridPane.rowIndex="0" GridPane.columnIndex="3" promptText="Permission wählen"/>
+    </GridPane>
+
+    <HBox spacing="18" alignment="CENTER_RIGHT" style="-fx-padding: 18 0 0 0;">
+        <Button text="Speichern" onAction="#save"
+                style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px;"/>
+        <Button text="Abbrechen" onAction="#cancel"
+                style="-fx-background-color: #efefef; -fx-text-fill: #6a6f7a; -fx-background-radius: 8; -fx-font-size: 15px;"/>
+    </HBox>
+</VBox>
