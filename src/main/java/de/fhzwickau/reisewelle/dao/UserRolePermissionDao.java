@@ -57,7 +57,7 @@ public class UserRolePermissionDao implements BaseDao<UserRolePermission> {
     @Override
     public void save(UserRolePermission userRolePermission) throws SQLException {
         Connection connection = JDBCConfig.getInstance();
-        boolean isNew = userRolePermission.getId() == null;
+        boolean isNew = findById(userRolePermission.getId()) == null;
         String sql = isNew
                 ? "INSERT INTO UserRolePermission (role_id, permission_id) VALUES (?, ?)"
                 : "UPDATE UserRolePermission SET role_id = ?, permission_id = ? WHERE id = ?";

@@ -30,4 +30,10 @@ module de.fhzwickau.reisewelle {
     opens de.fhzwickau.reisewelle.controller.admin.trip to javafx.fxml;
     exports de.fhzwickau.reisewelle.controller.admin.employee;
     opens de.fhzwickau.reisewelle.controller.admin.employee to javafx.fxml;
+    exports de.fhzwickau.reisewelle.controller.admin.user_role;
+    opens de.fhzwickau.reisewelle.controller.admin.user_role to javafx.fxml;
+    exports de.fhzwickau.reisewelle.controller.admin.permission;
+    opens de.fhzwickau.reisewelle.controller.admin.permission to javafx.fxml;
+    exports de.fhzwickau.reisewelle.controller.admin.role_permission;
+    opens de.fhzwickau.reisewelle.controller.admin.role_permission to javafx.fxml;
 }

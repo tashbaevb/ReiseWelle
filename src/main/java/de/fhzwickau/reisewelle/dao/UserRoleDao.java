@@ -59,7 +59,7 @@ public class UserRoleDao implements BaseDao<UserRole> {
     @Override
     public void save(UserRole userRole) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        boolean isNew = userRole.getId() == null;
+        boolean isNew = findById(userRole.getId()) == null;
         String sql = isNew
                 ? "INSERT INTO [dbo].[UserRole] (id, role_name) VALUES (?, ?)"
                 : "UPDATE [dbo].[UserRole] SET role_name = ? WHERE id = ?";
@@ -80,8 +80,18 @@ public class UserRoleDao implements BaseDao<UserRole> {
 
     @Override
     public void delete(UUID id) throws SQLException {
-        // Not Realized
+        Connection conn = JDBCConfig.getInstance();
+        String sql = "DELETE FROM UserRole WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id.toString());
+            stmt.executeUpdate();
+            logger.info("Deleted role with id: " + id);
+        } catch (SQLException e) {
+            logger.error("Error deleting role: " + e.getMessage());
+            throw e;
+        }
     }
+
 
     public UserRole findByName(String name) throws SQLException {
         Connection conn = JDBCConfig.getInstance();

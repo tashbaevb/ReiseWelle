@@ -39,12 +39,12 @@ public class AdminHomeController {
 
     @FXML
     private void showRoles() {
-        loadContent("permission/permission.fxml");
+        loadContent("user_role/user-role.fxml");
     }
 
     @FXML
     private void showPermissions() {
-        loadContent("role/user-role.fxml");
+        loadContent("permission/permission.fxml");
     }
 
     @FXML

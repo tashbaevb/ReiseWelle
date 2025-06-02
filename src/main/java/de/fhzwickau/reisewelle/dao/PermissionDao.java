@@ -53,7 +53,7 @@ public class PermissionDao implements BaseDao<Permission> {
     @Override
     public void save(Permission permission) throws SQLException {
         Connection connection = JDBCConfig.getInstance();
-        boolean isNew = permission.getId() == null;
+        boolean isNew = findById(permission.getId()) == null;
         String sql = isNew
                 ? "INSERT INTO Permission (id, permission_name) VALUES (?, ?)"
                 : "UPDATE Permission SET permission_name = ? WHERE id = ?";
