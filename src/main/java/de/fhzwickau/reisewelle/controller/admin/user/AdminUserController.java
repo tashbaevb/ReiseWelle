@@ -1,9 +1,11 @@
 package de.fhzwickau.reisewelle.controller.admin.user;
 
+import de.fhzwickau.reisewelle.config.AccessManager;
 import de.fhzwickau.reisewelle.controller.admin.BaseTableController;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.UserDao;
 import de.fhzwickau.reisewelle.model.User;
+import de.fhzwickau.reisewelle.utils.PermissionsUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -36,13 +38,12 @@ public class AdminUserController extends BaseTableController<User> {
 
     @Override
     protected boolean isInUse(User user) {
-        // Логика проверки, используется ли пользователь где-то — если не нужно, возвращаем false
-        return false;
+        return !AccessManager.hasPermission(PermissionsUtil.KUNDEN_LOESCHEN);
     }
 
     @Override
     protected String getInUseMessage() {
-        return "Der Benutzer kann nicht gelöscht werden, da er noch in Verwendung ist.";
+        return "Sie haben nicht die Berechtigung, diesen Benutzer zu löschen.";
     }
 
     @Override
@@ -57,7 +58,7 @@ public class AdminUserController extends BaseTableController<User> {
 
     @Override
     protected Stage showAddEditDialog(User user) {
-        throw new UnsupportedOperationException("Sie können den Kunden weder löschen noch ändern");
+        throw new UnsupportedOperationException("Sie können den Kunden nicht löschen");
     }
 
     @Override

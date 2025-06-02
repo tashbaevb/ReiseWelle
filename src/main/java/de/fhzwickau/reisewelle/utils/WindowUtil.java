@@ -1,6 +1,7 @@
 package de.fhzwickau.reisewelle.utils;
 
 import de.fhzwickau.reisewelle.ReiseWelleApplication;
+import de.fhzwickau.reisewelle.config.AccessManager;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -25,8 +26,8 @@ public class WindowUtil {
 
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
     }
 

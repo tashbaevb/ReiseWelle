@@ -1,5 +1,7 @@
 package de.fhzwickau.reisewelle.controller;
 
+import de.fhzwickau.reisewelle.config.AccessManager;
+import de.fhzwickau.reisewelle.dao.UserRolePermissionDao;
 import de.fhzwickau.reisewelle.model.Authenticatable;
 import de.fhzwickau.reisewelle.utils.AlertUtil;
 import de.fhzwickau.reisewelle.utils.FormValidator;
@@ -11,6 +13,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import java.util.Set;
+
 public class LoginController {
 
     @FXML
@@ -20,6 +24,7 @@ public class LoginController {
     private PasswordField passwordField;
 
     private final AuthenticationService authService = new AuthenticationService();
+    private final UserRolePermissionDao userRolePermissionBaseDao = new UserRolePermissionDao();
 
     public void login(ActionEvent event) {
         if (FormValidator.hasEmptyFields(emailField, passwordField)) {
@@ -46,6 +51,10 @@ public class LoginController {
 
             Session.getInstance().setCurrentUser(user);
             String role = user.getUserRole().toString().toUpperCase();
+            System.out.println(role);
+
+            Set<String> permissions = userRolePermissionBaseDao.findPermissionNamesByUserId(user.getId());
+            AccessManager.setPermissions(permissions);
 
             switch (role) {
                 case "ADMIN":

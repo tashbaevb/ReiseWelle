@@ -8,7 +8,8 @@ public class UserRolePermission {
     private UserRole userRole;
     private Permission permission;
 
-    public UserRolePermission(UserRole userRole, Permission permission) {
+    public UserRolePermission(UUID id, UserRole userRole, Permission permission) {
+        this.id = id;
         this.userRole = userRole;
         this.permission = permission;
     }

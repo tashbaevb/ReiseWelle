@@ -17,9 +17,7 @@ public class CountryDao implements BaseDao<Country> {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return mapCountry(rs);
-                }
+                if (rs.next()) return mapCountry(rs);
             }
         }
         return null;
@@ -32,9 +30,7 @@ public class CountryDao implements BaseDao<Country> {
         List<Country> countries = new ArrayList<>();
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                countries.add(mapCountry(rs));
-            }
+            while (rs.next()) countries.add(mapCountry(rs));
         }
         return countries;
     }
@@ -69,13 +65,11 @@ public class CountryDao implements BaseDao<Country> {
         }
     }
 
-
-    // Вспомогательный метод для преобразования ResultSet в Country
     private Country mapCountry(ResultSet rs) throws SQLException {
         UUID id = UUID.fromString(rs.getString("id"));
         String name = rs.getString("name");
         Country country = new Country(name);
-        country.setId(id); // Устанавливаем id вручную, чтобы не сгенерировался новый
+        country.setId(id);
         return country;
     }
 }

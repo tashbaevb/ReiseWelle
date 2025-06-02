@@ -18,7 +18,7 @@ public class EmployeeDao implements BaseDao<Employee> {
     @Override
     public List<Employee> findAll() throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = "SELECT id, vorname, nachname, email, erstellt_am FROM Mitarbeiter";
+        String sql = "SELECT * FROM Mitarbeiter";
         List<Employee> employees = new ArrayList<>();
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
@@ -34,7 +34,7 @@ public class EmployeeDao implements BaseDao<Employee> {
     @Override
     public Employee findById(UUID id) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
-        String sql = "SELECT id, vorname, nachname, email, erstellt_am FROM Mitarbeiter WHERE id = ?";
+        String sql = "SELECT * FROM Mitarbeiter WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());

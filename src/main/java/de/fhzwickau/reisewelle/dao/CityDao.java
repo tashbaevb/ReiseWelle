@@ -20,12 +20,7 @@ public class CityDao implements BaseDao<City> {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Country country = countryDao.findById(UUID.fromString(rs.getString("country_id")));
-                    City city = new City(rs.getString("name"), country);
-                    city.setId(UUID.fromString(rs.getString("id")));
-                    return city;
-                }
+                if (rs.next()) return mapCity(rs);
             }
         }
         return null;
@@ -38,12 +33,7 @@ public class CityDao implements BaseDao<City> {
         List<City> list = new ArrayList<>();
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Country country = countryDao.findById(UUID.fromString(rs.getString("country_id")));
-                City city = new City(rs.getString("name"), country);
-                city.setId(UUID.fromString(rs.getString("id")));
-                list.add(city);
-            }
+            while (rs.next()) list.add(mapCity(rs));
         }
         return list;
     }
@@ -73,7 +63,6 @@ public class CityDao implements BaseDao<City> {
 
     @Override
     public void save(City entity) throws SQLException {
-        // По умолчанию делаем add, если нет id, иначе update (можно вообще убрать если используешь отдельно add/update)
         if (entity.getId() == null) {
             add(entity);
         } else {
@@ -88,5 +77,12 @@ public class CityDao implements BaseDao<City> {
             stmt.setString(1, id.toString());
             stmt.executeUpdate();
         }
+    }
+
+    private City mapCity(ResultSet rs) throws SQLException {
+        Country country = countryDao.findById(UUID.fromString(rs.getString("country_id")));
+        City city = new City(rs.getString("name"), country);
+        city.setId(UUID.fromString(rs.getString("id")));
+        return city;
     }
 }
