@@ -51,6 +51,11 @@ public class AdminHomeController {
         loadContent("status/admin-status.fxml");
     }
 
+    @FXML
+    public void showTripStatus() {
+        loadContent("trip_status/admin-trip-status.fxml");
+    }
+
 
     private void loadContent(String fxmlFile) {
         try {

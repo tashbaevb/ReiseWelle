@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.trip_status.AdminTripStatusController"
+      spacing="22" prefHeight="440.0" prefWidth="700.0"
+      style="-fx-background-color: #f6fafd; -fx-padding: 36 26 36 26;">
+    <Label text="Status der Reisen"
+           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2d3b50; -fx-padding: 0 0 18 4;"/>
+    <TableView fx:id="tripStatusTable" prefHeight="300.0"
+               style="-fx-background-radius: 16; -fx-effect: dropshadow(gaussian,rgba(100,110,140,0.10),12,0,0,2);">
+        <columns>
+            <TableColumn fx:id="nameColumn" text="Name" prefWidth="300.0"/>
+        </columns>
+    </TableView>
+    <HBox spacing="16" alignment="CENTER_RIGHT">
+        <Button fx:id="addButton" text="Hinzufügen" onAction="#onAdd"
+                style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 6 24;"/>
+        <Button fx:id="editButton" text="Ändern" onAction="#onEdit" disable="true"
+                style="-fx-background-color: #ffd447; -fx-text-fill: #2d3b50; -fx-background-radius: 8; -fx-font-size: 15px; -fx-padding: 6 24;"/>
+        <Button fx:id="deleteButton" text="Löschen" onAction="#onDelete" disable="true"
+                style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px; -fx-padding: 6 24;"/>
+    </HBox>
+</VBox>

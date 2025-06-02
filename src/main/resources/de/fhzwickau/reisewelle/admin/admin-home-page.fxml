@@ -107,6 +107,18 @@
                     </graphic>
                     Status
                 </Button>
+
+                <Button fx:id="tripStatusButton" onAction="#showTripStatus"
+                        style="-fx-background-color: #b294ff; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/trip_status.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Trip-Status
+                </Button>
             </children>
         </VBox>
     </left>
