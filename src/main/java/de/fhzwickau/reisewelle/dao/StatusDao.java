@@ -67,7 +67,12 @@ public class StatusDao implements BaseDao<Status> {
 
     @Override
     public void delete(UUID id) throws SQLException {
-        // Not Realized
+        Connection conn = JDBCConfig.getInstance();
+        String sql = "DELETE FROM Status WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id.toString());
+            stmt.executeUpdate();
+        }
     }
 
     private Status mapStatus(ResultSet rs) throws SQLException {

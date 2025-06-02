@@ -41,8 +41,14 @@ public class AdminHomeController {
         loadContent("country/admin-country.fxml");
     }
 
+    @FXML
     public void showCities() {
         loadContent("city/admin-city.fxml");
+    }
+
+    @FXML
+    public void showStatus() {
+        loadContent("status/admin-status.fxml");
     }
 
 

@@ -95,6 +95,18 @@
                     </graphic>
                     Städte
                 </Button>
+
+                <Button fx:id="statusButton" onAction="#showStatus"
+                        style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@images/status.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    Status
+                </Button>
             </children>
         </VBox>
     </left>

@@ -41,8 +41,8 @@ module de.fhzwickau.reisewelle {
     opens de.fhzwickau.reisewelle.controller.admin.city to javafx.fxml;
 
     // Для статусов (если отдельный пакет):
-//    exports de.fhzwickau.reisewelle.controller.admin.status;
-//    opens de.fhzwickau.reisewelle.controller.admin.status to javafx.fxml;
+    exports de.fhzwickau.reisewelle.controller.admin.status;
+    opens de.fhzwickau.reisewelle.controller.admin.status to javafx.fxml;
 
     // Для статусов трипа (если отдельный пакет):
 //    exports de.fhzwickau.reisewelle.controller.admin.tripstatus;
