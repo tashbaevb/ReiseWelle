@@ -8,7 +8,7 @@
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="de.fhzwickau.reisewelle.controller.admin.user_role.AddEditUserRoleController"
-      spacing="18" prefWidth="5000.0" prefHeight="320.0"
+      spacing="18" prefWidth="500.0" prefHeight="320.0"
       style="-fx-padding: 30; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
 
     <Label text="Die Role hinzufügen / bearbeiten"

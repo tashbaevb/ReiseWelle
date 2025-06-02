@@ -24,8 +24,11 @@ public class WindowUtil {
             newStage.setScene(scene);
             newStage.show();
 
-            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            currentStage.close();
+            // Закрываем текущее окно только если event не null
+            if (event != null && event.getSource() instanceof Node node) {
+                Stage currentStage = (Stage) node.getScene().getWindow();
+                currentStage.close();
+            }
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

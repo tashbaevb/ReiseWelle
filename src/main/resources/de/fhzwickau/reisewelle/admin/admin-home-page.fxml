@@ -12,6 +12,10 @@
             prefHeight="600.0" prefWidth="1080.0"
             style="-fx-background-color: #eef1f7;">
 
+    <top>
+        <fx:include source="admin-navbar.fxml"/>
+    </top>
+
     <left>
         <VBox spacing="16" alignment="TOP_CENTER"
               style="-fx-padding: 30 10 30 10; -fx-background-color: #f7fafd; -fx-background-radius: 0 22 22 0;">
@@ -76,7 +80,7 @@
                     <graphic>
                         <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
                             <image>
-                                <Image url="@images/trip.png"/>
+                                <Image url="@images/roles.png"/>
                             </image>
                         </ImageView>
                     </graphic>
@@ -87,7 +91,7 @@
                     <graphic>
                         <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
                             <image>
-                                <Image url="@images/trip.png"/>
+                                <Image url="@images/permissions.png"/>
                             </image>
                         </ImageView>
                     </graphic>
@@ -98,7 +102,7 @@
                     <graphic>
                         <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
                             <image>
-                                <Image url="@images/trip.png"/>
+                                <Image url="@images/roles_permissions.png"/>
                             </image>
                         </ImageView>
                     </graphic>

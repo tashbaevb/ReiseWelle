@@ -15,7 +15,7 @@
 <?import javafx.scene.control.DatePicker?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="de.fhzwickau.reisewelle.controller.user.TripController"
-            prefHeight="600.0" prefWidth="1350.0"
+            prefHeight="600.0" prefWidth="1380.0"
             style="-fx-background-color: #ffafd;">
 
     <VBox spacing="26" alignment="TOP_CENTER"
