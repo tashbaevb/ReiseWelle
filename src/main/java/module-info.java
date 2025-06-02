@@ -47,4 +47,7 @@ module de.fhzwickau.reisewelle {
 
     exports de.fhzwickau.reisewelle.controller.admin.trip_status;
     opens de.fhzwickau.reisewelle.controller.admin.trip_status to javafx.fxml;
+
+    exports de.fhzwickau.reisewelle.controller.admin.ticket;
+    opens de.fhzwickau.reisewelle.controller.admin.ticket to javafx.fxml;
 }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.ticket.AddEditTicketController"
+      spacing="22" prefWidth="500" style="-fx-padding: 28; -fx-background-radius: 14; -fx-background-color: #fafdff;">
+    <Label text="Ticket bearbeiten/erstellen"
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #3776c7; -fx-padding: 0 0 8 0;"/>
+    <HBox spacing="30">
+        <VBox spacing="10">
+            <Label text="User" style="-fx-font-size: 14px;"/>
+            <ComboBox fx:id="userComboBox" prefWidth="160"/>
+            <Label text="Trip" style="-fx-font-size: 14px;"/>
+            <ComboBox fx:id="tripComboBox" prefWidth="160"/>
+            <Label text="Von" style="-fx-font-size: 14px;"/>
+            <ComboBox fx:id="startStopComboBox" prefWidth="160"/>
+            <Label text="Nach" style="-fx-font-size: 14px;"/>
+            <ComboBox fx:id="endStopComboBox" prefWidth="160"/>
+        </VBox>
+        <VBox spacing="10">
+            <Label text="Erwachsene" style="-fx-font-size: 14px;"/>
+            <Spinner fx:id="adultsSpinner" prefWidth="70"/>
+            <Label text="Kinder" style="-fx-font-size: 14px;"/>
+            <Spinner fx:id="childrenSpinner" prefWidth="70"/>
+            <Label text="Fahrräder" style="-fx-font-size: 14px;"/>
+            <Spinner fx:id="bikesSpinner" prefWidth="70"/>
+            <Label text="Preis" style="-fx-font-size: 14px;"/>
+            <TextField fx:id="priceField" promptText="Total" prefWidth="90"/>
+            <Label text="Kaufdatum" style="-fx-font-size: 14px;"/>
+            <DatePicker fx:id="purchaseDatePicker" prefWidth="130"/>
+        </VBox>
+    </HBox>
+    <HBox spacing="14" alignment="CENTER_RIGHT">
+        <Button text="Speichern" onAction="#onSave"
+                style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-min-width: 110px; -fx-min-height: 36px;"/>
+        <Button text="Abbrechen" onAction="#onCancel"
+                style="-fx-background-color: #efefef; -fx-text-fill: #6a6f7a; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-min-width: 110px; -fx-min-height: 36px;"/>
+    </HBox>
+</VBox>

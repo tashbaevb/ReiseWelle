@@ -14,7 +14,7 @@
     <Label text="Kunden"
            style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #3776c7; -fx-padding: 0 0 18 0;"/>
     <TableView fx:id="usersTable" prefHeight="320.0"
-               style="-fx-background-radius: 12;">
+               style="-fx-background-radius: 12;" >
         <columns>
             <TableColumn fx:id="emailColumn" text="E-Mail" prefWidth="230.0"/>
             <TableColumn fx:id="createdAtColumn" text="Erstellt am" prefWidth="170.0"/>

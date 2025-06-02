@@ -15,4 +15,5 @@ public class PermissionsUtil {
     public final static String ROLLEN_VERWALTEN = "ROLLEN_VERWALTEN";
     public final static String BERECHTIGUNGEN_VERWALTEN = "BERECHTIGUNGEN_VERWALTEN";
     public final static String ROLLE_BERECHTIGUNGEN_VERWALTEN = "ROLLE_BERECHTIGUNGEN_VERWALTEN";
+    public final static String TICKETS_VERWALTEN = "TICKETS_VERWALTEN";
 }

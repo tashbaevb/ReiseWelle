@@ -28,6 +28,7 @@ public class AdminUserController extends BaseTableController<User> {
 
     @FXML
     protected void initialize() {
+        usersTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         emailColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEmail()));
         createdAtColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getCreatedAt() != null
                 ? c.getValue().getCreatedAt().toString() : "")

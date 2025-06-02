@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.ticket.AdminTicketsController"
+      spacing="20" prefHeight="540.0" prefWidth="1100.0"
+      style="-fx-background-color: #fafdff; -fx-padding: 32 24 32 24; -fx-background-radius: 16;">
+    <Label text="Tickets"
+           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #3776c7; -fx-padding: 0 0 18 0;"/>
+    <TableView fx:id="ticketsTable" prefHeight="380.0"
+               style="-fx-background-radius: 12;">
+        <columns>
+            <TableColumn fx:id="userColumn" text="User" prefWidth="170"/>
+            <TableColumn fx:id="tripColumn" text="Trip" prefWidth="120"/>
+            <TableColumn fx:id="startStopColumn" text="Von" prefWidth="110"/>
+            <TableColumn fx:id="endStopColumn" text="Nach" prefWidth="110"/>
+            <TableColumn fx:id="adultsColumn" text="Erwachsene" prefWidth="90"/>
+            <TableColumn fx:id="childrenColumn" text="Kinder" prefWidth="90"/>
+            <TableColumn fx:id="bikesColumn" text="Fahrräder" prefWidth="90"/>
+            <TableColumn fx:id="priceColumn" text="Preis" prefWidth="100"/>
+            <TableColumn fx:id="purchaseDateColumn" text="Kaufdatum" prefWidth="160"/>
+        </columns>
+    </TableView>
+    <HBox spacing="14" alignment="CENTER_RIGHT">
+        <Button text="Neu" onAction="#onAdd"
+                style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-min-width: 110px; -fx-min-height: 36px;"/>
+        <Button text="Bearbeiten" onAction="#onEdit" fx:id="editBtn"
+                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-min-width: 110px; -fx-min-height: 36px;"/>
+        <Button text="Löschen" onAction="#onDelete" fx:id="deleteBtn"
+                style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-min-width: 110px; -fx-min-height: 36px;"/>
+    </HBox>
+</VBox>

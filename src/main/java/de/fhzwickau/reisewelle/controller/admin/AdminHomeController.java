@@ -75,6 +75,11 @@ public class AdminHomeController {
         loadContent("trip_status/admin-trip-status.fxml", PermissionsUtil.REISEN_STAND_VERWALTEN);
     }
 
+    @FXML
+    private void showTickets() throws IOException {
+        loadContent("ticket/tickets_admin.fxml", PermissionsUtil.TICKETS_VERWALTEN);
+    }
+
     private void loadContent(String fxmlFile, String requiredPermission) {
 //        if (!AccessManager.hasPermission(requiredPermission)) {
 //            AlertUtil.showError("Zugriff verweigert", "Sie haben keine Berechtigung, dieses Fenster zu öffnen.");
