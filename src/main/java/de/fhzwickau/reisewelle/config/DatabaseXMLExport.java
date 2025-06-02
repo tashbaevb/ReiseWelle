@@ -8,9 +8,8 @@ import java.sql.Statement;
 
 public class DatabaseXMLExport {
 
-    public static void main(String[] args) {
-        String outputFile = "DB_EXPORT_2.xml";
-
+    // Старайся не делать логику в main - пусть будет метод:
+    public static boolean exportToXml(String outputFile) {
         try (Connection conn = JDBCConfig.getInstance();
              FileWriter writer = new FileWriter(outputFile)) {
             writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -39,9 +38,10 @@ public class DatabaseXMLExport {
 
             writer.write("</Database>");
             System.out.println("Export completed to: " + outputFile);
-
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 }
