@@ -8,18 +8,15 @@
 <?import javafx.scene.control.Button?>
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="de.fhzwickau.reisewelle.controller.admin.bus.AdminBusController"
+      fx:controller="de.fhzwickau.reisewelle.controller.admin.country.AdminCountryController"
       spacing="20" prefHeight="460.0" prefWidth="700.0"
       style="-fx-background-color: #fafdff; -fx-padding: 32 24 32 24; -fx-background-radius: 16;">
-    <Label text="Die Busse"
+    <Label text="Länder"
            style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #3776c7; -fx-padding: 0 0 18 0;"/>
-    <TableView fx:id="busesTable" prefHeight="320.0"
+    <TableView fx:id="countriesTable" prefHeight="320.0"
                style="-fx-background-radius: 12;">
         <columns>
-            <TableColumn fx:id="busNumberColumn" text="Bus Nummer" prefWidth="200.0"/>
-            <TableColumn fx:id="totalSeatsColumn" text="Sitzplätze" prefWidth="110.0"/>
-            <TableColumn fx:id="bikeSpacesColumn" text="Fahrräder" prefWidth="110.0"/>
-            <TableColumn fx:id="statusColumn" text="Status" prefWidth="120.0"/>
+            <TableColumn fx:id="nameColumn" text="Name" prefWidth="320.0"/>
         </columns>
     </TableView>
     <HBox spacing="18" alignment="CENTER_RIGHT">

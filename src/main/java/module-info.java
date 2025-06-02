@@ -36,4 +36,15 @@ module de.fhzwickau.reisewelle {
     opens de.fhzwickau.reisewelle.controller.admin.permission to javafx.fxml;
     exports de.fhzwickau.reisewelle.controller.admin.role_permission;
     opens de.fhzwickau.reisewelle.controller.admin.role_permission to javafx.fxml;
+    exports de.fhzwickau.reisewelle.controller.admin.country;
+    opens de.fhzwickau.reisewelle.controller.admin.country to javafx.fxml;
+
+    exports de.fhzwickau.reisewelle.controller.admin.city;
+    opens de.fhzwickau.reisewelle.controller.admin.city to javafx.fxml;
+
+    exports de.fhzwickau.reisewelle.controller.admin.status;
+    opens de.fhzwickau.reisewelle.controller.admin.status to javafx.fxml;
+
+    exports de.fhzwickau.reisewelle.controller.admin.trip_status;
+    opens de.fhzwickau.reisewelle.controller.admin.trip_status to javafx.fxml;
 }
