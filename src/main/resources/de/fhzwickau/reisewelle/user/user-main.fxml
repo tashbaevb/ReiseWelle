@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="de.fhzwickau.reisewelle.controller.user.UserMainController"
+            prefHeight="700.0" prefWidth="1000.0">
+
+    <top>
+        <fx:include fx:id="navbar" source="user-navbar.fxml"/>
+    </top>
+    <center>
+        <AnchorPane fx:id="contentContainer"/>
+    </center>
+</BorderPane>
