@@ -64,7 +64,7 @@ public class LoginController {
                     WindowUtil.openWindow("/de/fhzwickau/reisewelle/admin/admin-home-page.fxml", "Mitarbeiter Dashboard", event);
                     break;
                 case "USER":
-                    WindowUtil.openWindow("/de/fhzwickau/reisewelle/user/user-profile-page.fxml", "Benutzerbereich", event);
+                    WindowUtil.openWindow("/de/fhzwickau/reisewelle/user/user-main.fxml", "Benutzerbereich", event);
                     break;
                 default:
                     AlertUtil.showError("Unbekannte Rolle", "Unbekannter Benutzerrolle: " + role);
