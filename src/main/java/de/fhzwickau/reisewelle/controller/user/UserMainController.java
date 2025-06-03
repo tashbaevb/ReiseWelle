@@ -2,7 +2,7 @@ package de.fhzwickau.reisewelle.controller.user;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane; // поменяли тут
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -11,7 +11,7 @@ import java.io.IOException;
 public class UserMainController {
 
     @FXML
-    private AnchorPane contentContainer;
+    private StackPane contentContainer; // поменяли тут
 
     @FXML
     private UserNavbarController navbarController;
@@ -27,7 +27,7 @@ public class UserMainController {
 
     public void loadContent(String fxmlPath) {
         try {
-            AnchorPane page = FXMLLoader.load(getClass().getResource(fxmlPath));
+            Parent page = FXMLLoader.load(getClass().getResource(fxmlPath)); // теперь Parent, можно AnchorPane/StackPane
             contentContainer.getChildren().setAll(page);
         } catch (IOException e) {
             e.printStackTrace();

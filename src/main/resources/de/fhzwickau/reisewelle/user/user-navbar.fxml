@@ -9,7 +9,7 @@
       fx:controller="de.fhzwickau.reisewelle.controller.user.UserNavbarController"
       spacing="18"
       alignment="CENTER_LEFT"
-      style="-fx-background-color: #3776c7; -fx-padding: 0 32 0 32; -fx-min-height: 54px;">
+      style="-fx-background-color: #3776c7; -fx-padding: 0 90 0 32; -fx-min-height: 54px;">
     <Label text="ReiseWelle"
            style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white; -fx-padding: 0 36 0 0;"/>
     <Region HBox.hgrow="ALWAYS"/>

@@ -14,8 +14,8 @@
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="de.fhzwickau.reisewelle.controller.admin.trip.AddEditTripController"
-      spacing="18" prefWidth="820" prefHeight="650"
-      style="-fx-padding:28; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
+      spacing="18" prefWidth="1050" prefHeight="650"
+      style="-fx-padding:28 ; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
 
     <Label text="Reise anlegen/bearbeiten"
            style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2d3b50; -fx-padding: 0 0 18 0;"/>
@@ -44,12 +44,12 @@
     <HBox spacing="24">
         <VBox>
             <Label text="Stationen:" style="-fx-font-weight: bold;"/>
-            <TableView fx:id="stopsTable" prefHeight="220" prefWidth="360" style="-fx-background-radius: 10;">
+            <TableView fx:id="stopsTable" prefHeight="220" prefWidth="500" style="-fx-background-radius: 10;">
                 <columns>
-                    <TableColumn text="Nr." fx:id="orderColumn"/>
-                    <TableColumn text="Stadt" fx:id="cityColumn"/>
-                    <TableColumn text="Ankunft" fx:id="arrivalColumn"/>
-                    <TableColumn text="Abfahrt" fx:id="departureColumn"/>
+                    <TableColumn text="Nr." fx:id="orderColumn" prefWidth="50"/>
+                    <TableColumn text="Stadt" fx:id="cityColumn" prefWidth="180"/>
+                    <TableColumn text="Ankunft" fx:id="arrivalColumn" prefWidth="130"/>
+                    <TableColumn text="Abfahrt" fx:id="departureColumn" prefWidth="130"/>
                 </columns>
             </TableView>
             <HBox spacing="10" style="-fx-padding:10 0 0 0;">
@@ -67,11 +67,11 @@
         </VBox>
         <VBox>
             <Label text="Preise (ab Start bis Station):" style="-fx-font-weight: bold;"/>
-            <TableView fx:id="priceTable" prefHeight="130" prefWidth="320" editable="true" style="-fx-background-radius: 10;">
+            <TableView fx:id="priceTable" prefHeight="130" prefWidth="420" editable="true" style="-fx-background-radius: 10;">
                 <columns>
-                    <TableColumn text="Stadt" fx:id="priceCityColumn"/>
-                    <TableColumn text="Preis (Erwachsene)" fx:id="priceAdultColumn"/>
-                    <TableColumn text="Preis (Kinder)" fx:id="priceChildColumn"/>
+                    <TableColumn text="Stadt" fx:id="priceCityColumn" prefWidth="160"/>
+                    <TableColumn text="Preis (Erwachsene)" fx:id="priceAdultColumn" prefWidth="130"/>
+                    <TableColumn text="Preis (Kinder)" fx:id="priceChildColumn" prefWidth="130"/>
                 </columns>
             </TableView>
             <Button text="Preise aktualisieren" onAction="#updatePrices"

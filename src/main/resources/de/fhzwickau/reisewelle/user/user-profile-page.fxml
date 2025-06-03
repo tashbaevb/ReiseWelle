@@ -7,39 +7,51 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.shape.Circle?>
-<?import javafx.scene.paint.Color?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.layout.StackPane?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="de.fhzwickau.reisewelle.controller.user.UserProfilePageController"
-            prefHeight="440" prefWidth="540"
-            style="-fx-background-color: #f6fafd;">
-    <VBox spacing="28" alignment="TOP_CENTER"
-          style="-fx-background-color: #fff; -fx-background-radius: 20; -fx-padding: 38 38 34 38; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.12),15,0,0,3);">
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="de.fhzwickau.reisewelle.controller.user.UserProfilePageController"
+           prefHeight="700" prefWidth="1300"
+           style="-fx-background-color: #f6fafd;">
+    <VBox spacing="24" alignment="CENTER"
+          AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+          style="-fx-background-color: #fff; -fx-background-radius: 26; -fx-padding: 44 56 44 56; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.14),24,0,0,7);"
+          maxWidth="1080" maxHeight="700">
 
         <!-- Avatar and Title -->
-        <HBox alignment="CENTER_LEFT" spacing="18" style="-fx-padding: 0 0 0 8;">
-            <Circle radius="26" fill="#3776c7"/>
+        <HBox alignment="CENTER_LEFT" spacing="18" style="-fx-padding: 0 0 0 6;">
+            <AnchorPane prefWidth="56" prefHeight="56"
+                        style="-fx-background-color: #3776c7; -fx-background-radius: 50%;">
+                <ImageView fitHeight="38" fitWidth="38" layoutX="9" layoutY="9">
+                    <image>
+                        <Image url="@../images/user-avatar.png"/>
+                    </image>
+                </ImageView>
+            </AnchorPane>
             <Label text="Profil"
-                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3776c7;"/>
+                   style="-fx-font-size: 27px; -fx-font-weight: bold; -fx-text-fill: #3776c7;"/>
         </HBox>
 
         <!-- User info -->
-        <GridPane hgap="18" vgap="10" style="-fx-padding: 6 0 2 0;">
+        <GridPane hgap="22" vgap="12" style="-fx-padding: 14 0 2 0;">
             <Label text="E-Mail:" GridPane.rowIndex="0" GridPane.columnIndex="0"
-                   style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2d3b50;"/>
+                   style="-fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: #2d3b50;"/>
             <Label fx:id="emailLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"
-                   style="-fx-font-size: 16px;"/>
+                   style="-fx-font-size: 18px;"/>
         </GridPane>
 
         <Separator style="-fx-background-color: #e8ecf1;"/>
 
         <!-- Tickets List -->
         <Label text="Ihre Tickets:"
-               style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2d3b50; -fx-padding: 4 0 0 0;"/>
+               style="-fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: #2d3b50; -fx-padding: 10 0 0 0;"/>
         <ListView fx:id="ticketsListView"
-                  prefHeight="180"
-                  style="-fx-background-radius: 10; -fx-background-color: #fafdff; -fx-font-size: 15px;"/>
+                  VBox.vgrow="ALWAYS"
+                  prefWidth="960"
+                  style="-fx-background-radius: 20; -fx-background-color: #fafdff; -fx-font-size: 15px;"/>
     </VBox>
-</AnchorPane>
+</StackPane>
