@@ -6,25 +6,40 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.paint.Color?>
 
-<AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
             fx:controller="de.fhzwickau.reisewelle.controller.user.UserProfilePageController"
-            prefHeight="400.0" prefWidth="480.0"
+            prefHeight="440" prefWidth="540"
             style="-fx-background-color: #f6fafd;">
+    <VBox spacing="28" alignment="TOP_CENTER"
+          style="-fx-background-color: #fff; -fx-background-radius: 20; -fx-padding: 38 38 34 38; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.12),15,0,0,3);">
 
-    <VBox spacing="22" alignment="TOP_CENTER"
-          style="-fx-background-color: #ffffff; -fx-background-radius: 16; -fx-padding: 32 26 32 26; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.09),15,0,0,3);">
+        <!-- Avatar and Title -->
+        <HBox alignment="CENTER_LEFT" spacing="18" style="-fx-padding: 0 0 0 8;">
+            <Circle radius="26" fill="#3776c7"/>
+            <Label text="Profil"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3776c7;"/>
+        </HBox>
 
         <!-- User info -->
-        <GridPane hgap="12" vgap="8">
-            <Label text="E-Mail:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold; -fx-font-size: 15px;"/>
-            <Label fx:id="emailLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-size: 15px;"/>
+        <GridPane hgap="18" vgap="10" style="-fx-padding: 6 0 2 0;">
+            <Label text="E-Mail:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                   style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2d3b50;"/>
+            <Label fx:id="emailLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                   style="-fx-font-size: 16px;"/>
         </GridPane>
 
-        <Separator/>
+        <Separator style="-fx-background-color: #e8ecf1;"/>
 
         <!-- Tickets List -->
-        <Label text="Ihre Tickets:" style="-fx-font-weight: bold; -fx-font-size: 15px;"/>
-        <ListView fx:id="ticketsListView" prefHeight="170" style="-fx-background-radius: 8;"/>
+        <Label text="Ihre Tickets:"
+               style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2d3b50; -fx-padding: 4 0 0 0;"/>
+        <ListView fx:id="ticketsListView"
+                  prefHeight="180"
+                  style="-fx-background-radius: 10; -fx-background-color: #fafdff; -fx-font-size: 15px;"/>
     </VBox>
 </AnchorPane>

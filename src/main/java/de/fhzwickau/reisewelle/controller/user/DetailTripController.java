@@ -1,11 +1,7 @@
 package de.fhzwickau.reisewelle.controller.user;
 
-import de.fhzwickau.reisewelle.dao.BaseDao;
-import de.fhzwickau.reisewelle.dao.SeatAvailabilityDao;
-import de.fhzwickau.reisewelle.dao.StopDao;
-import de.fhzwickau.reisewelle.dao.TicketDao;
-import de.fhzwickau.reisewelle.dao.TripAdminDao;
-import de.fhzwickau.reisewelle.dao.UserDao;
+import de.fhzwickau.reisewelle.dao.*;
+import de.fhzwickau.reisewelle.dto.TripDetailsDTO;
 import de.fhzwickau.reisewelle.model.SeatAvailability;
 import de.fhzwickau.reisewelle.model.Stop;
 import de.fhzwickau.reisewelle.model.Ticket;
@@ -16,8 +12,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import de.fhzwickau.reisewelle.dto.TripDetailsDTO;
-import de.fhzwickau.reisewelle.dao.TripDao;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -47,10 +41,20 @@ public class DetailTripController {
     private final TripAdminDao tripAdminDao = new TripAdminDao();
     private boolean isViewingTicket = false;
 
+    /**
+     * Включить/выключить режим "только просмотр" (для профиля/админа).
+     * Если true — кнопка "Купить" скрыта.
+     */
     public void setViewingTicket(boolean viewingTicket) {
         this.isViewingTicket = viewingTicket;
+        if (buyBtn != null) {
+            buyBtn.setVisible(!isViewingTicket);
+        }
     }
 
+    /**
+     * Загружает детали трипа и отображает их.
+     */
     public void loadTripDetails(UUID tripId, Double price, String startStopId, String endStopId, int adults, int children, int bikes) throws SQLException {
         this.tripId = tripId;
         this.startStopId = startStopId;
@@ -59,7 +63,10 @@ public class DetailTripController {
         this.children = children;
         this.bikes = bikes;
         this.price = price;
-        buyBtn.setVisible(!isViewingTicket);
+
+        if (buyBtn != null) {
+            buyBtn.setVisible(!isViewingTicket);
+        }
 
         TripDetailsDTO trip = tripDao.getTripDetails(tripId, price);
         if (trip == null) {
@@ -68,10 +75,15 @@ public class DetailTripController {
         }
 
         busLabel.setText(trip.getBusNumber());
-        priceLabel.setText(String.valueOf(trip.getPrice()));
+        // Можно сделать "12.50 €"
+        priceLabel.setText(String.format("%.2f €", trip.getPrice()));
         stopsList.getItems().setAll(trip.getStops());
     }
 
+    /**
+     * Кнопка "Купить" — подтверждение и создание тикета.
+     */
+    @FXML
     public void onBuy() {
         AlertUtil.showConfirmation("Ticket kaufen?", confirmed -> {
             if (confirmed) {
@@ -80,6 +92,9 @@ public class DetailTripController {
         });
     }
 
+    /**
+     * Проверяет и покупает билет.
+     */
     private void updateTripInfo() {
         try {
             UUID userId = Session.getInstance().getCurrentUser().getId();
@@ -103,7 +118,7 @@ public class DetailTripController {
                 return;
             }
 
-            // Check availability of seats on all segments
+            // Проверка доступности мест на каждом сегменте
             for (int i = fromIndex; i < toIndex; i++) {
                 UUID segStartId = allStops.get(i).getId();
                 UUID segEndId = allStops.get(i + 1).getId();
@@ -125,7 +140,7 @@ public class DetailTripController {
                 }
             }
 
-            // update the availability of seats on all segments
+            // Обновляем доступные места на всех сегментах
             for (int i = fromIndex; i < toIndex; i++) {
                 UUID segStartId = allStops.get(i).getId();
                 UUID segEndId = allStops.get(i + 1).getId();

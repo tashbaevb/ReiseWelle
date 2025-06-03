@@ -27,12 +27,5 @@
             <TableColumn fx:id="purchaseDateColumn" text="Kaufdatum" prefWidth="160"/>
         </columns>
     </TableView>
-    <HBox spacing="14" alignment="CENTER_RIGHT">
-        <Button text="Neu" onAction="#onAdd"
-                style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-min-width: 110px; -fx-min-height: 36px;"/>
-        <Button text="Bearbeiten" onAction="#onEdit" fx:id="editBtn"
-                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-min-width: 110px; -fx-min-height: 36px;"/>
-        <Button text="Löschen" onAction="#onDelete" fx:id="deleteBtn"
-                style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-min-width: 110px; -fx-min-height: 36px;"/>
-    </HBox>
+
 </VBox>
