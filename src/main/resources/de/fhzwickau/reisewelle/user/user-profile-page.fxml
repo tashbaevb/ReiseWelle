@@ -52,6 +52,7 @@
         <ListView fx:id="ticketsListView"
                   VBox.vgrow="ALWAYS"
                   prefWidth="960"
-                  style="-fx-background-radius: 20; -fx-background-color: #fafdff; -fx-font-size: 15px;"/>
+                  style="-fx-background-radius: 20; -fx-font-size: 15px;"
+                  stylesheets="@tickets-list.css"/>
     </VBox>
 </StackPane>
