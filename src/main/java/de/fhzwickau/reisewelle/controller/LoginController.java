@@ -60,7 +60,7 @@ public class LoginController {
                 case "ADMIN":
                     WindowUtil.openWindow("/de/fhzwickau/reisewelle/admin/admin-home-page.fxml", "Admin Dashboard", event);
                     break;
-                case "EMPLOYEE":
+                case "MITARBEITER":
                     WindowUtil.openWindow("/de/fhzwickau/reisewelle/admin/admin-home-page.fxml", "Mitarbeiter Dashboard", event);
                     break;
                 case "USER":

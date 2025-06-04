@@ -25,7 +25,7 @@ public class AddEditEmployeeController extends BaseAddEditController<Employee> {
     @FXML
     private Label passwordLabel;
 
-    private static final String EMPLOYEE_ROLE_NAME = "Employee";
+    private static final String EMPLOYEE_ROLE_NAME = "Mitarbeiter";
     private static final Logger logger = LoggerFactory.getLogger(User.class);
     private final BaseDao<Employee> employeeDao = new EmployeeDao();
     private final UserRoleDao userRoleDao = new UserRoleDao();

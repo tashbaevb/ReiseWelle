@@ -106,7 +106,7 @@ public class EmployeeDao implements BaseDao<Employee> {
         String salt = rs.getString("salt");
         LocalDateTime erstelltAm = rs.getTimestamp("erstellt_am").toLocalDateTime();
 
-        UserRole role = userRoleDao.findByName("Employee");
+        UserRole role = userRoleDao.findByName("Mitarbeiter");
 
         return new Employee(id, vorname, nachname, email, password, salt, erstelltAm, role);
     }

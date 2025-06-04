@@ -9,20 +9,20 @@
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="de.fhzwickau.reisewelle.controller.admin.role_permission.AddEditRolePermissionController"
-      spacing="18" prefWidth="380.0" prefHeight="340.0"
+      spacing="18" prefWidth="450.0" prefHeight="340.0"
       style="-fx-padding: 30; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
 
-    <Label text="Die Role-Permission hinzufügen / bearbeiten"
+    <Label text="Die Rolle-Berechtigungen hinzufügen / bearbeiten"
            style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d3b50; -fx-padding: 0 0 18 0;"/>
 
     <GridPane hgap="18" vgap="16" style="-fx-padding: 0 0 14 0;">
-        <Label text="Role:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+        <Label text="Rolle:" GridPane.rowIndex="0" GridPane.columnIndex="0"
                style="-fx-font-size: 15px;"/>
         <ComboBox fx:id="roleComboBox" GridPane.rowIndex="0" GridPane.columnIndex="1" promptText="Die Role wählen"
                   prefWidth="180"/>
-        <Label text="Permission:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+        <Label text="Berechtigungen:" GridPane.rowIndex="1" GridPane.columnIndex="0"
                style="-fx-font-size: 15px;"/>
-        <ComboBox fx:id="permissionComboBox" GridPane.rowIndex="1" GridPane.columnIndex="1" promptText="Permission wählen"
+        <ComboBox fx:id="permissionComboBox" GridPane.rowIndex="1" GridPane.columnIndex="1" promptText="Berechtigungen wählen"
                   prefWidth="180"/>
     </GridPane>
 

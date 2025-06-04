@@ -8,10 +8,10 @@
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="de.fhzwickau.reisewelle.controller.admin.permission.AddEditPermissionController"
-      spacing="18" prefWidth="360.0" prefHeight="320.0"
+      spacing="18" prefWidth="450.0" prefHeight="320.0"
       style="-fx-padding: 30; -fx-background-color: #f7fafd; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian,rgba(120,130,160,0.13),20,0,0,5);">
 
-    <Label text="Die Permission hinzufügen / bearbeiten"
+    <Label text="Die Berechtigungen hinzufügen / bearbeiten"
            style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d3b50; -fx-padding: 0 0 18 0;"/>
 
     <Label text="Name" style="-fx-font-size: 13px;"/>

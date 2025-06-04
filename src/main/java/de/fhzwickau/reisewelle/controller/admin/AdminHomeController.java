@@ -81,10 +81,10 @@ public class AdminHomeController {
     }
 
     private void loadContent(String fxmlFile, String requiredPermission) {
-//        if (!AccessManager.hasPermission(requiredPermission)) {
-//            AlertUtil.showError("Zugriff verweigert", "Sie haben keine Berechtigung, dieses Fenster zu öffnen.");
-//            return;
-//        }
+        if (!AccessManager.hasPermission(requiredPermission)) {
+            AlertUtil.showError("Zugriff verweigert", "Sie haben keine Berechtigung, dieses Fenster zu öffnen.");
+            return;
+        }
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/de/fhzwickau/reisewelle/admin/" + fxmlFile));

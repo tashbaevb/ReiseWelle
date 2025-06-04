@@ -32,4 +32,17 @@ public class JDBCConfig {
         logger.info("Database connection established: " + connection);
         return connection;
     }
+
+    public static synchronized void close() {
+        if (connection != null) {
+            try {
+                if (!connection.isClosed()) {
+                    connection.close();
+                    logger.info("Database connection closed.");
+                }
+            } catch (SQLException e) {
+                logger.severe("Error closing database connection: " + e.getMessage());
+            }
+        }
+    }
 }

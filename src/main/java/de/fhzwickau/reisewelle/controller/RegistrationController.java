@@ -69,7 +69,7 @@ public class RegistrationController {
                     owner
             );
 
-            WindowUtil.openWindow("/de/fhzwickau/reisewelle/user/trips_page.fxml", "Benutzerbereich", event);
+            WindowUtil.openWindow("/de/fhzwickau/reisewelle/user/user-main.fxml", "Benutzerbereich", event);
         } catch (Exception e) {
             e.printStackTrace();
             AlertUtil.showError("Fehler", "Registrierung fehlgeschlagen: " + e.getMessage());

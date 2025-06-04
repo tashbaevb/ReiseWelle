@@ -117,7 +117,7 @@
                             </image>
                         </ImageView>
                     </graphic>
-                    Rollen-Permission
+                    Rollen-Berechtigungen
                 </Button>
 
                 <Button fx:id="countriesButton" onAction="#showCountries"
@@ -165,7 +165,7 @@
                             </image>
                         </ImageView>
                     </graphic>
-                    Trip-Status
+                    Reise-Status
                 </Button>
             </children>
         </VBox>

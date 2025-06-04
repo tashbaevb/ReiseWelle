@@ -23,7 +23,7 @@
     <HBox spacing="16" alignment="CENTER_RIGHT">
         <Button fx:id="addButton" text="Hinzufügen" onAction="#onAdd"
                 style="-fx-background-color: #26c281; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 6 24;"/>
-        <Button fx:id="editButton" text="Ändern" onAction="#onEdit" disable="true"
+        <Button fx:id="editButton" text="Bearbeiten" onAction="#onEdit" disable="true"
                 style="-fx-background-color: #ffd447; -fx-text-fill: #2d3b50; -fx-background-radius: 8; -fx-font-size: 15px; -fx-padding: 6 24;"/>
         <Button fx:id="deleteButton" text="Löschen" onAction="#onDelete" disable="true"
                 style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 15px; -fx-padding: 6 24;"/>
