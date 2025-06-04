@@ -1,30 +1,29 @@
 package de.fhzwickau.reisewelle.controller.admin.city;
 
+import de.fhzwickau.reisewelle.controller.admin.BaseAddEditController;
 import de.fhzwickau.reisewelle.dao.CityDao;
 import de.fhzwickau.reisewelle.dao.CountryDao;
 import de.fhzwickau.reisewelle.model.City;
 import de.fhzwickau.reisewelle.model.Country;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.stage.Modality;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.sql.SQLException;
 import java.util.function.Consumer;
 
-public class AddEditCityController {
+public class AddEditCityController extends BaseAddEditController<City> {
 
     @FXML
     private TextField nameField;
     @FXML
     private ComboBox<Country> countryCombo;
-    @FXML
-    private Button onSave, onCancel;
 
     private final CityDao cityDao = new CityDao();
     private final CountryDao countryDao = new CountryDao();
-    private City city;
     private Consumer<Void> onSaveCallback;
 
     public static void showDialog(City city, Consumer<Void> onSaveCallback) {
@@ -32,9 +31,9 @@ public class AddEditCityController {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     AddEditCityController.class.getResource("/de/fhzwickau/reisewelle/admin/city/add-edit-city.fxml"));
             Stage dialog = new Stage();
-            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             dialog.setTitle(city == null ? "Stadt hinzufügen" : "Stadt ändern");
-            dialog.setScene(new Scene(loader.load()));
+            dialog.setScene(new javafx.scene.Scene(loader.load()));
             AddEditCityController controller = loader.getController();
             controller.setCity(city);
             controller.setOnSaveCallback(onSaveCallback);
@@ -45,16 +44,17 @@ public class AddEditCityController {
     }
 
     public void setCity(City city) {
-        this.city = city;
+        this.entity = city;
         try {
             countryCombo.setItems(FXCollections.observableArrayList(countryDao.findAll()));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (city != null) {
-            nameField.setText(city.getName());
-            if (city.getCountry() != null) {
-                countryCombo.getSelectionModel().select(city.getCountry());
+
+        if (entity != null) {
+            nameField.setText(entity.getName());
+            if (entity.getCountry() != null) {
+                countryCombo.getSelectionModel().select(entity.getCountry());
             }
         } else {
             nameField.setText("");
@@ -62,39 +62,58 @@ public class AddEditCityController {
         }
     }
 
-    public void setOnSaveCallback(Consumer<Void> callback) {
-        this.onSaveCallback = callback;
+    public void setOnSaveCallback(Consumer<Void> onSaveCallback) {
+        this.onSaveCallback = onSaveCallback;
     }
 
-    @FXML
-    public void onSave() {
+    @Override
+    protected void saveEntity() throws SQLException {
         String name = nameField.getText().trim();
         Country country = countryCombo.getSelectionModel().getSelectedItem();
+
         if (name.isEmpty() || country == null) {
-            nameField.setStyle("-fx-border-color: red;");
-            countryCombo.setStyle("-fx-border-color: red;");
-            return;
+            throw new SQLException("Name und Land müssen ausgefüllt sein.");
         }
+
+        if (entity == null) {
+            entity = new City(name, country);
+            cityDao.add(entity);
+        } else {
+            entity.setName(name);
+            entity.setCountry(country);
+            cityDao.update(entity);
+        }
+
+        if (onSaveCallback != null) onSaveCallback.accept(null);
+    }
+
+    @Override
+    protected javafx.scene.Node getAnyControl() {
+        return nameField;
+    }
+
+    @FXML
+    protected void save() {
         try {
-            if (city == null) {
-                cityDao.add(new City(name, country));
+            saveEntity();
+            close();
+        } catch (SQLException e) {
+            AlertUtil.showError("Fehler beim Speichern", e.getMessage());
+            if (nameField.getText().trim().isEmpty()) {
+                nameField.setStyle("-fx-border-color: red;");
             } else {
-                city.setName(name);
-                city.setCountry(country);
-                cityDao.update(city);
+                nameField.setStyle(null);
             }
-            ((Stage) nameField.getScene().getWindow()).close();
-            if (onSaveCallback != null) onSaveCallback.accept(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Fehler beim Speichern: " + e.getMessage());
-            alert.setHeaderText("Fehler");
-            alert.showAndWait();
+            if (countryCombo.getSelectionModel().getSelectedItem() == null) {
+                countryCombo.setStyle("-fx-border-color: red;");
+            } else {
+                countryCombo.setStyle(null);
+            }
         }
     }
 
     @FXML
-    public void onCancel() {
-        ((Stage) nameField.getScene().getWindow()).close();
+    protected void cancel() {
+        close();
     }
 }

@@ -47,6 +47,18 @@ public class DriverDao implements BaseDao<Driver> {
         return null;
     }
 
+    public boolean isDriverWithStatusId(UUID id) throws SQLException {
+        Connection connection = JDBCConfig.getInstance();
+        String sql = "SELECT TOP 1 id FROM Driver WHERE status_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, id.toString());
+
+            try (ResultSet rs = statement.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
     @Override
     public void save(Driver driver) throws SQLException {
         Connection conn = JDBCConfig.getInstance();

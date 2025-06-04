@@ -27,7 +27,7 @@ public class AddEditDriverController extends BaseAddEditController<Driver> {
     private final BaseDao<Status> statusDao = new StatusDao();
 
     @FXML
-    private void initialize() throws SQLException {
+    private void initialize() {
         ComboBoxUtils.populate(statusComboBox, statusDao);
     }
 

@@ -1,80 +1,81 @@
 package de.fhzwickau.reisewelle.controller.admin.trip_status;
 
+import de.fhzwickau.reisewelle.controller.admin.BaseAddEditController;
 import de.fhzwickau.reisewelle.dao.TripStatusDao;
 import de.fhzwickau.reisewelle.model.TripStatus;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
+import de.fhzwickau.reisewelle.utils.WindowUtil;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.scene.Node;
+import javafx.scene.control.TextField;
 
-import java.util.function.Consumer;
+import java.io.IOException;
+import java.sql.SQLException;
 
-public class AddEditTripStatusController {
+public class AddEditTripStatusController extends BaseAddEditController<TripStatus> {
 
     @FXML
     private TextField nameField;
-    @FXML
-    private Button onSave, onCancel;
 
     private final TripStatusDao tripStatusDao = new TripStatusDao();
-    private TripStatus tripStatus;
-    private Consumer<Void> onSaveCallback;
 
-    public static void showDialog(TripStatus tripStatus, Consumer<Void> onSaveCallback) {
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(AddEditTripStatusController.class.getResource("/de/fhzwickau/reisewelle/admin/trip_status/add-edit-trip-status.fxml"));
-            Stage dialog = new Stage();
-            dialog.initModality(Modality.APPLICATION_MODAL);
-            dialog.setTitle(tripStatus == null ? "Status hinzufügen" : "Status ändern");
-            dialog.setScene(new Scene(loader.load()));
-            AddEditTripStatusController controller = loader.getController();
-            controller.setTripStatus(tripStatus);
-            controller.setOnSaveCallback(onSaveCallback);
-            dialog.showAndWait();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    private Runnable onSaved;
 
     public void setTripStatus(TripStatus tripStatus) {
-        this.tripStatus = tripStatus;
-        if (tripStatus != null) {
-            nameField.setText(tripStatus.getName());
+        this.entity = tripStatus;
+        if (entity != null) {
+            nameField.setText(entity.getName());
+        } else {
+            nameField.clear();
         }
     }
 
-    public void setOnSaveCallback(Consumer<Void> callback) {
-        this.onSaveCallback = callback;
+    public void setOnSaved(Runnable onSaved) {
+        this.onSaved = onSaved;
     }
 
-    @FXML
-    public void onSave() {
+    @Override
+    protected void saveEntity() throws SQLException {
         String name = nameField.getText().trim();
+
         if (name.isEmpty()) {
-            nameField.setStyle("-fx-border-color: red;");
-            return;
+            AlertUtil.showError("Fehler", "Name darf nicht leer sein");
+            throw new SQLException("Name darf nicht leer sein"); // прервать сохранение
         }
-        try {
-            if (tripStatus == null) {
-                tripStatusDao.save(new TripStatus(name));
-            } else {
-                tripStatus.setName(name);
-                tripStatusDao.save(tripStatus);
-            }
-            ((Stage) nameField.getScene().getWindow()).close();
-            if (onSaveCallback != null) onSaveCallback.accept(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            nameField.setStyle("-fx-border-color: red;");
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Fehler beim Speichern: " + e.getMessage());
-            alert.setHeaderText("Fehler");
-            alert.showAndWait();
+
+        if (entity == null) {
+            entity = new TripStatus(name);
+        } else {
+            entity.setName(name);
+        }
+
+        tripStatusDao.save(entity);
+
+        if (onSaved != null) {
+            onSaved.run();
         }
     }
 
-    @FXML
-    public void onCancel() {
-        ((Stage) nameField.getScene().getWindow()).close();
+    @Override
+    protected Node getAnyControl() {
+        return nameField;
+    }
+
+    public static void showDialog(TripStatus tripStatus, Runnable onSaved) {
+        try {
+            WindowUtil.showModalWindow(
+                    "/de/fhzwickau/reisewelle/admin/trip_status/add-edit-trip-status.fxml",
+                    tripStatus == null ? "Status hinzufügen" : "Status bearbeiten",
+                    controller -> {
+                        AddEditTripStatusController c = (AddEditTripStatusController) controller;
+                        c.setTripStatus(tripStatus);
+                        c.setOnSaved(onSaved);
+                    },
+                    onSaved
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+            AlertUtil.showError("Fehler beim Öffnen des Dialogs", e.getMessage());
+        }
     }
 }

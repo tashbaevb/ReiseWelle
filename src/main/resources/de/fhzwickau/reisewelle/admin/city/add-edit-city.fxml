@@ -21,9 +21,9 @@
         <ComboBox fx:id="countryCombo" promptText="Land auswählen" prefWidth="220"/>
     </VBox>
     <HBox spacing="16" alignment="CENTER_RIGHT">
-        <Button fx:id="onSave" text="Speichern" onAction="#onSave"
+        <Button fx:id="onSave" text="Speichern" onAction="#save"
                 style="-fx-background-color: #3776c7; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;"/>
-        <Button fx:id="onCancel" text="Abbrechen" onAction="#onCancel"
+        <Button fx:id="onCancel" text="Abbrechen" onAction="#cancel"
                 style="-fx-background-color: #eef1f7; -fx-text-fill: #3776c7; -fx-background-radius: 8;"/>
     </HBox>
 </VBox>

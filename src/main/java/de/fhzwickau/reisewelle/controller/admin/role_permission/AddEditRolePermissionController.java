@@ -1,5 +1,6 @@
 package de.fhzwickau.reisewelle.controller.admin.role_permission;
 
+import de.fhzwickau.reisewelle.controller.admin.BaseAddEditController;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.PermissionDao;
 import de.fhzwickau.reisewelle.dao.UserRoleDao;
@@ -10,14 +11,14 @@ import de.fhzwickau.reisewelle.model.UserRolePermission;
 import de.fhzwickau.reisewelle.utils.AlertUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import javafx.stage.Stage;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-public class AddEditRolePermissionController {
+public class AddEditRolePermissionController extends BaseAddEditController<UserRolePermission> {
 
     @FXML
     private ComboBox<UserRole> roleComboBox;
@@ -29,21 +30,7 @@ public class AddEditRolePermissionController {
     private final BaseDao<UserRole> userRoleBaseDao = new UserRoleDao();
     private final BaseDao<Permission> permissionDao = new PermissionDao();
 
-    private UserRolePermission userRolePermission;
     private Runnable onSaved;
-
-    public void setPermission(UserRolePermission userRolePermission) {
-        this.userRolePermission = userRolePermission;
-
-        if (userRolePermission != null) {
-            roleComboBox.setValue(userRolePermission.getUserRole());
-            permissionComboBox.setValue(userRolePermission.getPermission());
-        }
-    }
-
-    public void setOnSaved(Runnable onSaved) {
-        this.onSaved = onSaved;
-    }
 
     @FXML
     private void initialize() {
@@ -58,43 +45,72 @@ public class AddEditRolePermissionController {
         }
     }
 
-    @FXML
-    private void save() {
+    public void setUserRolePermission(UserRolePermission userRolePermission) {
+        this.entity = userRolePermission;
+
+        if (entity != null) {
+            roleComboBox.setValue(entity.getUserRole());
+            permissionComboBox.setValue(entity.getPermission());
+        } else {
+            roleComboBox.getSelectionModel().clearSelection();
+            permissionComboBox.getSelectionModel().clearSelection();
+        }
+    }
+
+    public void setOnSaved(Runnable onSaved) {
+        this.onSaved = onSaved;
+    }
+
+    @Override
+    protected void saveEntity() throws SQLException {
         UserRole selectedRole = roleComboBox.getValue();
         Permission selectedPermission = permissionComboBox.getValue();
 
         if (selectedRole == null || selectedPermission == null) {
-            AlertUtil.showError("Fehlende Eingabe", "Bitte wählen Sie sowohl eine Rolle als auch eine Berechtigung aus.");
-            return;
+            throw new SQLException("Bitte wählen Sie sowohl eine Rolle als auch eine Berechtigung aus.");
         }
 
+        if (entity == null) {
+            entity = new UserRolePermission(UUID.randomUUID());
+        }
+
+        entity.setUserRole(selectedRole);
+        entity.setPermission(selectedPermission);
+
+        userRolePermissionBaseDao.save(entity);
+
+        if (onSaved != null) {
+            onSaved.run();
+        }
+    }
+
+    @Override
+    protected Node getAnyControl() {
+        return roleComboBox;
+    }
+
+    @FXML
+    protected void save() {
         try {
-            if (userRolePermission == null) {
-                userRolePermission = new UserRolePermission(UUID.randomUUID());
-            }
-
-            userRolePermission.setUserRole(selectedRole);
-            userRolePermission.setPermission(selectedPermission);
-
-            userRolePermissionBaseDao.save(userRolePermission);
-
-            if (onSaved != null) {
-                onSaved.run();
-            }
-
-            closeWindow();
+            saveEntity();
+            close();
         } catch (SQLException e) {
             AlertUtil.showError("Fehler beim Speichern", e.getMessage());
+            if (roleComboBox.getValue() == null) {
+                roleComboBox.setStyle("-fx-border-color: red;");
+            } else {
+                roleComboBox.setStyle(null);
+            }
+            if (permissionComboBox.getValue() == null) {
+                permissionComboBox.setStyle("-fx-border-color: red;");
+            } else {
+                permissionComboBox.setStyle(null);
+            }
         }
     }
 
     @FXML
-    private void cancel() {
-        closeWindow();
-    }
-
-    private void closeWindow() {
-        Stage stage = (Stage) roleComboBox.getScene().getWindow();
-        stage.close();
+    protected void cancel() {
+        close();
     }
 }

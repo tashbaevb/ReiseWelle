@@ -1,23 +1,21 @@
 package de.fhzwickau.reisewelle.controller.admin.role_permission;
 
+import de.fhzwickau.reisewelle.controller.admin.BaseTableController;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.UserRolePermissionDao;
 import de.fhzwickau.reisewelle.model.UserRolePermission;
-import de.fhzwickau.reisewelle.utils.AlertUtil;
 import de.fhzwickau.reisewelle.utils.WindowUtil;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.SQLException;
+import java.util.UUID;
 
-public class RolePermissionController {
+public class RolePermissionController extends BaseTableController<UserRolePermission> {
 
     @FXML
     private TableView<UserRolePermission> rolePermissionsTable;
@@ -28,79 +26,52 @@ public class RolePermissionController {
     @FXML
     private Button editButton, deleteButton;
 
-    private final BaseDao<UserRolePermission> userRolePermissionBaseDao = new UserRolePermissionDao();
-    private final ObservableList<UserRolePermission> userRolePermissions = FXCollections.observableArrayList();
+    private final BaseDao<UserRolePermission> userRolePermissionDao = new UserRolePermissionDao();
 
     @FXML
     public void initialize() {
         roleNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getUserRole().getRoleName()));
         permissionNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPermission().getPermissionName()));
-        rolePermissionsTable.setItems(userRolePermissions);
 
-        rolePermissionsTable.setOnMouseClicked(this::onRowSelected);
-
-        loadRoles();
+        init(userRolePermissionDao, rolePermissionsTable, editButton, deleteButton);
     }
 
-    private void loadRoles() {
-        userRolePermissions.clear();
-        try {
-            userRolePermissions.addAll(userRolePermissionBaseDao.findAll());
-        } catch (SQLException sqle) {
-            AlertUtil.showError("Fehler beim Laden der Role-Berechtigung", sqle.getMessage());
-        }
+    @Override
+    protected boolean isInUse(UserRolePermission entity) {
+        return false;
     }
 
-    private void onRowSelected(MouseEvent event) {
-        boolean hasSelection = rolePermissionsTable.getSelectionModel().getSelectedItem() != null;
-        editButton.setDisable(!hasSelection);
-        deleteButton.setDisable(!hasSelection);
+    @Override
+    protected String getInUseMessage() {
+        return "Diese Rolle-Berechtigung kann nicht gelöscht werden, da sie verwendet wird.";
     }
 
-    @FXML
-    private void onAdd() {
-        openAddEditDialog(null);
+    @Override
+    protected UUID getId(UserRolePermission entity) {
+        return entity.getId();
     }
 
-    @FXML
-    private void onEdit() {
-        UserRolePermission selected = rolePermissionsTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            openAddEditDialog(selected);
-        }
+    @Override
+    protected Stage showAddEditDialog(UserRolePermission entity) throws IOException {
+        return WindowUtil.showModalWindow(
+                "/de/fhzwickau/reisewelle/admin/role-permission/add-edit-role-permission.fxml",
+                entity == null ? "Role-Berechtigung hinzufügen" : "Role-Berechtigung bearbeiten",
+                controller -> {
+                    AddEditRolePermissionController c = (AddEditRolePermissionController) controller;
+                    c.setUserRolePermission(entity);
+                    c.setOnSaved(this::loadDataAsync);
+                },
+                this::loadDataAsync
+        );
     }
 
-    @FXML
-    private void onDelete() {
-        UserRolePermission selected = rolePermissionsTable.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
-
-        AlertUtil.showConfirmation("Möchten Sie die Role-Berechtigung wirklich löschen?", confirmed -> {
-            if (confirmed) {
-                try {
-                    userRolePermissionBaseDao.delete(selected.getId());
-                    loadRoles();
-                    AlertUtil.showInfo("Erfolg", "Die Role-Berechtigung wurde gelöscht.");
-                } catch (SQLException sqle) {
-                    AlertUtil.showError("Fehler beim Löschen", sqle.getMessage());
-                }
-            }
-        });
+    @Override
+    protected String getDeleteConfirmationMessage(UserRolePermission entity) {
+        return "Rolle: " + entity.getUserRole().getRoleName() + ", Berechtigung: " + entity.getPermission().getPermissionName();
     }
 
-    private void openAddEditDialog(UserRolePermission userRolePermission) {
-        try {
-            WindowUtil.showModalWindow(
-                    "/de/fhzwickau/reisewelle/admin/role-permission/add-edit-role-permission.fxml",
-                    userRolePermission == null ? "Role-Berechtigung hinzufügen" : "Role-Berechtigung bearbeiten",
-                    (AddEditRolePermissionController controller) -> {
-                        controller.setPermission(userRolePermission);
-                        controller.setOnSaved(this::loadRoles);
-                    },
-                    this::loadRoles
-            );
-        } catch (IOException ioe) {
-            AlertUtil.showError("Fehler beim Öffnen", ioe.getMessage());
-        }
+    @Override
+    protected TableView<UserRolePermission> getTableView() {
+        return rolePermissionsTable;
     }
 }

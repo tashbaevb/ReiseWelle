@@ -1,18 +1,30 @@
 package de.fhzwickau.reisewelle.controller.admin.ticket;
 
-import de.fhzwickau.reisewelle.dao.*;
-import de.fhzwickau.reisewelle.model.*;
+import de.fhzwickau.reisewelle.controller.admin.BaseAddEditController;
+import de.fhzwickau.reisewelle.dao.StopDao;
+import de.fhzwickau.reisewelle.dao.TicketDao;
+import de.fhzwickau.reisewelle.dao.TripAdminDao;
+import de.fhzwickau.reisewelle.dao.UserDao;
+import de.fhzwickau.reisewelle.model.Stop;
+import de.fhzwickau.reisewelle.model.Ticket;
+import de.fhzwickau.reisewelle.model.Trip;
+import de.fhzwickau.reisewelle.model.User;
 import de.fhzwickau.reisewelle.utils.AlertUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.stage.Stage;
+import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextField;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-public class AddEditTicketController {
+public class AddEditTicketController extends BaseAddEditController<Ticket> {
 
     @FXML
     private ComboBox<User> userComboBox;
@@ -29,19 +41,22 @@ public class AddEditTicketController {
     @FXML
     private DatePicker purchaseDatePicker;
 
-    private Ticket ticket;
+    private final UserDao userDao = new UserDao();
+    private final TripAdminDao tripDao = new TripAdminDao();
+    private final StopDao stopDao = new StopDao();
+    private final TicketDao ticketDao = new TicketDao();
+
     private Runnable onSaved;
 
     @FXML
     public void initialize() {
-        // Заполняем комбобоксы
         try {
-            List<User> users = new UserDao().findAll();
+            List<User> users = userDao.findAll();
             userComboBox.setItems(FXCollections.observableList(users));
-            List<Trip> trips = new TripAdminDao().findAll();
+
+            List<Trip> trips = tripDao.findAll();
             tripComboBox.setItems(FXCollections.observableList(trips));
 
-            // Обновлять список остановок при смене поездки
             tripComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateStops());
 
         } catch (Exception e) {
@@ -57,7 +72,7 @@ public class AddEditTicketController {
         Trip selectedTrip = tripComboBox.getValue();
         if (selectedTrip != null) {
             try {
-                List<Stop> stops = new StopDao().findByTripId(selectedTrip.getId());
+                List<Stop> stops = stopDao.findByTripId(selectedTrip.getId());
                 startStopComboBox.setItems(FXCollections.observableList(stops));
                 endStopComboBox.setItems(FXCollections.observableList(stops));
             } catch (Exception e) {
@@ -70,22 +85,22 @@ public class AddEditTicketController {
     }
 
     public void setTicket(Ticket ticket) {
-        this.ticket = ticket;
-        if (ticket != null) {
-            userComboBox.setValue(ticket.getUser());
-            tripComboBox.setValue(ticket.getTrip());
-            // После выбора trip обновить остановки и выставить их
-            if (ticket.getTrip() != null) {
+        this.entity = ticket;
+        if (entity != null) {
+            userComboBox.setValue(entity.getUser());
+            tripComboBox.setValue(entity.getTrip());
+
+            if (entity.getTrip() != null) {
                 updateStops();
-                startStopComboBox.setValue(ticket.getStartStop());
-                endStopComboBox.setValue(ticket.getEndStop());
+                startStopComboBox.setValue(entity.getStartStop());
+                endStopComboBox.setValue(entity.getEndStop());
             }
-            adultsSpinner.getValueFactory().setValue(ticket.getAdultCount());
-            childrenSpinner.getValueFactory().setValue(ticket.getChildCount());
-            bikesSpinner.getValueFactory().setValue(ticket.getBikeCount());
-            priceField.setText(ticket.getTotalPrice() != null ? ticket.getTotalPrice().toString() : "");
-            if (ticket.getPurchaseDate() != null)
-                purchaseDatePicker.setValue(ticket.getPurchaseDate().toLocalDate());
+            adultsSpinner.getValueFactory().setValue(entity.getAdultCount());
+            childrenSpinner.getValueFactory().setValue(entity.getChildCount());
+            bikesSpinner.getValueFactory().setValue(entity.getBikeCount());
+            priceField.setText(entity.getTotalPrice() != null ? entity.getTotalPrice().toString() : "");
+            if (entity.getPurchaseDate() != null)
+                purchaseDatePicker.setValue(entity.getPurchaseDate().toLocalDate());
         }
     }
 
@@ -93,53 +108,47 @@ public class AddEditTicketController {
         this.onSaved = onSaved;
     }
 
-    @FXML
-    private void onSave() {
-        try {
-            if (userComboBox.getValue() == null || tripComboBox.getValue() == null ||
-                    startStopComboBox.getValue() == null || endStopComboBox.getValue() == null ||
-                    purchaseDatePicker.getValue() == null) {
-                AlertUtil.showError("Fehler", "Bitte alle Felder ausfüllen!");
-                return;
-            }
-            if (ticket == null) {
-                ticket = new Ticket(
-                        userComboBox.getValue(),
-                        tripComboBox.getValue(),
-                        startStopComboBox.getValue(),
-                        endStopComboBox.getValue(),
-                        adultsSpinner.getValue(),
-                        childrenSpinner.getValue(),
-                        bikesSpinner.getValue(),
-                        Double.parseDouble(priceField.getText()),
-                        LocalDateTime.of(purchaseDatePicker.getValue(), LocalTime.now())
-                );
-            } else {
-                ticket.setUser(userComboBox.getValue());
-                ticket.setTrip(tripComboBox.getValue());
-                ticket.setStartStop(startStopComboBox.getValue());
-                ticket.setEndStop(endStopComboBox.getValue());
-                ticket.setAdultCount(adultsSpinner.getValue());
-                ticket.setChildCount(childrenSpinner.getValue());
-                ticket.setBikeCount(bikesSpinner.getValue());
-                ticket.setTotalPrice(Double.parseDouble(priceField.getText()));
-                ticket.setPurchaseDate(LocalDateTime.of(purchaseDatePicker.getValue(), LocalTime.now()));
-            }
-            new TicketDao().save(ticket);
+    @Override
+    protected void saveEntity() throws SQLException {
+        if (userComboBox.getValue() == null || tripComboBox.getValue() == null ||
+                startStopComboBox.getValue() == null || endStopComboBox.getValue() == null ||
+                purchaseDatePicker.getValue() == null) {
+            throw new IllegalArgumentException("Bitte alle Felder ausfüllen!");
+        }
 
-            if (onSaved != null) onSaved.run();
-            close();
-        } catch (Exception e) {
-            AlertUtil.showError("Fehler beim Speichern", e.getMessage());
+        if (entity == null) {
+            entity = new Ticket(
+                    userComboBox.getValue(),
+                    tripComboBox.getValue(),
+                    startStopComboBox.getValue(),
+                    endStopComboBox.getValue(),
+                    adultsSpinner.getValue(),
+                    childrenSpinner.getValue(),
+                    bikesSpinner.getValue(),
+                    Double.parseDouble(priceField.getText()),
+                    LocalDateTime.of(purchaseDatePicker.getValue(), LocalTime.now())
+            );
+        } else {
+            entity.setUser(userComboBox.getValue());
+            entity.setTrip(tripComboBox.getValue());
+            entity.setStartStop(startStopComboBox.getValue());
+            entity.setEndStop(endStopComboBox.getValue());
+            entity.setAdultCount(adultsSpinner.getValue());
+            entity.setChildCount(childrenSpinner.getValue());
+            entity.setBikeCount(bikesSpinner.getValue());
+            entity.setTotalPrice(Double.parseDouble(priceField.getText()));
+            entity.setPurchaseDate(LocalDateTime.of(purchaseDatePicker.getValue(), LocalTime.now()));
+        }
+
+        ticketDao.save(entity);
+
+        if (onSaved != null) {
+            onSaved.run();
         }
     }
 
-    @FXML
-    private void onCancel() {
-        close();
-    }
-
-    private void close() {
-        ((Stage) userComboBox.getScene().getWindow()).close();
+    @Override
+    protected Node getAnyControl() {
+        return userComboBox;
     }
 }

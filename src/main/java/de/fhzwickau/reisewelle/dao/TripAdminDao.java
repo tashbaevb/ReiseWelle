@@ -87,6 +87,18 @@ public class TripAdminDao implements BaseDao<Trip> {
         }
     }
 
+    public boolean isTripWithStatusId(UUID id) throws SQLException {
+        Connection connection = JDBCConfig.getInstance();
+        String sql = "SELECT TOP 1 id FROM Trip WHERE status_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, id.toString());
+
+            try (ResultSet rs = statement.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
     private Trip mapRow(ResultSet rs) throws SQLException {
         UUID id = UUID.fromString(rs.getString("id"));
         UUID busId = UUID.fromString(rs.getString("bus_id"));

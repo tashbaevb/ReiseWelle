@@ -53,6 +53,18 @@ public class BusDao implements BaseDao<Bus> {
         return null;
     }
 
+    public boolean isBusWithStatusId(UUID id) throws SQLException {
+        Connection connection = JDBCConfig.getInstance();
+        String sql = "SELECT TOP 1 id FROM Bus WHERE status_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, id.toString());
+
+            try (ResultSet rs = statement.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
     public void save(Bus bus) throws SQLException {
         Connection conn = JDBCConfig.getInstance();
         boolean isNew = bus.getId() == null;

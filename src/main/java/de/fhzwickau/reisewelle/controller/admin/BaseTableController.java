@@ -28,6 +28,7 @@ public abstract class BaseTableController<T> {
     protected ObservableList<T> items = FXCollections.observableArrayList();
 
     protected void init(BaseDao<T> dao, TableView<T> tableView, Button editButton, Button deleteButton) {
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         this.dao = dao;
         this.tableView = tableView;
         this.editButton = editButton;

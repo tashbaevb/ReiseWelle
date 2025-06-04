@@ -1,23 +1,21 @@
 package de.fhzwickau.reisewelle.controller.admin.permission;
 
+import de.fhzwickau.reisewelle.controller.admin.BaseTableController;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.PermissionDao;
 import de.fhzwickau.reisewelle.model.Permission;
-import de.fhzwickau.reisewelle.utils.AlertUtil;
 import de.fhzwickau.reisewelle.utils.WindowUtil;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.SQLException;
+import java.util.UUID;
 
-public class PermissionController {
+public class PermissionController extends BaseTableController<Permission> {
 
     @FXML
     private TableView<Permission> permissionsTable;
@@ -28,78 +26,50 @@ public class PermissionController {
     @FXML
     private Button editButton, deleteButton;
 
-    private final BaseDao<Permission> permissionBaseDao = new PermissionDao();
-    private final ObservableList<Permission> permissions = FXCollections.observableArrayList();
+    private final BaseDao<Permission> permissionDao = new PermissionDao();
 
     @FXML
     public void initialize() {
         nameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPermissionName()));
-        permissionsTable.setItems(permissions);
-
-        permissionsTable.setOnMouseClicked(this::onRowSelected);
-
-        loadRoles();
+        init(permissionDao, permissionsTable, editButton, deleteButton);
     }
 
-    private void loadRoles() {
-        permissions.clear();
-        try {
-            permissions.addAll(permissionBaseDao.findAll());
-        } catch (SQLException sqle) {
-            AlertUtil.showError("Fehler beim Laden der Berechtigung", sqle.getMessage());
-        }
+    @Override
+    protected boolean isInUse(Permission permission) {
+        return false;
     }
 
-    private void onRowSelected(MouseEvent event) {
-        boolean hasSelection = permissionsTable.getSelectionModel().getSelectedItem() != null;
-        editButton.setDisable(!hasSelection);
-        deleteButton.setDisable(!hasSelection);
+    @Override
+    protected String getInUseMessage() {
+        return "Diese Berechtigung wird verwendet und kann nicht gelöscht werden.";
     }
 
-    @FXML
-    private void onAdd() {
-        openAddEditDialog(null);
+    @Override
+    protected UUID getId(Permission permission) {
+        return permission.getId();
     }
 
-    @FXML
-    private void onEdit() {
-        Permission selected = permissionsTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            openAddEditDialog(selected);
-        }
+    @Override
+    protected Stage showAddEditDialog(Permission permission) throws IOException {
+        return WindowUtil.showModalWindow(
+                "/de/fhzwickau/reisewelle/admin/permission/add-edit-permission.fxml",
+                permission == null ? "Berechtigung hinzufügen" : "Berechtigung bearbeiten",
+                controller -> {
+                    AddEditPermissionController c = (AddEditPermissionController) controller;
+                    c.setPermission(permission);
+                    c.setOnSaved(this::loadDataAsync);
+                },
+                this::loadDataAsync
+        );
     }
 
-    @FXML
-    private void onDelete() {
-        Permission selected = permissionsTable.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
-
-        AlertUtil.showConfirmation("Möchten Sie die Berechtigung wirklich löschen?", confirmed -> {
-            if (confirmed) {
-                try {
-                    permissionBaseDao.delete(selected.getId());
-                    loadRoles();
-                    AlertUtil.showInfo("Erfolg", "Die Berechtigung wurde gelöscht.");
-                } catch (SQLException sqle) {
-                    AlertUtil.showError("Fehler beim Löschen", sqle.getMessage());
-                }
-            }
-        });
+    @Override
+    protected String getDeleteConfirmationMessage(Permission permission) {
+        return "Berechtigung: " + permission.getPermissionName();
     }
 
-    private void openAddEditDialog(Permission permission) {
-        try {
-            WindowUtil.showModalWindow(
-                    "/de/fhzwickau/reisewelle/admin/permission/add-edit-permission.fxml",
-                    permission == null ? "Berechtigung hinzufügen" : "Berechtigung bearbeiten",
-                    (AddEditPermissionController controller) -> {
-                        controller.setPermission(permission);
-                        controller.setOnSaved(this::loadRoles);
-                    },
-                    this::loadRoles
-            );
-        } catch (IOException ioe) {
-            AlertUtil.showError("Fehler beim Öffnen", ioe.getMessage());
-        }
+    @Override
+    protected TableView<Permission> getTableView() {
+        return permissionsTable;
     }
 }

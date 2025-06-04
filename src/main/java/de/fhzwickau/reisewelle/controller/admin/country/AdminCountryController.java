@@ -1,13 +1,21 @@
 package de.fhzwickau.reisewelle.controller.admin.country;
 
+import de.fhzwickau.reisewelle.controller.admin.BaseTableController;
 import de.fhzwickau.reisewelle.dao.CountryDao;
 import de.fhzwickau.reisewelle.model.Country;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import de.fhzwickau.reisewelle.utils.AlertUtil;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.stage.Stage;
 
-public class AdminCountryController {
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.UUID;
+
+public class AdminCountryController extends BaseTableController<Country> {
 
     @FXML
     private TableView<Country> countriesTable;
@@ -17,64 +25,62 @@ public class AdminCountryController {
     private Button addButton, editButton, deleteButton;
 
     private final CountryDao countryDao = new CountryDao();
-    private final ObservableList<Country> countryList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        nameColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getName()));
-        loadCountries();
-        countriesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            editButton.setDisable(newVal == null);
-            deleteButton.setDisable(newVal == null);
-        });
+        nameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
+        init(countryDao, countriesTable, editButton, deleteButton);
+
+        addButton.setOnAction(e -> onAdd());
     }
 
-    private void loadCountries() {
+    @Override
+    protected boolean isInUse(Country entity) {
+        return false;
+    }
+
+    @Override
+    protected String getInUseMessage() {
+        return "Das Land wird verwendet und kann nicht gelöscht werden.";
+    }
+
+    @Override
+    protected UUID getId(Country entity) {
+        return entity.getId();
+    }
+
+    @Override
+    protected String getDeleteConfirmationMessage(Country entity) {
+        return "Land: " + entity.getName() + " wirklich löschen?";
+    }
+
+    @Override
+    protected Stage showAddEditDialog(Country entity) throws IOException {
+        return de.fhzwickau.reisewelle.utils.WindowUtil.showModalWindow(
+                "/de/fhzwickau/reisewelle/admin/country/add-edit-country.fxml",
+                entity == null ? "Land hinzufügen" : "Land bearbeiten",
+                controller -> {
+                    AddEditCountryController c = (AddEditCountryController) controller;
+                    c.setCountry(entity);
+                    c.setOnSaved(v -> loadDataAsync());
+                },
+                this::loadDataAsync
+        );
+    }
+
+
+    @Override
+    protected TableView<Country> getTableView() {
+        return countriesTable;
+    }
+
+    @Override
+    @FXML
+    protected void onDelete() {
         try {
-            countryList.setAll(countryDao.findAll());
-            countriesTable.setItems(countryList);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showError("Fehler beim Laden der Länder: " + e.getMessage());
+            super.onDelete();
+        } catch (SQLException e) {
+            AlertUtil.showError("Fehler beim Löschen", e.getMessage());
         }
-    }
-
-    @FXML
-    public void onAdd() {
-        AddEditCountryController.showDialog(null, v -> loadCountries());
-    }
-
-    @FXML
-    public void onEdit() {
-        Country selected = countriesTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            AddEditCountryController.showDialog(selected, v -> loadCountries());
-        }
-    }
-
-    @FXML
-    public void onDelete() {
-        Country selected = countriesTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Land wirklich löschen?", ButtonType.YES, ButtonType.NO);
-            alert.setHeaderText(null);
-            alert.showAndWait().ifPresent(bt -> {
-                if (bt == ButtonType.YES) {
-                    try {
-                        countryDao.delete(selected.getId());
-                        loadCountries();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        showError("Fehler beim Löschen: " + e.getMessage());
-                    }
-                }
-            });
-        }
-    }
-
-    private void showError(String msg) {
-        Alert a = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
-        a.setHeaderText("Fehler");
-        a.showAndWait();
     }
 }

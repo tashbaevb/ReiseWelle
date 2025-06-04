@@ -1,66 +1,57 @@
 package de.fhzwickau.reisewelle.controller.admin.user_role;
 
+import de.fhzwickau.reisewelle.controller.admin.BaseAddEditController;
 import de.fhzwickau.reisewelle.dao.BaseDao;
 import de.fhzwickau.reisewelle.dao.UserRoleDao;
 import de.fhzwickau.reisewelle.model.UserRole;
 import de.fhzwickau.reisewelle.utils.AlertUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
+import javafx.scene.Node;
 
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class AddEditUserRoleController {
+public class AddEditUserRoleController extends BaseAddEditController<UserRole> {
+
 
     @FXML
     private TextField nameField;
 
     private final BaseDao<UserRole> userRoleDao = new UserRoleDao();
-    private UserRole role;
     private Runnable onSaved;
-
-    public void setRole(UserRole role) {
-        this.role = role;
-        if (role != null) {
-            nameField.setText(role.getRoleName());
-        }
-    }
 
     public void setOnSaved(Runnable onSaved) {
         this.onSaved = onSaved;
     }
 
-    @FXML
-    private void save() {
+    public void setRole(UserRole role) {
+        this.entity = role;
+        if (entity != null) {
+            nameField.setText(entity.getRoleName());
+        }
+    }
+
+    @Override
+    protected void saveEntity() throws SQLException {
         String name = nameField.getText().trim();
         if (name.isEmpty()) {
-            AlertUtil.showError("Ungültiger Name", "Der Rollenname darf nicht leer sein.");
-            return;
+            AlertUtil.showError("Fehler", "Der Rollenname darf nicht leer sein.");
         }
+        if (entity == null) {
+            entity = new UserRole(UUID.randomUUID(), name);
+        } else {
+            entity.setRoleName(name);
+        }
+        userRoleDao.save(entity);
 
-        try {
-            if (role == null) {
-                role = new UserRole(UUID.randomUUID(), name);
-            } else {
-                role.setRoleName(name);
-            }
-            userRoleDao.save(role);
-
-            if (onSaved != null) onSaved.run();
-            closeWindow();
-        } catch (SQLException sqle) {
-            AlertUtil.showError("Fehler beim Speichern", sqle.getMessage());
+        if (onSaved != null) {
+            onSaved.run();
         }
     }
 
-    @FXML
-    private void cancel() {
-        closeWindow();
-    }
-
-    private void closeWindow() {
-        Stage stage = (Stage) nameField.getScene().getWindow();
-        stage.close();
+    @Override
+    protected Node getAnyControl() {
+        return nameField;
     }
 }

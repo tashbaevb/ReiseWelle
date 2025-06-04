@@ -41,10 +41,6 @@ public class DetailTripController {
     private final TripAdminDao tripAdminDao = new TripAdminDao();
     private boolean isViewingTicket = false;
 
-    /**
-     * Включить/выключить режим "только просмотр" (для профиля/админа).
-     * Если true — кнопка "Купить" скрыта.
-     */
     public void setViewingTicket(boolean viewingTicket) {
         this.isViewingTicket = viewingTicket;
         if (buyBtn != null) {
@@ -52,9 +48,6 @@ public class DetailTripController {
         }
     }
 
-    /**
-     * Загружает детали трипа и отображает их.
-     */
     public void loadTripDetails(UUID tripId, Double price, String startStopId, String endStopId, int adults, int children, int bikes) throws SQLException {
         this.tripId = tripId;
         this.startStopId = startStopId;
@@ -75,14 +68,11 @@ public class DetailTripController {
         }
 
         busLabel.setText(trip.getBusNumber());
-        // Можно сделать "12.50 €"
         priceLabel.setText(String.format("%.2f €", trip.getPrice()));
         stopsList.getItems().setAll(trip.getStops());
     }
 
-    /**
-     * Кнопка "Купить" — подтверждение и создание тикета.
-     */
+
     @FXML
     public void onBuy() {
         AlertUtil.showConfirmation("Ticket kaufen?", confirmed -> {
@@ -92,9 +82,6 @@ public class DetailTripController {
         });
     }
 
-    /**
-     * Проверяет и покупает билет.
-     */
     private void updateTripInfo() {
         try {
             UUID userId = Session.getInstance().getCurrentUser().getId();
@@ -118,7 +105,6 @@ public class DetailTripController {
                 return;
             }
 
-            // Проверка доступности мест на каждом сегменте
             for (int i = fromIndex; i < toIndex; i++) {
                 UUID segStartId = allStops.get(i).getId();
                 UUID segEndId = allStops.get(i + 1).getId();
@@ -140,7 +126,6 @@ public class DetailTripController {
                 }
             }
 
-            // Обновляем доступные места на всех сегментах
             for (int i = fromIndex; i < toIndex; i++) {
                 UUID segStartId = allStops.get(i).getId();
                 UUID segEndId = allStops.get(i + 1).getId();

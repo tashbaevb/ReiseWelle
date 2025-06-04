@@ -26,10 +26,10 @@
                style="-fx-background-radius: 10; -fx-font-size: 15px; -fx-border-color: #e3e8f3; -fx-border-radius: 10; -fx-padding: 8 12;"/>
     <HBox spacing="18" alignment="CENTER_RIGHT">
         <Button fx:id="onSave" text="Speichern"
-                onAction="#onSave"
+                onAction="#save"
                 style="-fx-background-color: #3776c7; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 9; -fx-min-width: 110px; -fx-padding: 7 0;"/>
         <Button fx:id="onCancel" text="Abbrechen"
-                onAction="#onCancel"
+                onAction="#cancel"
                 style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 9; -fx-min-width: 110px; -fx-padding: 7 0;"/>
     </HBox>
 </VBox>

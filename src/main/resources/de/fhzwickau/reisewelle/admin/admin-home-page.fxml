@@ -87,7 +87,7 @@
                     Reisen
                 </Button>
                 <Button fx:id="rolesButton" onAction="#showRoles"
-                        style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                        style="-fx-background-color: #3a960b; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
                     <graphic>
                         <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
                             <image>
@@ -95,10 +95,10 @@
                             </image>
                         </ImageView>
                     </graphic>
-                    Rolen
+                    Rollen
                 </Button>
                 <Button fx:id="permissionsButton" onAction="#showPermissions"
-                        style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                        style="-fx-background-color: #f1b419; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
                     <graphic>
                         <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
                             <image>
@@ -106,10 +106,10 @@
                             </image>
                         </ImageView>
                     </graphic>
-                    Permissions
+                    Berechtigungen
                 </Button>
                 <Button fx:id="rolePermissionsButton" onAction="#showRolePermissions"
-                        style="-fx-background-color: #fc5c7d; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
+                        style="-fx-background-color: #89fc5c; -fx-text-fill: #2d3b50; -fx-background-radius: 12; -fx-font-size: 16px; -fx-min-width: 180px; -fx-alignment: CENTER_LEFT; -fx-graphic-text-gap: 12;">
                     <graphic>
                         <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
                             <image>
@@ -117,7 +117,7 @@
                             </image>
                         </ImageView>
                     </graphic>
-                    Rolen-Permission
+                    Rollen-Permission
                 </Button>
 
                 <Button fx:id="countriesButton" onAction="#showCountries"
